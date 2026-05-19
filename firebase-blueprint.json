@@ -1,0 +1,26 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Registered users in the system",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastLogin": { "type": "string", "format": "date-time" },
+        "accountType": { "type": "string" },
+        "onboardingStatus": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profile information"
+    }
+  }
+}
