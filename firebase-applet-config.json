@@ -1,10 +1,10 @@
 {
-  "projectId": "idyllic-app-807pf",
-  "appId": "1:817908829665:web:4c1b3d0a2049a5f8c356a0",
-  "apiKey": "AIzaSyBxZY0aEO3hRTdeyqY5VPop3mrno-1M9fc",
-  "authDomain": "idyllic-app-807pf.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-c44ebab0-7e3b-4913-b19d-6b90e454c3ac",
-  "storageBucket": "idyllic-app-807pf.firebasestorage.app",
-  "messagingSenderId": "817908829665",
+  "projectId": "einortsolution",
+  "appId": "1:254828728723:web:c0b148ab5acbd186075866",
+  "apiKey": "AIzaSyD4rkzKGjM22RtylSeNt5tFqADIceyW9X8",
+  "authDomain": "einortsolution.firebaseapp.com",
+  "firestoreDatabaseId": "",
+  "storageBucket": "einortsolution.firebasestorage.app",
+  "messagingSenderId": "254828728723",
   "measurementId": ""
 }

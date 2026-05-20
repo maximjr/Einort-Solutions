@@ -86,7 +86,7 @@ export function AdminAnalytics() {
             </div>
             
             <div className="mt-8 p-4 border border-electric-blue/30 bg-electric-blue/5 rounded-lg flex items-start gap-4">
-              <div className="w-8 h-8 rounded-full bg-electric-blue/20 flex flex-shrink-0 items-center justify-center text-electric-blue font-bold font-mono">AI</div>
+              <div className="w-8 h-8 rounded-full bg-electric-blue/20 flex flex-shrink-0 items-center justify-center text-electric-blue font-bold font-mono">SYS</div>
               <p className="font-sans text-sm text-silver-metallic">
                 <strong className="text-white">Insight:</strong> Desktop conversions for <span className="text-electric-blue">SaaS Templates</span> are up 14% over mobile devices. We recommend optimizing the SaaS preview engine for ultra-wide displays.
               </p>

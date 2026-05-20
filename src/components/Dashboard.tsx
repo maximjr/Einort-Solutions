@@ -3,8 +3,7 @@ import { motion } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import { handleFirestoreError, OperationType } from '../lib/firebase-utils';
-import { Clock, Star, Settings, FileText, ChevronRight, Activity } from 'lucide-react';
+import { Clock, Star, Settings, FileText, ChevronRight, Activity, ArrowRight, ShieldCheck } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 
 interface UserProfile {
@@ -30,7 +29,7 @@ export function Dashboard() {
             setProfile(docSnap.data() as UserProfile);
           }
         } catch (err) {
-          handleFirestoreError(err, OperationType.GET, `users/${user.uid}`);
+          console.warn(`Could not fetch profile for user ${user.uid} (database might be offline): `, err);
         } finally {
           setProfileLoading(false);
         }
@@ -42,7 +41,7 @@ export function Dashboard() {
   if (loading || profileLoading) {
     return (
       <div className="min-h-screen bg-dark flex items-center justify-center pt-24 text-white">
-        <div className="w-12 h-12 border-2 border-electric-blue border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-2 border-electric-blue border-t-transparent rounded-full animate-spin shadow-[0_0_15px_rgba(37,99,235,0.5)]"></div>
       </div>
     );
   }
@@ -53,80 +52,90 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen bg-dark pt-32 pb-24 text-white relative">
-      <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-electric-blue/10 to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-0 w-full h-[500px] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] mix-blend-overlay pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-electric-blue/10 blur-[150px] pointer-events-none rounded-full" />
       
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-          <div className="flex items-center gap-6">
-            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full border-2 border-electric-blue p-1 overflow-hidden">
-              <div className="w-full h-full rounded-full overflow-hidden bg-dark-blue">
+        {/* User Identity Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 relative">
+          <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-electric-blue/50 via-white/10 to-transparent" />
+          
+          <div className="flex items-center gap-8 pb-8">
+            <div className="w-24 h-24 md:w-32 md:h-32 geometric-clip bg-white/5 border border-white/20 p-2 flex items-center justify-center relative shadow-[0_0_30px_rgba(37,99,235,0.15)] group">
+              <div className="absolute inset-0 bg-gradient-to-br from-electric-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="w-full h-full geometric-clip overflow-hidden bg-dark-blue flex items-center justify-center">
                 {user.photoURL ? (
                   <img src={user.photoURL} alt={user.displayName || "User"} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-3xl font-display text-electric-blue uppercase">
-                    {user.email?.charAt(0) || 'U'}
+                  <div className="w-full h-full flex items-center justify-center text-4xl font-display text-electric-blue uppercase">
+                    {profile?.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}
                   </div>
                 )}
               </div>
             </div>
+            
             <div>
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="inline-flex items-center gap-2 px-3 py-1 bg-electric-blue/10 border border-electric-blue/30 rounded-full w-fit mb-3"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="inline-flex items-center gap-3 px-4 py-1.5 glass-panel-light border-l-2 border-l-neon-blue geometric-clip-right w-fit mb-4"
               >
-                <div className="w-2 h-2 bg-electric-blue rounded-full animate-pulse"></div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-electric-blue">Active Session</span>
+                <div className="w-2 h-2 bg-neon-blue geometric-diamond animate-pulse shadow-[0_0_10px_#3b82f6]"></div>
+                <span className="text-[10px] font-mono font-bold uppercase tracking-[0.25em] text-white">Encrypted Session</span>
               </motion.div>
-              <h1 className="font-display text-4xl md:text-5xl font-bold mb-1">{profile?.displayName || user.displayName || 'Welcome Back'}</h1>
-              <p className="text-gray-400">{profile?.email || user.email}</p>
+              <h1 className="font-display text-4xl md:text-5xl font-bold mb-2 tracking-tight">{profile?.displayName || user.displayName || 'Architect'}</h1>
+              <div className="flex items-center gap-3">
+                <ShieldCheck className="w-4 h-4 text-electric-blue" />
+                <p className="text-silver-metallic font-mono text-xs">{profile?.email || user.email}</p>
+              </div>
             </div>
           </div>
           
-          <div className="flex flex-wrap items-center gap-4">
-            <Link to="/admin" className="px-6 py-3 font-mono text-xs font-bold uppercase tracking-[0.2em] bg-white/5 border border-white/10 geometric-clip-button hover:bg-white/10 hover:border-white/30 transition-all flex items-center gap-2">
-               Command Center <Activity className="w-4 h-4 text-electric-blue" />
+          <div className="flex flex-wrap items-center gap-4 pb-8">
+            <Link to="/admin" className="px-6 py-3 font-mono text-xs font-bold uppercase tracking-[0.2em] bg-white/5 border border-white/10 geometric-clip hover:bg-electric-blue/10 hover:border-electric-blue/50 transition-all duration-300 flex items-center gap-3 group">
+               Terminal <Settings className="w-4 h-4 text-gray-400 group-hover:text-electric-blue transition-colors" />
             </Link>
-            <button className="p-3 bg-white/5 border border-white/10 hover:border-white/30 rounded-full transition-colors text-gray-400 hover:text-white">
-              <Settings className="w-5 h-5" />
-            </button>
-            <Link to="/contact" className="px-6 py-3 bg-white text-dark font-bold text-sm tracking-widest uppercase rounded-full hover:bg-electric-blue hover:text-white transition-colors flex xl:w-auto">
-              New Project
+            <Link to="/contact" className="group relative inline-flex items-center justify-center px-8 py-3 bg-white overflow-hidden geometric-clip-right hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all duration-300">
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-black/10 to-transparent -translate-x-[150%] skew-x-[-45deg] group-hover:transition-transform group-hover:translate-x-[150%] duration-1000" />
+              <span className="relative z-10 tracking-[0.2em] text-xs font-bold uppercase text-dark flex items-center gap-2 font-mono">
+                Initialize Project <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </span>
             </Link>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {/* Stats Cards */}
+        {/* Telemetry HUD Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="glass-panel p-6 rounded-3xl border border-white/5 flex flex-col gap-4 relative overflow-hidden"
+            className="holographic-panel p-8 geometric-clip border border-white/10 flex flex-col gap-4 relative overflow-hidden group hover:border-electric-blue/40 transition-colors duration-500"
           >
-            <div className="absolute -right-4 -top-4 w-24 h-24 bg-electric-blue/10 rounded-full blur-xl pointer-events-none" />
-            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-electric-blue mb-2">
-              <Activity className="w-5 h-5" />
+            <div className="absolute -right-4 -top-4 w-32 h-32 bg-electric-blue/10 rounded-full blur-2xl pointer-events-none group-hover:bg-electric-blue/20 transition-colors duration-700" />
+            <div className="w-12 h-12 geometric-diamond bg-white/5 flex items-center justify-center border border-white/10 mb-4 shadow-sm group-hover:border-electric-blue/50 transition-colors">
+              <Activity className="w-5 h-5 text-electric-blue" />
             </div>
             <div>
-              <span className="text-sm font-semibold uppercase tracking-widest text-gray-500">Activity Level</span>
-              <p className="text-3xl font-display font-bold mt-1">High</p>
+              <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-silver-metallic">System Velocity</span>
+              <p className="text-4xl font-display font-bold mt-2 text-white group-hover:text-glow-silver transition-all">Optimal</p>
             </div>
+            <div className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-electric-blue to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-left" />
           </motion.div>
 
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="glass-panel p-6 rounded-3xl border border-white/5 flex flex-col gap-4"
+            className="glass-panel p-8 geometric-clip border border-white/5 flex flex-col gap-4 group hover:border-white/20 transition-colors duration-500 relative"
           >
-            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-electric-blue mb-2">
-              <Star className="w-5 h-5" />
+            <div className="w-12 h-12 geometric-diamond bg-white/5 flex items-center justify-center border border-white/10 mb-4">
+              <Star className="w-5 h-5 text-electric-blue group-hover:text-white transition-colors" />
             </div>
             <div>
-              <span className="text-sm font-semibold uppercase tracking-widest text-gray-500">Saved Projects</span>
-              <p className="text-3xl font-display font-bold mt-1">2</p>
+              <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-silver-metallic">Saved Architectures</span>
+              <p className="text-4xl font-display font-bold mt-2 text-white">02</p>
             </div>
           </motion.div>
 
@@ -134,38 +143,43 @@ export function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="glass-panel p-6 rounded-3xl border border-white/5 flex flex-col gap-4"
+            className="glass-panel p-8 geometric-clip border border-white/5 flex flex-col gap-4 group hover:border-white/20 transition-colors duration-500 relative"
           >
-            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-electric-blue mb-2">
-              <FileText className="w-5 h-5" />
+            <div className="w-12 h-12 geometric-diamond bg-white/5 flex items-center justify-center border border-white/10 mb-4">
+              <FileText className="w-5 h-5 text-electric-blue group-hover:text-white transition-colors" />
             </div>
             <div>
-              <span className="text-sm font-semibold uppercase tracking-widest text-gray-500">Consultations</span>
-              <p className="text-3xl font-display font-bold mt-1">0</p>
+              <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-silver-metallic">Active Consultations</span>
+              <p className="text-4xl font-display font-bold mt-2 text-white">00</p>
             </div>
           </motion.div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        {/* Dashboard Modules */}
+        <div className="grid lg:grid-cols-3 gap-10">
+          
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <h2 className="text-xl font-bold tracking-tight">Recent Activity</h2>
-              <button className="text-sm font-semibold text-electric-blue hover:text-white transition-colors">View All</button>
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-neon-blue geometric-diamond animate-pulse" />
+                <h2 className="text-sm font-mono font-bold uppercase tracking-[0.2em]">Activity Log</h2>
+              </div>
+              <button className="text-[10px] font-mono font-bold uppercase tracking-widest text-electric-blue hover:text-white transition-colors">View All Archive</button>
             </div>
             
             <div className="space-y-4">
-              {[1, 2, 3].map((_, i) => (
-                <div key={i} className="group p-5 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/5 transition-all flex items-start sm:items-center justify-between gap-4">
-                  <div className="flex items-start gap-4">
-                    <div className="mt-1 sm:mt-0 w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0">
-                      <Clock className="w-4 h-4 text-gray-400 group-hover:text-electric-blue transition-colors" />
+              {[1, 2].map((_, i) => (
+                <div key={i} className="group p-5 geometric-clip-right border border-white/5 bg-white/[0.02] hover:bg-white/5 hover:border-white/10 transition-all flex items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-start gap-5">
+                    <div className="mt-1 sm:mt-0 w-10 h-10 geometric-diamond bg-dark flex items-center justify-center shrink-0 border border-white/5 group-hover:border-electric-blue/30 transition-colors">
+                      <Clock className="w-4 h-4 text-silver-metallic group-hover:text-electric-blue transition-colors" />
                     </div>
                     <div>
-                      <p className="font-medium mb-1 group-hover:text-white transition-colors">Viewed "Neon Banking" Architecture</p>
-                      <p className="text-sm text-gray-500">Just now</p>
+                      <p className="font-bold text-sm tracking-wide mb-1 group-hover:text-white transition-colors">Accessed "System Architecture" Blueprint</p>
+                      <p className="text-xs font-mono tracking-widest text-silver-metallic">T-{i * 12 + 5} MINUTES AGO</p>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-white transition-colors hidden sm:block shrink-0" />
+                  <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-electric-blue transition-colors hidden sm:block shrink-0 group-hover:translate-x-1" />
                 </div>
               ))}
             </div>
@@ -173,28 +187,36 @@ export function Dashboard() {
 
           <div className="space-y-6">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
-              <h2 className="text-xl font-bold tracking-tight">Saved Inspiration</h2>
+              <h2 className="text-sm font-mono font-bold uppercase tracking-[0.2em]">Inspiration Core</h2>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               {/* Mock Saved Cards */}
-              <div className="aspect-[4/3] rounded-xl overflow-hidden relative group cursor-pointer block glass-panel border-white/10">
-                <img src="https://images.unsplash.com/photo-1616803140344-6682afb13cda?q=80&w=800&auto=format&fit=crop" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Saved" />
-                <div className="absolute inset-0 bg-gradient-to-t from-dark/90 to-transparent opacity-80" />
-                <div className="absolute bottom-3 left-3 flex gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-electric-blue" />
-                   <p className="text-[10px] font-bold uppercase tracking-widest text-white">Fintech</p>
+              <div className="aspect-[4/5] geometric-clip overflow-hidden relative group cursor-pointer block border border-transparent hover:border-electric-blue/50 transition-colors duration-500">
+                <img src="https://images.unsplash.com/photo-1616803140344-6682afb13cda?q=80&w=800&auto=format&fit=crop" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" alt="Saved" />
+                <div className="absolute inset-0 bg-gradient-to-t from-dark via-dark/50 to-transparent opacity-90 group-hover:opacity-70 transition-opacity" />
+                <div className="absolute bottom-4 left-4 right-4">
+                   <div className="flex items-center gap-2 mb-2">
+                     <div className="w-1.5 h-1.5 geometric-diamond bg-electric-blue" />
+                     <p className="text-[9px] font-bold uppercase tracking-widest text-electric-blue">Fintech Model</p>
+                   </div>
+                   <p className="text-white font-bold text-sm tracking-wide">Nexus Interface</p>
                 </div>
               </div>
-              <div className="aspect-[4/3] rounded-xl overflow-hidden relative group cursor-pointer block glass-panel border-white/10">
-                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale" alt="Saved" />
-                <div className="absolute inset-0 bg-gradient-to-t from-dark/90 to-transparent opacity-80" />
-                <div className="absolute bottom-3 left-3 flex gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-electric-blue" />
-                   <p className="text-[10px] font-bold uppercase tracking-widest text-white">Commerce</p>
+              
+              <div className="aspect-[4/5] geometric-clip overflow-hidden relative group cursor-pointer block border border-transparent hover:border-white/20 transition-colors duration-500">
+                <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800&auto=format&fit=crop" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale" alt="Saved" />
+                <div className="absolute inset-0 bg-gradient-to-t from-dark via-dark/50 to-transparent opacity-90 group-hover:opacity-70 transition-opacity" />
+                <div className="absolute bottom-4 left-4 right-4">
+                   <div className="flex items-center gap-2 mb-2">
+                     <div className="w-1.5 h-1.5 geometric-diamond bg-white" />
+                     <p className="text-[9px] font-bold uppercase tracking-widest text-white/70">Platform</p>
+                   </div>
+                   <p className="text-white font-bold text-sm tracking-wide">Cognitive Core</p>
                 </div>
               </div>
             </div>
+            
           </div>
         </div>
 

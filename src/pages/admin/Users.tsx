@@ -8,6 +8,7 @@ interface UserData {
   id: string;
   email: string;
   displayName: string;
+  phoneNumber?: string;
   photoURL?: string;
   createdAt?: any;
 }
@@ -83,6 +84,7 @@ export function AdminUsers() {
                 <tr className="border-b border-white/5">
                   <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-normal">Identity</th>
                   <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-normal">UID</th>
+                  <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-normal">Activity</th>
                   <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-normal">Status</th>
                   <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-normal text-right">Actions</th>
                 </tr>
@@ -102,10 +104,17 @@ export function AdminUsers() {
                          <div>
                            <p className="font-sans text-sm font-medium text-white">{u.displayName || 'Unknown Entity'}</p>
                            <p className="font-mono text-[10px] text-silver-metallic">{u.email}</p>
+                           {u.phoneNumber && <p className="font-mono text-[10px] text-silver-metallic mt-0.5 opacity-80">{u.phoneNumber}</p>}
                          </div>
                       </div>
                     </td>
                     <td className="p-4 font-mono text-[10px] text-silver-metallic">{u.id}</td>
+                    <td className="p-4 font-mono text-[10px] text-silver-metallic">
+                      <div className="space-y-1">
+                        <p><span className="text-gray-500">Joined:</span> {u.createdAt?.toDate ? new Date(u.createdAt.toDate()).toLocaleDateString() : 'Unknown'}</p>
+                        <p><span className="text-gray-500">Last seen:</span> {(u as any).lastLogin?.toDate ? new Date((u as any).lastLogin.toDate()).toLocaleDateString() : 'Unknown'}</p>
+                      </div>
+                    </td>
                     <td className="p-4">
                        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-green-500/10 text-green-400 text-[9px] font-mono uppercase tracking-wider">
                          <span className="w-1 h-1 rounded-full bg-green-400" /> Active

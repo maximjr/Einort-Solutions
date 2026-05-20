@@ -9,12 +9,14 @@ interface ProjectOrder {
   id: string;
   projectId: string;
   userEmail: string;
+  userName?: string;
   status: string;
   createdAt: any;
   selections: {
     theme: string;
     layout: string;
     font: string;
+    buttonStyle?: string;
   }
 }
 
@@ -60,38 +62,44 @@ export function AdminProjects() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-         <div className="glass-panel geometric-clip border border-white/5 p-6 flex flex-col gap-2">
+         <div className="glass-panel geometric-clip border border-white/5 p-6 flex flex-col gap-2 relative overflow-hidden group hover:border-electric-blue/30 transition-colors">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-electric-blue/5 blur-[50px] rounded-full pointer-events-none group-hover:bg-electric-blue/10 transition-colors" />
             <Inbox className="w-5 h-5 text-electric-blue mb-2" />
-            <span className="font-display text-2xl">{projects.length}</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic">Total Orders</span>
+            <span className="font-display text-3xl">{projects.length}</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-bold">Total Transmissions</span>
          </div>
-         <div className="glass-panel geometric-clip border border-white/5 p-6 flex flex-col gap-2">
+         <div className="glass-panel geometric-clip border border-white/5 p-6 flex flex-col gap-2 relative overflow-hidden group hover:border-yellow-400/30 transition-colors">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-400/5 blur-[50px] rounded-full pointer-events-none group-hover:bg-yellow-400/10 transition-colors" />
             <Clock className="w-5 h-5 text-yellow-400 mb-2" />
-            <span className="font-display text-2xl">{projects.filter(p => p.status === 'pending').length}</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic">Pending Review</span>
+            <span className="font-display text-3xl">{projects.filter(p => p.status === 'pending').length}</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-bold">Awaiting Engineering Review</span>
          </div>
-         <div className="glass-panel geometric-clip border border-white/5 p-6 flex flex-col gap-2">
+         <div className="glass-panel geometric-clip border border-white/5 p-6 flex flex-col gap-2 relative overflow-hidden group hover:border-green-400/30 transition-colors">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-green-400/5 blur-[50px] rounded-full pointer-events-none group-hover:bg-green-400/10 transition-colors" />
             <CheckCircle className="w-5 h-5 text-green-400 mb-2" />
-            <span className="font-display text-2xl">{projects.filter(p => p.status === 'completed').length}</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic">Archived / Done</span>
+            <span className="font-display text-3xl">{projects.filter(p => p.status === 'completed').length}</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-bold">Architecture Deployed</span>
          </div>
       </div>
 
       <div className="glass-panel geometric-clip border border-white/5 bg-dark/50">
         <div className="p-4 border-b border-white/5">
-           <h3 className="font-mono text-xs uppercase tracking-widest text-white">Transmission Log</h3>
+           <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold text-white">Transmission Log</h3>
         </div>
         <div className="divide-y divide-white/5">
            {loading ? (
-             <div className="p-8 text-center font-mono text-xs uppercase text-silver-metallic">Syncing Database...</div>
+             <div className="p-8 text-center font-mono text-xs uppercase tracking-widest text-silver-metallic animate-pulse">Syncing Database...</div>
            ) : projects.length === 0 ? (
-             <div className="p-8 text-center font-mono text-xs uppercase text-silver-metallic">No Transmissions Found.</div>
+             <div className="p-8 text-center font-mono text-xs uppercase tracking-widest text-silver-metallic">No Transmissions Found.</div>
            ) : (
              projects.map((project) => (
-               <div key={project.id} className="p-6 hover:bg-white/[0.02] transition-colors flex flex-col md:flex-row items-start md:items-center justify-between gap-6 group">
-                 <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 geometric-clip bg-electric-blue/10 border border-electric-blue/30 flex items-center justify-center shrink-0">
-                       <Layers className="w-5 h-5 text-electric-blue" />
+               <div key={project.id} className="p-6 hover:bg-white/[0.02] transition-colors flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6 group relative overflow-hidden">
+                 
+                 <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-electric-blue transform scale-y-0 origin-top group-hover:scale-y-100 transition-transform duration-500" />
+
+                 <div className="flex items-start gap-5">
+                    <div className="w-12 h-12 geometric-clip bg-dark border border-white/10 group-hover:border-electric-blue/50 flex items-center justify-center shrink-0 transition-colors duration-500">
+                       <Layers className="w-5 h-5 text-silver-metallic group-hover:text-electric-blue transition-colors duration-500" />
                     </div>
                     <div>
                       <div className="flex items-center gap-3 mb-1">
@@ -100,23 +108,24 @@ export function AdminProjects() {
                           {project.status}
                         </span>
                       </div>
-                      <p className="font-mono text-[10px] text-silver-metallic tracking-wider">Client: {project.userEmail}</p>
+                      <p className="font-mono text-[10px] text-silver-metallic tracking-[0.1em] uppercase">Client: <span className="text-white opacity-80">{project.userName || 'Unknown'}</span> <span className="text-white opacity-50 lowercase">({project.userEmail})</span></p>
                       
                       {/* Selections breakdown */}
-                      <div className="flex items-center gap-3 mt-3">
-                         <span className="font-mono text-[9px] uppercase tracking-widest bg-white/5 px-2 py-1">Theme: {project.selections?.theme}</span>
-                         <span className="font-mono text-[9px] uppercase tracking-widest bg-white/5 px-2 py-1">Layout: {project.selections?.layout}</span>
-                         <span className="font-mono text-[9px] uppercase tracking-widest bg-white/5 px-2 py-1">Font: {project.selections?.font}</span>
+                      <div className="flex flex-wrap items-center gap-2 mt-3 text-[9px] font-mono uppercase tracking-widest">
+                         <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">Theme: {project.selections?.theme}</span>
+                         <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">Layout: {project.selections?.layout}</span>
+                         <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">Font: {project.selections?.font}</span>
+                         {project.selections?.buttonStyle && <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">UI: {project.selections.buttonStyle}</span>}
                       </div>
                     </div>
                  </div>
 
-                 <div className="flex flex-col items-end gap-3 shrink-0 w-full md:w-auto">
-                    <span className="font-mono text-[10px] text-silver-metallic">
+                 <div className="flex flex-col items-end gap-4 shrink-0 w-full xl:w-auto mt-4 xl:mt-0">
+                    <span className="font-mono text-[10px] text-silver-metallic tracking-wider">
                       {project.createdAt?.toDate ? format(project.createdAt.toDate(), 'PPpp') : 'Recent'}
                     </span>
-                    <button className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-electric-blue border border-electric-blue px-4 py-2 geometric-clip-button hover:bg-electric-blue hover:text-white transition-all w-full md:w-auto justify-center">
-                       Inspect Order <ChevronRight className="w-3 h-3" />
+                    <button className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-white border border-white/20 px-4 py-2 geometric-clip-button hover:bg-electric-blue hover:border-electric-blue transition-all w-full md:w-auto justify-center shadow-[0_0_15px_rgba(37,99,235,0)] hover:shadow-[0_0_15px_rgba(37,99,235,0.2)]">
+                       Inspect Architecture <ChevronRight className="w-3 h-3" />
                     </button>
                  </div>
                </div>

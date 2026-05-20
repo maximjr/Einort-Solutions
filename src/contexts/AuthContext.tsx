@@ -1,15 +1,15 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, GoogleAuthProvider, signInWithPopup, signInWithCredential, signOut as firebaseSignOut, onAuthStateChanged } from 'firebase/auth';
+import { User, signOut as firebaseSignOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile, AuthErrorCodes, AuthError } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
-import { handleFirestoreError, OperationType } from '../lib/firebase-utils';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   isAdmin: boolean;
-  signInWithGoogle: () => Promise<void>;
-  signInWithGoogleCredential: (credentialResponse: string) => Promise<void>;
+  signUpWithEmail: (email: string, password: string, fullName: string, phoneNumber?: string) => Promise<void>;
+  loginWithEmail: (email: string, password: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  const syncUserToFirestore = async (user: User) => {
+  const syncUserToFirestore = async (user: User, additionalData?: { phoneNumber?: string, fullName?: string }) => {
     if (!db) return;
     const userRef = doc(db, 'users', user.uid);
     try {
@@ -62,7 +62,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await setDoc(userRef, {
           uid: user.uid,
           email: user.email,
-          displayName: user.displayName,
+          displayName: additionalData?.fullName || user.displayName,
+          phoneNumber: additionalData?.phoneNumber || user.phoneNumber,
           photoURL: user.photoURL,
           createdAt: serverTimestamp(),
           lastLogin: serverTimestamp(),
@@ -94,33 +95,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
     } catch (err) {
-      handleFirestoreError(err, OperationType.WRITE, `users/${user.uid}`);
+      console.warn("Could not sync user to Firestore (database might not be initialized): ", err);
     }
   };
 
-  const signInWithGoogle = async () => {
+  const signUpWithEmail = async (email: string, password: string, fullName: string, phoneNumber?: string) => {
     if (!auth) {
-      console.warn("Auth initialization skipped because Firebase was not configured.");
-      return;
+      throw new Error("Auth initialization skipped because Firebase was not configured.");
     }
     try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      await syncUserToFirestore(result.user);
-    } catch (error) {
-      console.error("Error signing in with Google", error);
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(result.user, { displayName: fullName });
+      await syncUserToFirestore(result.user, { fullName, phoneNumber });
+    } catch (error: any) {
+      if (error.code === 'auth/email-already-in-use') {
+        throw new Error('User already exists. Sign in?');
+      }
       throw error;
     }
   };
 
-  const signInWithGoogleCredential = async (credentialResponse: string) => {
-    if (!auth) return;
+  const loginWithEmail = async (email: string, password: string) => {
+    if (!auth) {
+      throw new Error("Auth initialization skipped because Firebase was not configured.");
+    }
     try {
-      const credential = GoogleAuthProvider.credential(credentialResponse);
-      const result = await signInWithCredential(auth, credential);
+      const result = await signInWithEmailAndPassword(auth, email, password);
       await syncUserToFirestore(result.user);
+    } catch (error: any) {
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+        throw new Error('Password or Email Incorrect');
+      }
+      throw error;
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+     if (!auth) {
+      throw new Error("Auth initialization skipped because Firebase was not configured.");
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
     } catch (error) {
-      console.error("Error signing in with Google Credential", error);
+      console.error("Error resetting password", error);
       throw error;
     }
   };
@@ -136,7 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, isAdmin, signInWithGoogle, signInWithGoogleCredential, signOut }}>
+    <AuthContext.Provider value={{ user, loading, isAdmin, signUpWithEmail, loginWithEmail, resetPassword, signOut }}>
       {children}
     </AuthContext.Provider>
   );

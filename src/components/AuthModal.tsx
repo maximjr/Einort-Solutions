@@ -1,80 +1,102 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { X, ArrowRight, AlertTriangle } from 'lucide-react';
+import { X, ArrowRight, Lock, User, Phone, Eye, EyeOff, ChevronLeft, Mail, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useState, useEffect } from 'react';
-import { ENV, isGoogleAuthEnabled, isFirebaseConfigured } from '../config/env';
-
-declare global {
-  interface Window {
-    google?: any;
-  }
-}
+import { useState, useEffect, FormEvent } from 'react';
+import { isFirebaseConfigured } from '../config/env';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
+  title?: string;
+  subtitle?: string;
 }
 
-export function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const { signInWithGoogle, signInWithGoogleCredential } = useAuth();
+type AuthView = 'signIn' | 'signUp' | 'forgotPassword';
+
+export function AuthModal({ isOpen, onClose, onSuccess, title, subtitle }: AuthModalProps) {
+  const { signUpWithEmail, loginWithEmail, resetPassword } = useAuth();
+  
+  const [view, setView] = useState<AuthView>('signIn');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  
+  // Form states
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  
+  const [showPassword, setShowPassword] = useState(false);
 
+  // Reset states when modal closes or view changes
   useEffect(() => {
-    if (!isOpen) return;
-    
-    // Check if client ID is configured
-    if (!isGoogleAuthEnabled()) return;
-
-    const initializeGSI = () => {
-      if (!window.google) return;
-      
-      window.google.accounts.id.initialize({
-        client_id: ENV.GOOGLE_CLIENT_ID,
-        callback: async (response: any) => {
-          setLoading(true);
-          try {
-            await signInWithGoogleCredential(response.credential);
-            onClose();
-          } catch (error) {
-            console.error("One Tap error", error);
-          } finally {
-            setLoading(false);
-          }
-        },
-        use_fedcm_for_prompt: true,
-        auto_select: false,
-      });
-
-      // Show the One Tap UI slide-in
-      window.google.accounts.id.prompt();
-    };
-
-    if (window.google) {
-      initializeGSI();
-    } else {
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-      script.onload = initializeGSI;
-      document.body.appendChild(script);
+    setError(null);
+    setSuccess(null);
+    if (!isOpen) {
+      setView('signIn');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      setFullName('');
+      setPhoneNumber('');
     }
-  }, [isOpen, onClose, signInWithGoogleCredential]);
+  }, [isOpen, view]);
 
-  const handleGoogleSignIn = async () => {
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+    
+    if (view === 'signUp') {
+      if (!fullName || !email || !password || !confirmPassword) {
+        setError("Please fill in all required fields.");
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError("Passwords do not match.");
+        return;
+      }
+    } else if (view === 'signIn') {
+      if (!email || !password) {
+        setError("Email and password are required.");
+        return;
+      }
+    } else if (view === 'forgotPassword') {
+      if (!email) {
+        setError("Email is required to reset password.");
+        return;
+      }
+    }
+
     setLoading(true);
     try {
-      await signInWithGoogle();
-      onClose();
-    } catch (error) {
-      console.error(error);
+      if (view === 'signUp') {
+        await signUpWithEmail(email, password, fullName, phoneNumber);
+        if (onSuccess) onSuccess();
+        onClose();
+      } else if (view === 'signIn') {
+        await loginWithEmail(email, password);
+        if (onSuccess) onSuccess();
+        onClose();
+      } else if (view === 'forgotPassword') {
+        await resetPassword(email);
+        setSuccess("Password reset email sent. Please check your inbox.");
+        setTimeout(() => setView('signIn'), 3000);
+      }
+    } catch (err: any) {
+      setError(err.message || "An authentication error occurred.");
+      if (err.message === 'User already exists. Sign in?') {
+        setTimeout(() => setView('signIn'), 2000);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const isConfigured = isFirebaseConfigured();
-  const authReady = isConfigured && isGoogleAuthEnabled();
 
   return (
     <AnimatePresence>
@@ -86,27 +108,28 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4 }}
             className="fixed inset-0 z-[100] bg-dark/80 backdrop-blur-md"
-            onClick={onClose}
+            onClick={!loading ? onClose : undefined}
           />
           <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 sm:p-6 pointer-events-none">
-            <motion.div
+             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               transition={{ type: "spring", duration: 0.6, bounce: 0.2 }}
-              className="w-full max-w-md glass-panel bg-dark/90 border border-white/10 rounded-3xl p-8 relative overflow-hidden pointer-events-auto shadow-2xl"
+              className="w-full max-w-md glass-panel bg-dark/95 border border-white/10 rounded-3xl p-6 sm:p-8 relative overflow-hidden pointer-events-auto shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
             >
               <div className="absolute top-0 right-0 w-64 h-64 bg-electric-blue/10 blur-[80px] rounded-full pointer-events-none" />
               <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 blur-[80px] rounded-full pointer-events-none" />
 
               <button 
                 onClick={onClose}
-                className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors z-20"
+                disabled={loading}
+                className="absolute top-6 right-6 text-gray-400 hover:text-white transition-colors z-20 disabled:opacity-50"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              <div className="mb-10 mt-4">
+              <div className="mb-8 mt-2">
                 <div className="flex items-center gap-2 mb-6 relative z-10">
                   <div className="w-6 h-6 bg-electric-blue flex items-center justify-center rounded-sm rotate-45">
                     <div className="w-3 h-3 bg-white -rotate-45" />
@@ -115,56 +138,224 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     EINORT<span className="text-electric-blue">ID</span>
                   </span>
                 </div>
-                <h3 className="font-display text-3xl font-bold text-white mb-3 relative z-10">Welcome to the future.</h3>
-                <p className="text-gray-400 text-sm font-light relative z-10">
-                  Sign in to access your personalized enterprise dashboard, saved architectures, and consultation history.
-                </p>
+
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={view}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="relative z-10"
+                  >
+                    <h3 className="font-display text-2xl sm:text-3xl font-bold text-white mb-2">
+                      {title ? title : (view === 'signIn' ? "Welcome back." : view === 'signUp' ? "Join the future." : "Reset password.")}
+                    </h3>
+                    <p className="text-gray-400 text-xs sm:text-sm font-light">
+                      {subtitle ? subtitle : (view === 'signIn' ? "Sign in with your email and password." : view === 'signUp' ? "Create an account to begin your journey." : "Enter your email to receive recovery instructions.")}
+                    </p>
+                  </motion.div>
+                </AnimatePresence>
               </div>
 
-              {!authReady ? (
-                <div className="space-y-4 relative z-10 p-5 rounded-xl border border-yellow-500/20 bg-yellow-500/5">
+              {!isConfigured && view !== 'forgotPassword' && (
+                <div className="mb-6 p-4 rounded-xl border border-red-500/20 bg-red-500/5 relative z-10">
                    <div className="flex items-center gap-3 mb-2">
-                      <AlertTriangle className="w-5 h-5 text-yellow-500" />
-                      <h4 className="font-sans text-sm font-bold text-yellow-500">Authentication Initializing</h4>
+                      <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
+                      <h4 className="font-sans text-sm font-bold text-red-500">Firebase Unconfigured</h4>
                    </div>
                    <p className="text-xs text-silver-metallic leading-relaxed">
-                     Enterprise authentication services are currently starting up or missing vital parameters. You can continue browsing normally without an account.
+                     Authentication services require Firebase environment variables to be set.
                    </p>
-                   {ENV.IS_DEV && (
-                     <div className="mt-4 pt-3 border-t border-yellow-500/10">
-                        <span className="text-[10px] font-mono uppercase tracking-widest text-yellow-500/80 mb-2 block">Dev Missing Config:</span>
-                        <ul className="text-[10px] font-mono text-silver-metallic space-y-1">
-                          {!isConfigured && <li>- Firebase Environment Variables</li>}
-                          {!ENV.GOOGLE_CLIENT_ID && <li>- VITE_GOOGLE_CLIENT_ID</li>}
-                        </ul>
-                     </div>
-                   )}
-                </div>
-              ) : (
-                <div className="space-y-4 relative z-10">
-                  <button 
-                    onClick={handleGoogleSignIn}
-                    disabled={loading}
-                    className="w-full group flex items-center justify-between px-6 py-4 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <div className="flex items-center gap-4">
-                      <svg viewBox="0 0 24 24" className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                      </svg>
-                      <span className="font-semibold text-sm">Continue with Google</span>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors group-hover:translate-x-1" />
-                  </button>
                 </div>
               )}
 
-              <div className="mt-8 text-center relative z-10">
-                <p className="text-[10px] uppercase tracking-widest text-gray-500 font-semibold">
-                  By signing in, you agree to our Terms & Privacy Policy
-                </p>
+              <div className="relative z-10">
+                <AnimatePresence mode="wait">
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs sm:text-sm"
+                    >
+                      {error}
+                    </motion.div>
+                  )}
+                  {success && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-green-400 text-xs sm:text-sm"
+                    >
+                      {success}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {view === 'signUp' && (
+                    <>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <User className="w-4 h-4 text-gray-500" />
+                        </div>
+                        <input
+                          type="text"
+                          required
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          placeholder="Name"
+                          className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:border-electric-blue focus:ring-1 focus:ring-electric-blue transition-all disabled:opacity-50 text-sm"
+                          disabled={loading || !isConfigured}
+                        />
+                      </div>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <Phone className="w-4 h-4 text-gray-500" />
+                        </div>
+                        <input
+                          type="tel"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          placeholder="Phone Number (Optional)"
+                          className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:border-electric-blue focus:ring-1 focus:ring-electric-blue transition-all disabled:opacity-50 text-sm"
+                          disabled={loading || !isConfigured}
+                        />
+                      </div>
+                    </>
+                  )}
+
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <Mail className="w-4 h-4 text-gray-500" />
+                    </div>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Email"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:border-electric-blue focus:ring-1 focus:ring-electric-blue transition-all disabled:opacity-50 text-sm"
+                      disabled={loading || !isConfigured}
+                    />
+                  </div>
+
+                  {view !== 'forgotPassword' && (
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <Lock className="w-4 h-4 text-gray-500" />
+                      </div>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-12 text-white placeholder:text-gray-500 focus:outline-none focus:border-electric-blue focus:ring-1 focus:ring-electric-blue transition-all disabled:opacity-50 text-sm"
+                        disabled={loading || !isConfigured}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-white transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  )}
+
+                  {view === 'signUp' && (
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <Lock className="w-4 h-4 text-gray-500" />
+                      </div>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Repeat password"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-12 text-white placeholder:text-gray-500 focus:outline-none focus:border-electric-blue focus:ring-1 focus:ring-electric-blue transition-all disabled:opacity-50 text-sm"
+                        disabled={loading || !isConfigured}
+                      />
+                       <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-white transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  )}
+
+                  {view === 'signIn' && (
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setView('forgotPassword')}
+                        className="text-xs text-electric-blue hover:text-white transition-colors"
+                      >
+                        Forgot Password?
+                      </button>
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={loading || !isConfigured}
+                    className="w-full relative group overflow-hidden bg-electric-blue text-dark font-semibold py-3 sm:py-4 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-[0_0_20px_rgba(0,163,255,0.4)] flex justify-center items-center h-[52px]"
+                  >
+                    <span className="relative z-10 flex items-center gap-2">
+                      {loading ? (
+                        <span className="w-5 h-5 border-2 border-dark/30 border-t-dark rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          {view === 'signIn' ? "Sign In" : view === 'signUp' ? "Create Account" : "Send Reset Link"}
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
+                    </span>
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+                  </button>
+                </form>
+
+                {view === 'forgotPassword' ? (
+                  <div className="mt-6 text-center">
+                    <button
+                      onClick={() => setView('signIn')}
+                      className="flex items-center justify-center gap-2 text-xs sm:text-sm text-gray-400 hover:text-white transition-colors mx-auto"
+                    >
+                      <ChevronLeft className="w-4 h-4" /> Back to Sign In
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="mt-8 text-center text-xs sm:text-sm text-gray-400">
+                      {view === 'signIn' ? (
+                        <p>
+                          Don't have an account?{' '}
+                          <button onClick={() => setView('signUp')} className="text-white hover:text-electric-blue font-medium transition-colors">
+                            Sign up
+                          </button>
+                        </p>
+                      ) : (
+                        <p>
+                          Already have an account?{' '}
+                          <button onClick={() => setView('signIn')} className="text-white hover:text-electric-blue font-medium transition-colors">
+                            Sign in
+                          </button>
+                        </p>
+                      )}
+                    </div>
+                  </>
+                )}
+                
+                <div className="mt-6 text-center">
+                  <p className="text-[10px] uppercase tracking-widest text-gray-600 font-semibold">
+                    By proceeding, you agree to our Terms
+                  </p>
+                </div>
               </div>
             </motion.div>
           </div>

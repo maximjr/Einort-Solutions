@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, initializeFirestore } from 'firebase/firestore';
 import { safeFirebaseConfig, ENV, isFirebaseConfigured } from '../config/env';
 
 // Avoid duplicate initialization
@@ -13,5 +13,6 @@ const createFirebaseApp = () => {
 };
 
 export const app = createFirebaseApp();
-export const db = app ? getFirestore(app, ENV.FIREBASE_DATABASE_ID || undefined) : null as unknown as ReturnType<typeof getFirestore>;
+export const db = app ? initializeFirestore(app, { experimentalForceLongPolling: true }, ENV.FIREBASE_DATABASE_ID || undefined) : null as unknown as ReturnType<typeof getFirestore>;
 export const auth = app ? getAuth(app) : null as unknown as ReturnType<typeof getAuth>;
+
