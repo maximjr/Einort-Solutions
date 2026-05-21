@@ -97,6 +97,7 @@ export function About() {
             <img 
               src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2672&auto=format&fit=crop" 
               alt="Global Network"
+              loading="lazy"
               className="w-full h-full object-cover filter saturate-0 group-hover:saturate-100 transition-all duration-1000 group-hover:scale-110 mix-blend-luminosity group-hover:mix-blend-normal"
             />
             

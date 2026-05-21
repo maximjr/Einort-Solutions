@@ -38,8 +38,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           try {
             const adminDoc = await getDoc(doc(db, 'admins', currentUser.uid));
             setIsAdmin(adminDoc.exists() && ['admin', 'super_admin'].includes(adminDoc.data()?.role));
-          } catch (e) {
-            console.error("Error checking admin status:", e);
+          } catch (e: any) {
+            if (e?.code === 'unavailable' || e?.message?.includes('offline')) {
+              console.warn("Could not check admin status: Client is offline");
+            } else {
+              console.error("Error checking admin status:", e);
+            }
             setIsAdmin(false);
           }
         }

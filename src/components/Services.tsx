@@ -20,64 +20,62 @@ function ServiceCard({ service, index }: { service: typeof services[0]; index: n
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 40, scale: 0.98 }}
+      initial={{ opacity: 0, y: 20, scale: 0.98 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group relative p-8 lg:p-10 bg-dark-blue/20 glass-panel border-white/5 hover:border-electric-blue/30 transition-all duration-700 overflow-hidden h-full flex flex-col geometric-clip hover:shadow-[0_10px_40px_rgba(37,99,235,0.15)]"
+      className="group relative p-8 lg:p-10 bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all duration-500 overflow-hidden h-full flex flex-col rounded-3xl"
     >
-      {/* Holographic Glowing Overlay on Hover */}
+      {/* Subtle Glow Overlay on Hover */}
       <div 
         className={cn(
-          "absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-electric-blue/15 via-neon-blue/5 to-transparent opacity-0 transition-opacity duration-700 pointer-events-none",
+          "absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-electric-blue/10 via-transparent to-transparent opacity-0 transition-opacity duration-700 pointer-events-none",
           isHovered && "opacity-100"
         )}
       />
       
-      {/* Animated Geometry Line */}
+      {/* Animated Top Line */}
       <div className={cn(
-        "absolute top-0 right-0 w-32 h-[1px] bg-gradient-to-l from-electric-blue to-transparent transform origin-right transition-transform duration-700",
-        isHovered ? "scale-x-100" : "scale-x-0"
+        "absolute top-0 left-1/2 -translate-x-1/2 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent transition-all duration-700",
+        isHovered ? "w-2/3 opacity-100" : "w-0 opacity-0"
       )} />
 
-      <div className="absolute top-6 right-6 opacity-30 text-[10px] font-mono tracking-widest text-silver-metallic group-hover:opacity-100 group-hover:text-electric-blue transition-all duration-500">
+      <div className="absolute top-8 right-8 opacity-40 text-[10px] font-mono tracking-widest text-silver-metallic group-hover:opacity-100 group-hover:text-white transition-all duration-500">
         {index < 9 ? `0${index + 1}` : index + 1}
       </div>
       
       <div className="relative z-10 flex flex-col h-full">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-14 h-14 bg-white/5 geometric-clip-right flex items-center justify-center border border-white/10 group-hover:scale-110 group-hover:border-electric-blue transition-all duration-700 relative overflow-hidden shadow-lg">
-            <div className="absolute inset-0 bg-gradient-to-br from-electric-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-105 group-hover:bg-white/10 transition-all duration-500 relative overflow-hidden">
             <service.icon className={cn(
-              "w-6 h-6 text-silver-metallic transition-colors duration-500 relative z-10",
+              "w-5 h-5 text-silver-metallic transition-colors duration-500 relative z-10",
               isHovered && "text-white"
             )} />
           </div>
-          <span className="text-[9px] uppercase tracking-[0.2em] font-mono font-bold text-electric-blue bg-electric-blue/10 px-3 py-1 border border-electric-blue/20">
+          <span className="text-[10px] uppercase tracking-widest font-mono font-medium text-silver-metallic group-hover:text-white transition-colors">
             {service.tag}
           </span>
         </div>
         
-        <h3 className="text-2xl font-display font-medium mb-4 text-white group-hover:text-glow-silver tracking-tight transition-all duration-300 relative inline-block">
+        <h3 className="text-2xl font-display font-semibold mb-3 text-white tracking-tight transition-all duration-300 relative inline-block">
           {service.title}
         </h3>
         
-        <p className="text-silver-metallic font-light leading-relaxed mb-10 flex-grow text-sm md:text-base">
+        <p className="text-silver-metallic font-sans font-light leading-relaxed mb-10 flex-grow text-sm">
           {service.description}
         </p>
         
-        <div className="mt-auto pt-6 border-t border-white/5 relative">
-          <div className="absolute top-0 left-0 w-0 h-[1px] bg-gradient-to-r from-electric-blue to-neon-blue group-hover:w-full transition-all duration-700 ease-out" />
-          <Link to={`/services/${serviceSlug}`} className="flex items-center justify-between text-[11px] font-bold uppercase tracking-[0.2em] text-white/40 group-hover:text-white transition-colors cursor-pointer w-full font-mono">
+        <div className="mt-auto pt-6 border-t border-white/5 relative flex">
+          <Link to={`/services/${serviceSlug}`} className="flex items-center gap-2 text-[12px] font-sans font-medium text-white/50 group-hover:text-white transition-colors cursor-pointer w-fit group/btn">
             <span>Explore Capability</span>
             <motion.div 
-              animate={{ x: isHovered ? 5 : 0 }}
+              animate={{ x: isHovered ? 4 : 0 }}
               transition={{ type: 'spring', stiffness: 300 }}
-              className={cn("transition-colors duration-300", isHovered ? "text-electric-blue" : "text-white/40")}
+              className={cn("transition-colors duration-300", isHovered ? "text-white" : "text-white/50")}
             >
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-3.5 h-3.5" />
             </motion.div>
           </Link>
         </div>
@@ -96,36 +94,33 @@ export function Services() {
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
 
   return (
-    <section id="services" ref={containerRef} className="py-32 lg:py-48 relative text-white bg-dark overflow-hidden">
-      {/* Dynamic Cinematic Background Elements */}
-      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-      <motion.div style={{ y, opacity }} className="absolute right-[5%] top-1/4 w-[800px] h-[800px] bg-electric-blue/5 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
-      <div className="absolute left-0 bottom-0 w-1/2 h-1/2 bg-neon-blue/5 blur-[120px] pointer-events-none mix-blend-screen" />
+    <section id="services" ref={containerRef} className="py-24 lg:py-40 relative text-white bg-dark overflow-hidden">
+      {/* Background Subtleties */}
+      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+      <motion.div style={{ y, opacity }} className="absolute right-0 top-1/4 w-[600px] h-[600px] bg-electric-blue/5 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
-        <div className="mb-24 flex flex-col lg:flex-row lg:items-end justify-between gap-12 lg:gap-10">
+        <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-10">
           <div className="max-w-3xl">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
+              initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="flex items-center gap-4 mb-8"
+              className="flex items-center gap-3 mb-6"
             >
-              <div className="w-8 h-8 geometric-diamond bg-electric-blue/20 flex items-center justify-center border border-electric-blue/50">
-                <div className="w-2 h-2 bg-neon-blue geometric-diamond animate-pulse shadow-[0_0_10px_#3b82f6]" />
-              </div>
-              <span className="text-xs font-mono font-bold uppercase tracking-[0.3em] text-electric-blue">Core Capabilities</span>
+              <div className="w-1.5 h-1.5 bg-electric-blue rounded-full" />
+              <span className="text-[11px] font-mono font-medium uppercase tracking-[0.2em] text-silver-metallic">Core Capabilities</span>
             </motion.div>
 
             <motion.h2 
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-              className="font-display text-4xl md:text-5xl lg:text-[72px] font-bold leading-[1.05] tracking-tight drop-shadow-xl"
+              className="font-display text-4xl md:text-5xl lg:text-[64px] font-semibold leading-[1.1] tracking-tight"
             >
                Architecting The <br className="hidden md:block" />
-              <span className="text-gradient-metallic italic font-light font-display opacity-90">Unprecedented.</span>
+              <span className="text-silver-metallic font-light">Unprecedented.</span>
             </motion.h2>
           </div>
 
@@ -134,7 +129,7 @@ export function Services() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 1.2, delay: 0.3 }}
-            className="text-silver-metallic max-w-[400px] lg:text-right font-light leading-relaxed text-sm md:text-base border-l-2 lg:border-l-0 lg:border-r-2 border-electric-blue/30 pl-4 lg:pl-0 lg:pr-6 py-2"
+            className="text-silver-metallic max-w-[360px] font-sans font-light leading-relaxed text-sm lg:text-[15px]"
           >
             We deploy elite digital ecosystems designed to dominate markets, process billions in transactions, and inspire generations.
           </motion.p>
@@ -150,26 +145,20 @@ export function Services() {
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 1, delay: services.length * 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="group relative p-8 lg:p-10 bg-gradient-to-br from-electric-blue to-neon-blue flex flex-col justify-between geometric-clip border border-neon-blue/50 overflow-hidden shadow-[0_0_50px_rgba(37,99,235,0.2)]"
+            transition={{ duration: 0.6, delay: services.length * 0.1, ease: [0.16, 1, 0.3, 1] }}
+            className="group relative p-8 lg:p-10 bg-white text-dark flex flex-col justify-between rounded-3xl overflow-hidden hover:scale-[1.02] transition-transform duration-500"
           >
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 mix-blend-overlay" />
-            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-            <div className="absolute -right-20 -top-20 w-64 h-64 bg-white/20 blur-[80px] rounded-full group-hover:scale-150 transition-transform duration-1000" />
-            
             <div className="relative z-10">
-              <div className="w-10 h-10 mb-6 bg-white flex items-center justify-center geometric-clip-right shadow-lg">
-                <ArrowRight className="w-5 h-5 text-electric-blue" />
+              <div className="w-12 h-12 mb-6 rounded-full bg-dark/5 flex items-center justify-center">
+                <ArrowRight className="w-5 h-5 text-dark" />
               </div>
-              <h3 className="text-3xl lg:text-4xl font-display font-bold mb-4 text-white tracking-tight drop-shadow-md">Engage<br/>Transformation.</h3>
-              <p className="text-white/80 font-mono text-[10px] uppercase tracking-widest leading-relaxed max-w-[200px]">Strategic consultation for enterprise entities.</p>
+              <h3 className="text-3xl lg:text-4xl font-display font-semibold mb-3 tracking-tight">Engage<br/>Transformation.</h3>
+              <p className="text-dark/60 font-sans text-sm leading-relaxed max-w-[200px] font-medium">Strategic consultation for enterprise entities.</p>
             </div>
             
-            <Link to="/contact" className="inline-flex items-center justify-between pb-4 border-b border-white/30 text-[11px] font-bold uppercase tracking-[0.2em] text-white hover:border-white transition-colors relative z-10 font-mono w-full group/btn mt-12">
+            <Link to="/contact" className="inline-flex items-center gap-2 text-[13px] font-semibold text-dark hover:gap-3 transition-all relative z-10 w-fit mt-12 bg-dark text-white px-5 py-2.5 rounded-full hover:bg-dark/90">
               <span>Initiate Deployment</span>
-              <motion.span animate={{ x: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 1.5 }} className="group-hover/btn:translate-x-2 transition-transform">
-                <ArrowRight className="w-4 h-4" />
-              </motion.span>
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </motion.div>
         </div>

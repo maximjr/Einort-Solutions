@@ -16,48 +16,41 @@ export function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const navLinks = [
+    { name: 'Home', href: '/' },
     { name: 'Services', href: '/services' },
+    { name: 'Process', href: '/process' },
     { name: 'Work', href: '/work' },
     { name: 'About', href: '/about' },
-    { name: 'Process', href: '/process' },
   ];
 
   return (
     <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
-        isScrolled ? 'py-4' : 'py-6'
+        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+        isScrolled ? 'py-3 bg-dark/60 backdrop-blur-xl border-b border-white/5' : 'py-6 bg-transparent'
       )}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
-        <div className={cn(
-          "absolute inset-0 transition-opacity duration-500 -z-10",
-          isScrolled ? "opacity-100 glass-panel border-x-0 border-t-0" : "opacity-0"
-        )} />
-        
-        <Link to="/" className="flex items-center gap-4 group z-50">
-          <div className="relative">
-            <div className="w-12 h-12 flex items-center justify-center">
-              <img 
-                src="https://i.imgur.com/6V1ecDU.png" 
-                alt="EINORT Logo" 
-                className="w-full h-full object-contain transition-transform group-hover:scale-110 duration-500 relative z-10" 
-              />
-              <div className="absolute inset-0 bg-electric-blue/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </div>
+        <Link to="/" className="flex items-center gap-3 group z-50">
+          <div className="w-9 h-9 flex items-center justify-center">
+            <img 
+              src="https://i.imgur.com/6V1ecDU.png" 
+              alt="EINORT Logo" 
+              className="w-full h-full object-contain transition-transform group-hover:scale-105 duration-300" 
+            />
           </div>
-          <span className="font-display font-medium text-lg tracking-[0.2em] text-white">
-            EINORT<span className="text-electric-blue font-bold">.</span>
+          <span className="font-display font-medium text-base tracking-[0.1em] text-white">
+            EINORT
           </span>
         </Link>
 
@@ -67,14 +60,14 @@ export function Navbar() {
               key={link.name}
               to={link.href}
               className={cn(
-                "text-xs font-mono font-medium hover:text-white transition-colors uppercase tracking-[0.2em] relative group",
-                location.pathname === link.href ? "text-white" : "text-silver-metallic"
+                "text-[13px] font-sans font-medium transition-colors relative group",
+                location.pathname === link.href ? "text-white" : "text-white/60 hover:text-white"
               )}
             >
               {link.name}
               <span className={cn(
-                "absolute -bottom-2 left-0 h-[2px] bg-electric-blue transition-all duration-300",
-                location.pathname === link.href ? "w-full shadow-[0_0_10px_#2563eb]" : "w-0 group-hover:w-full group-hover:shadow-[0_0_10px_#2563eb]"
+                "absolute -bottom-1 left-0 h-[1px] bg-white transition-all duration-300",
+                location.pathname === link.href ? "w-full opacity-100" : "w-full scale-x-0 group-hover:scale-x-100 opacity-0 group-hover:opacity-100 origin-left"
               )} />
             </Link>
           ))}
@@ -85,12 +78,12 @@ export function Navbar() {
             <div className="relative">
               <button 
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="w-10 h-10 geometric-clip border border-white/20 overflow-hidden hover:border-electric-blue transition-all bg-dark-blue flex items-center justify-center"
+                className="w-9 h-9 rounded-full border border-white/10 overflow-hidden hover:border-white/30 transition-all bg-white/5 flex items-center justify-center shadow-sm"
               >
                 {user.photoURL ? (
                   <img src={user.photoURL} alt={user.displayName || "User"} className="w-full h-full object-cover" />
                 ) : (
-                  <UserIcon className="w-5 h-5 text-electric-blue" />
+                  <UserIcon className="w-4 h-4 text-white/80" />
                 )}
               </button>
 
@@ -101,17 +94,17 @@ export function Navbar() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-4 w-56 glass-panel border-neon geometric-clip shadow-[0_0_30px_rgba(59,130,246,0.15)] py-2 flex flex-col z-50"
+                    className="absolute right-0 mt-4 w-56 bg-dark/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl py-2 flex flex-col z-50 overflow-hidden"
                   >
                     <div className="px-4 py-3 border-b border-white/5 mb-2">
-                      <p className="font-sans font-semibold text-sm truncate text-white">{user.displayName}</p>
-                      <p className="font-mono text-xs text-silver-metallic truncate tracking-wider mt-1">{user.email}</p>
+                      <p className="font-sans font-medium text-[13px] truncate text-white">{user.displayName}</p>
+                      <p className="font-sans text-[11px] text-white/50 truncate mt-0.5">{user.email}</p>
                     </div>
-                    <Link to="/dashboard" onClick={() => setProfileDropdownOpen(false)} className="px-4 py-2 font-mono text-xs uppercase tracking-widest hover:bg-white/5 hover:text-electric-blue transition-colors text-left flex items-center gap-2 text-white/80">
+                    <Link to="/dashboard" onClick={() => setProfileDropdownOpen(false)} className="px-4 py-2 font-sans text-[13px] hover:bg-white/5 transition-colors text-left text-white/80 hover:text-white">
                       Dashboard
                     </Link>
-                    <button onClick={() => { signOut(); setProfileDropdownOpen(false); }} className="px-4 py-2 font-mono text-xs uppercase tracking-widest hover:bg-white/5 text-red-400 hover:text-red-300 transition-colors text-left flex items-center gap-2">
-                      <LogOut className="w-3 h-3" /> Sign Out
+                    <button onClick={() => { signOut(); setProfileDropdownOpen(false); }} className="px-4 py-2 font-sans text-[13px] hover:bg-red-500/10 text-red-400 transition-colors text-left flex items-center gap-2">
+                      <LogOut className="w-3.5 h-3.5" /> Sign Out
                     </button>
                   </motion.div>
                 )}
@@ -120,7 +113,7 @@ export function Navbar() {
           ) : (
             <button
               onClick={() => setAuthModalOpen(true)}
-              className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-silver-metallic hover:text-white transition-colors"
+              className="text-[13px] font-sans font-medium text-white/60 hover:text-white transition-colors"
             >
               Sign In
             </button>
@@ -128,17 +121,17 @@ export function Navbar() {
 
           <Link
             to="/contact"
-            className="px-6 py-2.5 bg-electric-blue geometric-clip-button text-white text-xs font-mono font-bold uppercase tracking-[0.2em] hover:bg-neon-blue transition-all"
+            className="px-5 py-2 bg-white text-dark rounded-full text-[13px] font-sans font-semibold hover:bg-white/90 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm"
           >
             Start Project
           </Link>
         </div>
 
         <button
-          className="md:hidden relative z-50 text-white"
+          className="md:hidden relative z-50 text-white p-2 -mr-2"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
-          {mobileMenuOpen ? <X /> : <Menu />}
+          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
@@ -149,50 +142,44 @@ export function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 bg-dark/95 backdrop-blur-xl z-40 flex flex-col items-center justify-center pt-20"
+            className="fixed inset-0 bg-dark/95 backdrop-blur-2xl z-40 flex flex-col items-center justify-center"
           >
-            <div className="flex flex-col items-center gap-8">
-              <Link
-                to="/"
-                onClick={() => setMobileMenuOpen(false)}
-                className="font-display text-4xl font-bold uppercase tracking-[0.2em] text-silver-metallic hover:text-white transition-colors"
-              >
-                HOME
-              </Link>
+            <div className="flex flex-col items-center gap-6 w-full max-w-sm px-6">
               {navLinks.map((link, i) => (
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
+                  transition={{ delay: i * 0.05 }}
                   key={link.name}
+                  className="w-full text-center"
                 >
                   <Link
                     to={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="font-display text-4xl font-bold uppercase tracking-[0.2em] text-silver-metallic hover:text-white transition-colors hover:text-glow-silver"
+                    className="block text-2xl font-display font-medium text-white/60 hover:text-white transition-colors py-2"
                   >
                     {link.name}
                   </Link>
                 </motion.div>
               ))}
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: navLinks.length * 0.1 }}
-                className="mt-8 flex flex-col items-center gap-4 w-full px-8 max-w-sm"
+                transition={{ delay: navLinks.length * 0.05 }}
+                className="mt-6 flex flex-col gap-3 w-full"
               >
                 {user ? (
                   <Link
                     to="/dashboard"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full text-center px-8 py-4 geometric-clip border border-white/20 text-white font-mono font-bold uppercase tracking-[0.2em] text-xs transition-all hover:border-electric-blue"
+                    className="w-full text-center px-6 py-3 border border-white/10 rounded-full text-white font-sans text-sm font-medium transition-colors hover:bg-white/5"
                   >
                     Dashboard
                   </Link>
                 ) : (
                   <button
                     onClick={() => { setMobileMenuOpen(false); setAuthModalOpen(true); }}
-                    className="w-full text-center px-8 py-4 geometric-clip border border-white/20 text-white font-mono font-bold uppercase tracking-[0.2em] text-xs transition-all hover:border-electric-blue"
+                    className="w-full text-center px-6 py-3 border border-white/10 rounded-full text-white font-sans text-sm font-medium transition-colors hover:bg-white/5"
                   >
                     Sign In
                   </button>
@@ -201,7 +188,7 @@ export function Navbar() {
                 <Link
                   to="/contact"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center px-8 py-4 geometric-clip-button bg-electric-blue text-white font-mono font-bold uppercase tracking-[0.2em] text-xs transition-all"
+                  className="w-full text-center px-6 py-3 bg-white text-dark rounded-full font-sans text-sm font-semibold transition-colors hover:bg-white/90"
                 >
                   Start Project
                 </Link>

@@ -3,28 +3,40 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { lazy, Suspense } from 'react';
 import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
-import { Services } from './components/Services';
-import { Portfolio } from './components/Portfolio';
-import { About } from './components/About';
-import { Process } from './components/Process';
-import { Testimonials } from './components/Testimonials';
-import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
-import { Dashboard } from './components/Dashboard';
-import { ServiceExperience } from './components/ServiceExperience';
-import { CustomizationStudio } from './components/CustomizationStudio';
-import { AdminLayout } from './pages/admin/AdminLayout';
-import { Overview } from './pages/admin/Overview';
-import { AdminUsers } from './pages/admin/Users';
-import { AdminProjects } from './pages/admin/Projects';
-import { AdminAnalytics } from './pages/admin/Analytics';
 import { DevSetupGuard } from './components/DevSetupGuard';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'motion/react';
 import { CinematicTransition } from './components/CinematicTransition';
 import { SEO } from './components/SEO';
+
+// Lazy loading components for performance
+const Hero = lazy(() => import('./components/Hero').then(m => ({ default: m.Hero })));
+const Services = lazy(() => import('./components/Services').then(m => ({ default: m.Services })));
+const Portfolio = lazy(() => import('./components/Portfolio').then(m => ({ default: m.Portfolio })));
+const About = lazy(() => import('./components/About').then(m => ({ default: m.About })));
+const Process = lazy(() => import('./components/Process').then(m => ({ default: m.Process })));
+const Testimonials = lazy(() => import('./components/Testimonials').then(m => ({ default: m.Testimonials })));
+const Contact = lazy(() => import('./components/Contact').then(m => ({ default: m.Contact })));
+const Dashboard = lazy(() => import('./components/Dashboard').then(m => ({ default: m.Dashboard })));
+const ServiceExperience = lazy(() => import('./components/ServiceExperience').then(m => ({ default: m.ServiceExperience })));
+const CustomizationStudio = lazy(() => import('./components/CustomizationStudio').then(m => ({ default: m.CustomizationStudio })));
+const CustomProjectRequest = lazy(() => import('./pages/CustomProjectRequest').then(m => ({ default: m.CustomProjectRequest })));
+
+// Admin Layout and Pages
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
+const Overview = lazy(() => import('./pages/admin/Overview').then(m => ({ default: m.Overview })));
+const AdminUsers = lazy(() => import('./pages/admin/Users').then(m => ({ default: m.AdminUsers })));
+const AdminProjects = lazy(() => import('./pages/admin/Projects').then(m => ({ default: m.AdminProjects })));
+const AdminAnalytics = lazy(() => import('./pages/admin/Analytics').then(m => ({ default: m.AdminAnalytics })));
+
+const LoadingFallback = () => (
+  <div className="min-h-[100dvh] flex items-center justify-center bg-dark">
+    <div className="w-12 h-12 border-2 border-electric-blue/20 border-t-electric-blue rounded-full animate-spin"></div>
+  </div>
+);
 
 export default function App() {
   const location = useLocation();
@@ -32,7 +44,8 @@ export default function App() {
   // Do not wrap CustomizationStudio in CinematicTransition with padding to allow full bleed sidebar
   const isStudioRoute = location.pathname.startsWith('/studio');
   const isAdminRoute = location.pathname.startsWith('/admin');
-  const hideGlobalLayout = isStudioRoute || isAdminRoute;
+  const isCustomProjectRoute = location.pathname.startsWith('/custom-project');
+  const hideGlobalLayout = isStudioRoute || isAdminRoute || isCustomProjectRoute;
 
   return (
     <div className="bg-dark min-h-screen text-white selection:bg-electric-blue selection:text-white font-sans relative overflow-x-hidden">
@@ -50,62 +63,67 @@ export default function App() {
         <main className="flex-grow">
           <AnimatePresence mode="wait">
             <div key={location.pathname}>
-              <Routes location={location}>
-                <Route path="/" element={
-                  <CinematicTransition>
-                    <Hero />
-                    <Testimonials />
-                  </CinematicTransition>
-                } />
-                <Route path="/services" element={
-                  <CinematicTransition>
-                    <div className="pt-24 min-h-screen"><Services /></div>
-                  </CinematicTransition>
-                } />
-                <Route path="/services/:serviceId" element={
-                  <CinematicTransition>
-                     <ServiceExperience />
-                  </CinematicTransition>
-                } />
-                <Route path="/studio/:projectId" element={
-                  <CustomizationStudio />
-                } />
-                
-                {/* Admin Routes */}
-                <Route path="/admin" element={<AdminLayout />}>
-                  <Route index element={<Overview />} />
-                  <Route path="users" element={<AdminUsers />} />
-                  <Route path="projects" element={<AdminProjects />} />
-                  <Route path="analytics" element={<AdminAnalytics />} />
-                  <Route path="operations" element={<Overview />} /> {/* Fallback for operations link */}
-                </Route>
+              <Suspense fallback={<LoadingFallback />}>
+                <Routes location={location}>
+                  <Route path="/" element={
+                    <CinematicTransition>
+                      <Hero />
+                      <Testimonials />
+                    </CinematicTransition>
+                  } />
+                  <Route path="/services" element={
+                    <CinematicTransition>
+                      <div className="pt-24 min-h-screen"><Services /></div>
+                    </CinematicTransition>
+                  } />
+                  <Route path="/services/:serviceId" element={
+                    <CinematicTransition>
+                       <ServiceExperience />
+                    </CinematicTransition>
+                  } />
+                  <Route path="/studio/:projectId" element={
+                    <CustomizationStudio />
+                  } />
+                  <Route path="/custom-project" element={
+                    <CustomProjectRequest />
+                  } />
+                  
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<Overview />} />
+                    <Route path="users" element={<AdminUsers />} />
+                    <Route path="projects" element={<AdminProjects />} />
+                    <Route path="analytics" element={<AdminAnalytics />} />
+                    <Route path="operations" element={<Overview />} /> {/* Fallback for operations link */}
+                  </Route>
 
-                <Route path="/work" element={
-                  <CinematicTransition>
-                    <div className="pt-24"><Portfolio /></div>
-                  </CinematicTransition>
-                } />
-                <Route path="/about" element={
-                  <CinematicTransition>
-                    <div className="pt-24 min-h-screen"><About /></div>
-                  </CinematicTransition>
-                } />
-                <Route path="/process" element={
-                  <CinematicTransition>
-                    <div className="pt-24 min-h-screen"><Process /></div>
-                  </CinematicTransition>
-                } />
-                <Route path="/contact" element={
-                  <CinematicTransition>
-                    <div className="pt-24 min-h-screen"><Contact /></div>
-                  </CinematicTransition>
-                } />
-                <Route path="/dashboard" element={
-                  <CinematicTransition>
-                    <Dashboard />
-                  </CinematicTransition>
-                } />
-              </Routes>
+                  <Route path="/work" element={
+                    <CinematicTransition>
+                      <div className="pt-24"><Portfolio /></div>
+                    </CinematicTransition>
+                  } />
+                  <Route path="/about" element={
+                    <CinematicTransition>
+                      <div className="pt-24 min-h-screen"><About /></div>
+                    </CinematicTransition>
+                  } />
+                  <Route path="/process" element={
+                    <CinematicTransition>
+                      <div className="pt-24 min-h-screen"><Process /></div>
+                    </CinematicTransition>
+                  } />
+                  <Route path="/contact" element={
+                    <CinematicTransition>
+                      <div className="pt-24 min-h-screen"><Contact /></div>
+                    </CinematicTransition>
+                  } />
+                  <Route path="/dashboard" element={
+                    <CinematicTransition>
+                      <Dashboard />
+                    </CinematicTransition>
+                  } />
+                </Routes>
+              </Suspense>
             </div>
           </AnimatePresence>
         </main>

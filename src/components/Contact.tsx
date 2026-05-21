@@ -88,23 +88,23 @@ export function Contact() {
              <form className="relative z-10 flex flex-col gap-6" onSubmit={(e) => e.preventDefault()}>
                <div className="grid md:grid-cols-2 gap-6">
                  <div className="flex flex-col gap-2">
-                   <label className="text-[10px] uppercase font-mono tracking-[0.2em] text-silver-metallic font-bold">Designation (First)</label>
-                   <input type="text" className="bg-dark/50 geometric-clip-right border border-white/10 px-5 py-4 text-white focus:outline-none focus:border-electric-blue transition-colors placeholder:text-white/20 font-light" placeholder="John" />
+                   <label htmlFor="firstName" className="text-[10px] uppercase font-mono tracking-[0.2em] text-silver-metallic font-bold">Designation (First)</label>
+                   <input id="firstName" type="text" className="bg-dark/50 geometric-clip-right border border-white/10 px-5 py-4 text-white focus:outline-none focus:border-electric-blue transition-colors placeholder:text-white/20 font-light" placeholder="John" />
                  </div>
                  <div className="flex flex-col gap-2">
-                   <label className="text-[10px] uppercase font-mono tracking-[0.2em] text-silver-metallic font-bold">Designation (Last)</label>
-                   <input type="text" className="bg-dark/50 geometric-clip-right border border-white/10 px-5 py-4 text-white focus:outline-none focus:border-electric-blue transition-colors placeholder:text-white/20 font-light" placeholder="Doe" />
+                   <label htmlFor="lastName" className="text-[10px] uppercase font-mono tracking-[0.2em] text-silver-metallic font-bold">Designation (Last)</label>
+                   <input id="lastName" type="text" className="bg-dark/50 geometric-clip-right border border-white/10 px-5 py-4 text-white focus:outline-none focus:border-electric-blue transition-colors placeholder:text-white/20 font-light" placeholder="Doe" />
                  </div>
                </div>
                
                <div className="flex flex-col gap-2">
-                 <label className="text-[10px] uppercase font-mono tracking-[0.2em] text-silver-metallic font-bold">Origin (Email)</label>
-                 <input type="email" className="bg-dark/50 geometric-clip-right border border-white/10 px-5 py-4 text-white focus:outline-none focus:border-electric-blue transition-colors placeholder:text-white/20 font-light" placeholder="john@enterprise.com" />
+                 <label htmlFor="email" className="text-[10px] uppercase font-mono tracking-[0.2em] text-silver-metallic font-bold">Origin (Email)</label>
+                 <input id="email" type="email" className="bg-dark/50 geometric-clip-right border border-white/10 px-5 py-4 text-white focus:outline-none focus:border-electric-blue transition-colors placeholder:text-white/20 font-light" placeholder="john@enterprise.com" />
                </div>
                
                <div className="flex flex-col gap-2">
-                 <label className="text-[10px] uppercase font-mono tracking-[0.2em] text-silver-metallic font-bold">Project Parameters</label>
-                 <textarea rows={4} className="bg-dark/50 geometric-clip-right border border-white/10 px-5 py-4 text-white focus:outline-none focus:border-electric-blue transition-colors placeholder:text-white/20 font-light resize-none" placeholder="Outline your architectural vision..." />
+                 <label htmlFor="message" className="text-[10px] uppercase font-mono tracking-[0.2em] text-silver-metallic font-bold">Project Parameters</label>
+                 <textarea id="message" rows={4} className="bg-dark/50 geometric-clip-right border border-white/10 px-5 py-4 text-white focus:outline-none focus:border-electric-blue transition-colors placeholder:text-white/20 font-light resize-none" placeholder="Outline your architectural vision..." />
                </div>
                
                <button className="group/btn relative w-full flex items-center justify-center gap-4 bg-white text-dark px-8 py-5 geometric-clip font-bold uppercase tracking-[0.2em] font-mono text-sm overflow-hidden mt-6 hover:shadow-[0_0_30px_rgba(37,99,235,0.4)] transition-all">

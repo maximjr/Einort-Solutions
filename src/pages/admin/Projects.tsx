@@ -2,40 +2,92 @@ import { motion } from 'motion/react';
 import { useState, useEffect } from 'react';
 import { db } from '../../lib/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import { Layers, ChevronRight, Inbox, Clock, CheckCircle } from 'lucide-react';
+import { Layers, ChevronRight, Inbox, Clock, CheckCircle, TerminalSquare } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface ProjectOrder {
   id: string;
-  projectId: string;
+  type: 'sandbox' | 'custom';
+  projectId?: string;
+  title?: string;
   userEmail: string;
   userName?: string;
   status: string;
   createdAt: any;
-  selections: {
+  selections?: {
     theme: string;
     layout: string;
     font: string;
     buttonStyle?: string;
+  };
+  customDetails?: {
+    industry: string;
+    category: string;
+    budget: string;
+    timeline: string;
+    suggestedStack: string[];
+    complexity: string;
   }
 }
 
 export function AdminProjects() {
   const [projects, setProjects] = useState<ProjectOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'all' | 'sandbox' | 'custom'>('all');
 
   useEffect(() => {
-    const q = query(collection(db, 'projectSubmissions'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snap) => {
-      const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ProjectOrder));
-      setProjects(data);
+    let sandboxData: ProjectOrder[] = [];
+    let customData: ProjectOrder[] = [];
+
+    const mergeData = () => {
+      const merged = [...sandboxData, ...customData].sort((a, b) => {
+        const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+        const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+        return timeB - timeA;
+      });
+      setProjects(merged);
       setLoading(false);
-    }, (err) => {
-      console.error("Error fetching projects:", err);
-      setLoading(false);
+    };
+
+    const qSandbox = query(collection(db, 'projectSubmissions'), orderBy('createdAt', 'desc'));
+    const unsubSandbox = onSnapshot(qSandbox, (snap) => {
+      sandboxData = snap.docs.map(doc => ({ 
+        id: doc.id, 
+        type: 'sandbox',
+        ...doc.data() 
+      } as ProjectOrder));
+      mergeData();
+    });
+
+    const qCustom = query(collection(db, 'customProjects'), orderBy('createdAt', 'desc'));
+    const unsubCustom = onSnapshot(qCustom, (snap) => {
+      customData = snap.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          type: 'custom',
+          title: data.title,
+          userEmail: data.email,
+          userName: data.fullName,
+          status: data.status,
+          createdAt: data.createdAt,
+          customDetails: {
+            industry: data.industry,
+            category: data.category,
+            budget: data.budget,
+            timeline: data.timeline,
+            suggestedStack: data.suggestedStack || [],
+            complexity: data.complexity
+          }
+        } as ProjectOrder;
+      });
+      mergeData();
     });
     
-    return () => unsubscribe();
+    return () => {
+      unsubSandbox();
+      unsubCustom();
+    };
   }, []);
 
   const getStatusColor = (status: string) => {
@@ -47,6 +99,8 @@ export function AdminProjects() {
     }
   };
 
+  const filteredProjects = projects.filter(p => activeTab === 'all' || p.type === activeTab);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -57,7 +111,7 @@ export function AdminProjects() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
          <div>
             <h1 className="font-display text-4xl text-white font-medium tracking-tight mb-2">Project Orders</h1>
-            <p className="font-mono text-xs uppercase tracking-widest text-silver-metallic">Manage architectural submissions.</p>
+            <p className="font-mono text-xs uppercase tracking-widest text-silver-metallic">Manage architectural submissions and custom leads.</p>
          </div>
       </div>
 
@@ -83,39 +137,60 @@ export function AdminProjects() {
       </div>
 
       <div className="glass-panel geometric-clip border border-white/5 bg-dark/50">
-        <div className="p-4 border-b border-white/5">
+        <div className="p-4 border-b border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
            <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold text-white">Transmission Log</h3>
+           <div className="flex gap-2">
+             <button onClick={() => setActiveTab('all')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'all' ? 'bg-electric-blue/20 border-electric-blue/50 text-electric-blue' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>All</button>
+             <button onClick={() => setActiveTab('sandbox')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'sandbox' ? 'bg-electric-blue/20 border-electric-blue/50 text-electric-blue' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>Sandbox</button>
+             <button onClick={() => setActiveTab('custom')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'custom' ? 'bg-electric-blue/20 border-electric-blue/50 text-electric-blue' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>Custom</button>
+           </div>
         </div>
         <div className="divide-y divide-white/5">
            {loading ? (
              <div className="p-8 text-center font-mono text-xs uppercase tracking-widest text-silver-metallic animate-pulse">Syncing Database...</div>
-           ) : projects.length === 0 ? (
+           ) : filteredProjects.length === 0 ? (
              <div className="p-8 text-center font-mono text-xs uppercase tracking-widest text-silver-metallic">No Transmissions Found.</div>
            ) : (
-             projects.map((project) => (
+             filteredProjects.map((project) => (
                <div key={project.id} className="p-6 hover:bg-white/[0.02] transition-colors flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6 group relative overflow-hidden">
                  
                  <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-electric-blue transform scale-y-0 origin-top group-hover:scale-y-100 transition-transform duration-500" />
 
                  <div className="flex items-start gap-5">
                     <div className="w-12 h-12 geometric-clip bg-dark border border-white/10 group-hover:border-electric-blue/50 flex items-center justify-center shrink-0 transition-colors duration-500">
-                       <Layers className="w-5 h-5 text-silver-metallic group-hover:text-electric-blue transition-colors duration-500" />
+                       {project.type === 'sandbox' ? (
+                         <Layers className="w-5 h-5 text-silver-metallic group-hover:text-electric-blue transition-colors duration-500" />
+                       ) : (
+                         <TerminalSquare className="w-5 h-5 text-silver-metallic group-hover:text-neon-blue transition-colors duration-500" />
+                       )}
                     </div>
                     <div>
                       <div className="flex items-center gap-3 mb-1">
-                        <h4 className="font-display text-lg tracking-tight text-white">{project.projectId.toUpperCase()}</h4>
+                        <h4 className="font-display text-lg tracking-tight text-white">{project.type === 'sandbox' ? project.projectId?.toUpperCase() : project.title}</h4>
                         <span className={`px-2 py-0.5 border text-[9px] font-mono uppercase tracking-widest rounded-sm ${getStatusColor(project.status)}`}>
                           {project.status}
+                        </span>
+                        <span className="px-2 py-0.5 border border-white/10 bg-white/5 text-[9px] font-mono uppercase tracking-widest rounded-sm text-silver-metallic">
+                          {project.type}
                         </span>
                       </div>
                       <p className="font-mono text-[10px] text-silver-metallic tracking-[0.1em] uppercase">Client: <span className="text-white opacity-80">{project.userName || 'Unknown'}</span> <span className="text-white opacity-50 lowercase">({project.userEmail})</span></p>
                       
                       {/* Selections breakdown */}
                       <div className="flex flex-wrap items-center gap-2 mt-3 text-[9px] font-mono uppercase tracking-widest">
-                         <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">Theme: {project.selections?.theme}</span>
-                         <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">Layout: {project.selections?.layout}</span>
-                         <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">Font: {project.selections?.font}</span>
-                         {project.selections?.buttonStyle && <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">UI: {project.selections.buttonStyle}</span>}
+                         {project.type === 'sandbox' && project.selections ? (
+                           <>
+                             <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">Theme: {project.selections.theme}</span>
+                             <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">Layout: {project.selections.layout}</span>
+                             <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">Font: {project.selections.font}</span>
+                           </>
+                         ) : project.customDetails ? (
+                           <>
+                             <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">Sector: {project.customDetails.industry}</span>
+                             <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">Budget: {project.customDetails.budget || 'Open'}</span>
+                             <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip text-electric-blue">AI Comp: {project.customDetails.complexity}</span>
+                           </>
+                         ) : null}
                       </div>
                     </div>
                  </div>
