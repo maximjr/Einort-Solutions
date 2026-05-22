@@ -9,36 +9,46 @@ interface SEOProps {
   url?: string;
   canonical?: string;
   keywords?: string;
+  article?: {
+    publishedTime?: string;
+    modifiedTime?: string;
+    author?: string[];
+  };
+  breadcrumbs?: Array<{ name: string; url: string }>;
+  isService?: boolean;
 }
 
 export function SEO({
-  title = "EINORT SOLUTIONS | Future-Forward Digital Architecture",
-  description = "EINORT SOLUTIONS architects immersive web experiences, deep tech ecosystems, and scalable infrastructure designed to dominate markets and inspire generations.",
+  title = "EINORT SOLUTIONS | Premium Digital Agency & Software Architecture",
+  description = "EINORT SOLUTIONS is a world-class digital agency engineering enterprise web applications, premium UI/UX, and highly scalable software solutions.",
   type = "website",
   name = "EINORT SOLUTIONS",
   image = "https://i.imgur.com/6V1ecDU.png",
   url = "https://einort.com",
   canonical,
-  keywords = "enterprise digital architecture, UI/UX design agency, deep tech solutions, scalable infrastructure, web development, cloud platform engineering, futuristic UI"
+  keywords = "web development company, custom software development, UI/UX agency, digital transformation agency, enterprise software development, premium web design agency",
+  article,
+  breadcrumbs,
+  isService = false,
 }: SEOProps) {
   const metaTitle = title.includes("EINORT") ? title : `${title} | EINORT SOLUTIONS`;
   const canonicalUrl = canonical || url;
 
-  const structuredData = {
+  const baseSchema = {
     "@context": "https://schema.org",
     "@graph": [
       {
-        "@type": "ProfessionalService",
+        "@type": ["ProfessionalService", "Organization"],
         "@id": `${url}/#organization`,
         "name": "EINORT SOLUTIONS",
-        "url": url,
+        "url": "https://einort.com",
         "logo": {
           "@type": "ImageObject",
           "url": image,
           "width": 512,
           "height": 512
         },
-        "description": description,
+        "description": "World-class digital agency engineering enterprise web applications.",
         "image": image,
         "priceRange": "$$$$",
         "address": {
@@ -55,38 +65,72 @@ export function SEO({
           "@type": "ContactPoint",
           "contactType": "customer service",
           "email": "hello@einort.com",
-          "availableLanguage": ["English"]
+          "availableLanguage": ["English", "Spanish", "French", "German"]
         }
       },
       {
         "@type": "WebSite",
         "@id": `${url}/#website`,
-        "url": url,
-        "name": metaTitle,
+        "url": "https://einort.com",
+        "name": "EINORT SOLUTIONS",
         "publisher": {
-          "@id": `${url}/#organization`
+          "@id": "https://einort.com/#organization"
         }
       }
     ]
   };
 
+  if (breadcrumbs && breadcrumbs.length > 0) {
+    baseSchema["@graph"].push({
+      "@type": "BreadcrumbList",
+      "@id": `${url}/#breadcrumb`,
+      "itemListElement": breadcrumbs.map((crumb, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
+          "@id": crumb.url,
+          "name": crumb.name
+        }
+      }))
+    } as any);
+  }
+
+  if (isService) {
+    baseSchema["@graph"].push({
+      "@type": "Service",
+      "name": metaTitle,
+      "provider": {
+        "@id": "https://einort.com/#organization"
+      },
+      "description": description,
+      "serviceType": "Digital Agency Services"
+    } as any);
+  }
+
   return (
     <Helmet>
       {/* Standard metadata tags */}
-      <html lang="en" />
+      <html lang="en-US" />
       <title>{metaTitle}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
-      <meta name="theme-color" content="#020617" />
+      <meta name="theme-color" content="#000000" />
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
       <link rel="canonical" href={canonicalUrl} />
+      
+      {/* International SEO */}
+      <link rel="alternate" hrefLang="en-US" href={`${canonicalUrl}`} />
+      <link rel="alternate" hrefLang="en-GB" href={`${canonicalUrl}`} />
+      <link rel="alternate" hrefLang="en-CA" href={`${canonicalUrl}`} />
+      <link rel="alternate" hrefLang="en-ZA" href={`${canonicalUrl}`} />
+      <link rel="alternate" hrefLang="x-default" href={`${canonicalUrl}`} />
       {/* End standard metadata tags */}
       
       {/* Open Graph tags */}
       <meta property="og:type" content={type} />
       <meta property="og:title" content={metaTitle} />
       <meta property="og:description" content={description} />
-      <meta property="og:url" content={url} />
+      <meta property="og:url" content={canonicalUrl} />
       <meta property="og:image" content={image} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
@@ -102,7 +146,7 @@ export function SEO({
       {/* End Twitter tags */}
 
       <script type="application/ld+json">
-        {JSON.stringify(structuredData)}
+        {JSON.stringify(baseSchema)}
       </script>
     </Helmet>
   );

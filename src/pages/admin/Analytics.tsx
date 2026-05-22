@@ -59,19 +59,19 @@ export function AdminAnalytics() {
                <div>
                  <div className="flex justify-between font-mono text-[10px] tracking-widest uppercase mb-2">
                    <span className="text-white">Desktop (MacOS)</span>
-                   <span className="text-electric-blue">65%</span>
+                   <span className="text-premium-gold">65%</span>
                  </div>
                  <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                   <div className="h-full bg-electric-blue w-[65%]" />
+                   <div className="h-full bg-premium-gold w-[65%]" />
                  </div>
                </div>
                <div>
                  <div className="flex justify-between font-mono text-[10px] tracking-widest uppercase mb-2">
                    <span className="text-white">Mobile (iOS)</span>
-                   <span className="text-neon-blue">25%</span>
+                   <span className="text-oxblood">25%</span>
                  </div>
                  <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                   <div className="h-full bg-neon-blue w-[25%]" />
+                   <div className="h-full bg-oxblood w-[25%]" />
                  </div>
                </div>
                <div>
@@ -85,10 +85,10 @@ export function AdminAnalytics() {
                </div>
             </div>
             
-            <div className="mt-8 p-4 border border-electric-blue/30 bg-electric-blue/5 rounded-lg flex items-start gap-4">
-              <div className="w-8 h-8 rounded-full bg-electric-blue/20 flex flex-shrink-0 items-center justify-center text-electric-blue font-bold font-mono">SYS</div>
+            <div className="mt-8 p-4 border border-premium-gold/30 bg-premium-gold/5 rounded-lg flex items-start gap-4">
+              <div className="w-8 h-8 rounded-full bg-premium-gold/20 flex flex-shrink-0 items-center justify-center text-premium-gold font-bold font-mono">SYS</div>
               <p className="font-sans text-sm text-silver-metallic">
-                <strong className="text-white">Insight:</strong> Desktop conversions for <span className="text-electric-blue">SaaS Templates</span> are up 14% over mobile devices. We recommend optimizing the SaaS preview engine for ultra-wide displays.
+                <strong className="text-white">Insight:</strong> Desktop conversions for <span className="text-premium-gold">SaaS Templates</span> are up 14% over mobile devices. We recommend optimizing the SaaS preview engine for ultra-wide displays.
               </p>
             </div>
          </div>

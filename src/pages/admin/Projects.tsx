@@ -93,7 +93,7 @@ export function AdminProjects() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
-      case 'active': return 'text-electric-blue bg-electric-blue/10 border-electric-blue/20';
+      case 'active': return 'text-premium-gold bg-premium-gold/10 border-premium-gold/20';
       case 'completed': return 'text-green-400 bg-green-400/10 border-green-400/20';
       default: return 'text-silver-metallic bg-white/5 border-white/10';
     }
@@ -116,9 +116,9 @@ export function AdminProjects() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-         <div className="glass-panel geometric-clip border border-white/5 p-6 flex flex-col gap-2 relative overflow-hidden group hover:border-electric-blue/30 transition-colors">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-electric-blue/5 blur-[50px] rounded-full pointer-events-none group-hover:bg-electric-blue/10 transition-colors" />
-            <Inbox className="w-5 h-5 text-electric-blue mb-2" />
+         <div className="glass-panel geometric-clip border border-white/5 p-6 flex flex-col gap-2 relative overflow-hidden group hover:border-premium-gold/30 transition-colors">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-premium-gold/5 blur-[50px] rounded-full pointer-events-none group-hover:bg-premium-gold/10 transition-colors" />
+            <Inbox className="w-5 h-5 text-premium-gold mb-2" />
             <span className="font-display text-3xl">{projects.length}</span>
             <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-bold">Total Transmissions</span>
          </div>
@@ -140,9 +140,9 @@ export function AdminProjects() {
         <div className="p-4 border-b border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
            <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold text-white">Transmission Log</h3>
            <div className="flex gap-2">
-             <button onClick={() => setActiveTab('all')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'all' ? 'bg-electric-blue/20 border-electric-blue/50 text-electric-blue' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>All</button>
-             <button onClick={() => setActiveTab('sandbox')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'sandbox' ? 'bg-electric-blue/20 border-electric-blue/50 text-electric-blue' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>Sandbox</button>
-             <button onClick={() => setActiveTab('custom')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'custom' ? 'bg-electric-blue/20 border-electric-blue/50 text-electric-blue' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>Custom</button>
+             <button onClick={() => setActiveTab('all')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'all' ? 'bg-premium-gold/20 border-premium-gold/50 text-premium-gold' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>All</button>
+             <button onClick={() => setActiveTab('sandbox')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'sandbox' ? 'bg-premium-gold/20 border-premium-gold/50 text-premium-gold' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>Sandbox</button>
+             <button onClick={() => setActiveTab('custom')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'custom' ? 'bg-premium-gold/20 border-premium-gold/50 text-premium-gold' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>Custom</button>
            </div>
         </div>
         <div className="divide-y divide-white/5">
@@ -154,14 +154,14 @@ export function AdminProjects() {
              filteredProjects.map((project) => (
                <div key={project.id} className="p-6 hover:bg-white/[0.02] transition-colors flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6 group relative overflow-hidden">
                  
-                 <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-electric-blue transform scale-y-0 origin-top group-hover:scale-y-100 transition-transform duration-500" />
+                 <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-premium-gold transform scale-y-0 origin-top group-hover:scale-y-100 transition-transform duration-500" />
 
                  <div className="flex items-start gap-5">
-                    <div className="w-12 h-12 geometric-clip bg-dark border border-white/10 group-hover:border-electric-blue/50 flex items-center justify-center shrink-0 transition-colors duration-500">
+                    <div className="w-12 h-12 geometric-clip bg-dark border border-white/10 group-hover:border-premium-gold/50 flex items-center justify-center shrink-0 transition-colors duration-500">
                        {project.type === 'sandbox' ? (
-                         <Layers className="w-5 h-5 text-silver-metallic group-hover:text-electric-blue transition-colors duration-500" />
+                         <Layers className="w-5 h-5 text-silver-metallic group-hover:text-premium-gold transition-colors duration-500" />
                        ) : (
-                         <TerminalSquare className="w-5 h-5 text-silver-metallic group-hover:text-neon-blue transition-colors duration-500" />
+                         <TerminalSquare className="w-5 h-5 text-silver-metallic group-hover:text-oxblood transition-colors duration-500" />
                        )}
                     </div>
                     <div>
@@ -188,7 +188,7 @@ export function AdminProjects() {
                            <>
                              <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">Sector: {project.customDetails.industry}</span>
                              <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip">Budget: {project.customDetails.budget || 'Open'}</span>
-                             <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip text-electric-blue">AI Comp: {project.customDetails.complexity}</span>
+                             <span className="bg-white/5 border border-white/10 px-2 py-1 geometric-clip text-premium-gold">AI Comp: {project.customDetails.complexity}</span>
                            </>
                          ) : null}
                       </div>
@@ -199,7 +199,7 @@ export function AdminProjects() {
                     <span className="font-mono text-[10px] text-silver-metallic tracking-wider">
                       {project.createdAt?.toDate ? format(project.createdAt.toDate(), 'PPpp') : 'Recent'}
                     </span>
-                    <button className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-white border border-white/20 px-4 py-2 geometric-clip-button hover:bg-electric-blue hover:border-electric-blue transition-all w-full md:w-auto justify-center shadow-[0_0_15px_rgba(37,99,235,0)] hover:shadow-[0_0_15px_rgba(37,99,235,0.2)]">
+                    <button className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-white border border-white/20 px-4 py-2 geometric-clip-button hover:bg-premium-gold hover:border-premium-gold transition-all w-full md:w-auto justify-center shadow-[0_0_15px_rgba(37,99,235,0)] hover:shadow-[0_0_15px_rgba(37,99,235,0.2)]">
                        Inspect Architecture <ChevronRight className="w-3 h-3" />
                     </button>
                  </div>

@@ -114,18 +114,18 @@ export function Overview() {
              animate={{ opacity: 1, y: 0 }}
              transition={{ delay: i * 0.1 }}
              key={i} 
-             className="glass-panel geometric-clip border border-white/5 p-6 relative overflow-hidden group hover:border-electric-blue/30 transition-colors bg-gradient-to-br from-white/[0.02] to-transparent"
+             className="glass-panel geometric-clip border border-white/5 p-6 relative overflow-hidden group hover:border-premium-gold/30 transition-colors bg-gradient-to-br from-white/[0.02] to-transparent"
            >
-             <div className="absolute top-0 right-0 w-32 h-32 bg-electric-blue/5 rounded-full blur-[50px] group-hover:bg-electric-blue/10 transition-colors" />
+             <div className="absolute top-0 right-0 w-32 h-32 bg-premium-gold/5 rounded-full blur-[50px] group-hover:bg-premium-gold/10 transition-colors" />
              <div className="flex justify-between items-start mb-6 relative z-10">
                <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic">{stat.label}</span>
-               <div className="w-8 h-8 geometric-clip bg-electric-blue/10 flex items-center justify-center border border-electric-blue/20">
-                 <stat.icon className="w-4 h-4 text-electric-blue" />
+               <div className="w-8 h-8 geometric-clip bg-premium-gold/10 flex items-center justify-center border border-premium-gold/20">
+                 <stat.icon className="w-4 h-4 text-premium-gold" />
                </div>
              </div>
              <div className="flex items-baseline gap-4 relative z-10">
                <span className="font-display text-3xl font-medium text-white tracking-tight">{stat.value}</span>
-               <span className="font-mono text-[10px] tracking-wider text-neon-blue flex items-center gap-1">
+               <span className="font-mono text-[10px] tracking-wider text-oxblood flex items-center gap-1">
                  <ArrowUpRight className="w-3 h-3" /> {stat.increase}
                </span>
              </div>
@@ -139,7 +139,7 @@ export function Overview() {
            <div className="flex justify-between items-center mb-8">
               <h3 className="font-mono text-xs uppercase tracking-widest text-white">Global Traffic Flow</h3>
               <div className="flex gap-2">
-                 <button className="px-3 py-1 font-mono text-[9px] uppercase tracking-widest bg-electric-blue text-white geometric-clip transition-colors">Week</button>
+                 <button className="px-3 py-1 font-mono text-[9px] uppercase tracking-widest bg-premium-gold text-white geometric-clip transition-colors">Week</button>
                  <button className="px-3 py-1 font-mono text-[9px] uppercase tracking-widest text-silver-metallic hover:bg-white/5 geometric-clip transition-colors">Month</button>
                  <button className="px-3 py-1 font-mono text-[9px] uppercase tracking-widest text-silver-metallic hover:bg-white/5 geometric-clip transition-colors">Year</button>
               </div>
@@ -197,13 +197,13 @@ export function Overview() {
       <div className="glass-panel geometric-clip border border-white/5 p-6 bg-dark/50">
          <div className="flex justify-between items-center mb-6">
            <h3 className="font-mono text-xs uppercase tracking-widest text-white">Live Activity Stream</h3>
-           <button className="text-[10px] font-mono text-electric-blue uppercase tracking-widest hover:text-white transition-colors">View All Events →</button>
+           <button className="text-[10px] font-mono text-premium-gold uppercase tracking-widest hover:text-white transition-colors">View All Events →</button>
          </div>
          <div className="space-y-4">
            {recentActivity.length > 0 ? recentActivity.map((log, i) => (
              <div key={log.id || i} className="flex gap-4 p-4 border border-white/5 rounded-lg bg-white/[0.01] hover:bg-white/[0.03] transition-colors relative overflow-hidden group">
-               <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-electric-blue opacity-0 group-hover:opacity-100 transition-opacity" />
-               <div className="w-2 h-2 mt-1.5 rounded-full bg-electric-blue" />
+               <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-premium-gold opacity-0 group-hover:opacity-100 transition-opacity" />
+               <div className="w-2 h-2 mt-1.5 rounded-full bg-premium-gold" />
                <div>
                  <p className="font-sans text-sm font-medium text-white">{log.title}</p>
                  <p className="font-mono text-[10px] text-silver-metallic tracking-wider mt-1">{log.desc}</p>

@@ -117,12 +117,12 @@ export function CustomizationStudio() {
 
       {/* Control Panel (Sidebar) */}
       <div 
-        className={`w-full lg:w-[420px] bg-dark/95 backdrop-blur-3xl border-t lg:border-t-0 lg:border-r border-white/5 flex flex-col h-[75vh] lg:h-screen fixed lg:static bottom-0 left-0 z-50 lg:z-20 shadow-[0_-20px_40px_rgba(0,0,0,0.8)] lg:shadow-2xl shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] lg:translate-y-0 rounded-t-[2rem] lg:rounded-none overflow-hidden ${isMobilePanelOpen ? 'translate-y-0' : 'translate-y-full'}`}
+        className={`w-full lg:w-[420px] bg-dark/95 backdrop-blur-3xl border-t lg:border-t-0 lg:border-l border-white/5 flex flex-col h-[75vh] lg:h-screen fixed lg:static bottom-0 right-0 z-50 lg:z-20 shadow-[0_-20px_40px_rgba(0,0,0,0.8)] lg:shadow-2xl shrink-0 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] lg:translate-y-0 rounded-t-[2rem] lg:rounded-none overflow-hidden lg:order-2 ${isMobilePanelOpen ? 'translate-y-0' : 'translate-y-full'}`}
       >
-        <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-white/5 to-transparent" />
+        <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-[1px] bg-gradient-to-b from-transparent via-white/5 to-transparent" />
 
         {/* Mobile Drag Indicator */}
-        <div className="lg:hidden w-full flex justify-center pt-4 pb-2 cursor-pointer touch-none" onClick={() => setIsMobilePanelOpen(false)}>
+        <div className="lg:hidden w-full flex justify-center py-4 cursor-pointer touch-none" onClick={() => setIsMobilePanelOpen(false)}>
            <div className="w-12 h-1.5 bg-white/20 rounded-full" />
         </div>
 
@@ -145,7 +145,7 @@ export function CustomizationStudio() {
           <button 
             onClick={triggerAISuggestion}
             disabled={aiSuggesting}
-            className="w-full flex items-center justify-between p-3 lg:p-4 rounded-xl lg:rounded-2xl bg-white/[0.03] border border-white/10 hover:border-white/30 hover:bg-white/[0.05] group transition-all duration-300"
+            className="w-full flex items-center justify-between p-4 lg:p-4 rounded-xl lg:rounded-2xl bg-white/[0.03] border border-white/10 hover:border-white/30 hover:bg-white/[0.05] group transition-all duration-300"
           >
             <div className="flex items-center gap-3 lg:gap-4">
               <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center bg-white/10 border border-white/5 shrink-0 ${aiSuggesting ? 'animate-spin' : ''}`}>
@@ -153,10 +153,10 @@ export function CustomizationStudio() {
               </div>
               <div className="text-left">
                 <p className="text-xs lg:text-sm font-sans font-medium text-white">AI Copilot</p>
-                <p className="text-[10px] lg:text-[11px] text-white/50">{aiSuggesting ? 'Synthesizing...' : 'Suggest optimal aesthetic'}</p>
+                <p className="text-[10px] lg:text-[11px] text-white/60">{aiSuggesting ? 'Synthesizing...' : 'Suggest optimal aesthetic'}</p>
               </div>
             </div>
-            <ArrowRight className="w-4 h-4 text-white/50 group-hover:text-white group-hover:translate-x-1 transition-all shrink-0" />
+            <ArrowRight className="w-4 h-4 text-white/60 group-hover:text-white group-hover:translate-x-1 transition-all shrink-0" />
           </button>
         </div>
 
@@ -171,7 +171,7 @@ export function CustomizationStudio() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 flex-shrink-0 px-3 lg:px-4 py-3 lg:py-4 text-[10px] lg:text-[11px] font-sans uppercase tracking-[0.05em] font-medium transition-all border-b-2 ${activeTab === tab.id ? 'text-white border-white' : 'text-white/40 border-transparent hover:text-white/80'}`}
+              className={`flex items-center gap-2 flex-shrink-0 px-4 py-4 text-[10px] lg:text-[11px] font-sans uppercase tracking-[0.05em] font-medium transition-all border-b-2 ${activeTab === tab.id ? 'text-white border-white' : 'text-white/60 border-transparent hover:text-white/80'}`}
             >
               <tab.icon className="w-3.5 h-3.5" /> {tab.label}
             </button>
@@ -188,7 +188,7 @@ export function CustomizationStudio() {
                     <button
                       key={theme.id}
                       onClick={() => setSelections({...selections, theme: theme.id})}
-                      className={`w-full p-3 lg:p-4 rounded-xl lg:rounded-2xl flex flex-col gap-3 lg:gap-4 transition-all duration-300 border ${selections.theme === theme.id ? 'border-white bg-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]' : 'border-white/10 hover:border-white/20 bg-white/5'}`}
+                      className={`w-full p-4 rounded-xl lg:rounded-2xl flex flex-col gap-3 lg:gap-4 transition-all duration-300 border ${selections.theme === theme.id ? 'border-white bg-white/10 shadow-[0_0_20px_rgba(255,255,255,0.05)]' : 'border-white/10 hover:border-white/20 bg-white/5'}`}
                     >
                        <div className="flex items-center gap-1 w-full h-8 lg:h-10 rounded-md lg:rounded-lg overflow-hidden shrink-0">
                           <div className="flex-1 h-full" style={{backgroundColor: theme.primary}}></div>
@@ -213,11 +213,11 @@ export function CustomizationStudio() {
                     <button
                       key={layout.id}
                       onClick={() => setSelections({...selections, layout: layout.id})}
-                      className={`w-full p-3 lg:p-5 rounded-xl lg:rounded-2xl border flex items-center justify-between transition-all duration-300 ${selections.layout === layout.id ? 'border-white bg-white/10' : 'border-white/10 hover:border-white/20 bg-white/5'}`}
+                      className={`w-full p-4 lg:p-5 rounded-xl lg:rounded-2xl border flex items-center justify-between transition-all duration-300 ${selections.layout === layout.id ? 'border-white bg-white/10' : 'border-white/10 hover:border-white/20 bg-white/5'}`}
                     >
                        <div className="text-left pr-4">
                          <span className="font-sans font-medium text-xs lg:text-sm block mb-0.5 text-white">{layout.name}</span>
-                         <span className="font-sans font-light text-[10px] lg:text-xs text-white/50">{layout.desc}</span>
+                         <span className="font-sans font-light text-[10px] lg:text-xs text-white/60">{layout.desc}</span>
                        </div>
                        {selections.layout === layout.id && <div className="w-5 h-5 lg:w-6 lg:h-6 rounded-full bg-white flex flex-shrink-0 items-center justify-center"><Check className="w-3 h-3 text-dark" /></div>}
                     </button>
@@ -234,11 +234,11 @@ export function CustomizationStudio() {
                     <button
                       key={font.id}
                       onClick={() => setSelections({...selections, font: font.id})}
-                      className={`w-full p-3 lg:p-5 rounded-xl lg:rounded-2xl border flex items-center justify-between transition-all duration-300 ${selections.font === font.id ? 'border-white bg-white/10' : 'border-white/10 hover:border-white/20 bg-white/5'}`}
+                      className={`w-full p-4 lg:p-5 rounded-xl lg:rounded-2xl border flex items-center justify-between transition-all duration-300 ${selections.font === font.id ? 'border-white bg-white/10' : 'border-white/10 hover:border-white/20 bg-white/5'}`}
                     >
                        <div className="text-left pr-4">
                          <span className={`text-base lg:text-xl block mb-1 text-white ${font.id === 'serif' ? 'font-serif' : font.id === 'display' ? 'font-display' : font.id === 'mono' ? 'font-mono' : 'font-sans'}`}>{font.name}</span>
-                         <span className="font-sans font-light text-[10px] lg:text-xs text-white/50">{font.desc}</span>
+                         <span className="font-sans font-light text-[10px] lg:text-xs text-white/60">{font.desc}</span>
                        </div>
                        {selections.font === font.id && <Check className="w-4 h-4 text-white shrink-0" />}
                     </button>
@@ -255,7 +255,7 @@ export function CustomizationStudio() {
                     <button
                       key={style.id}
                       onClick={() => setSelections({...selections, buttonStyle: style.id})}
-                      className={`w-full p-3 lg:p-5 rounded-xl lg:rounded-2xl border flex items-center justify-between transition-all duration-300 ${selections.buttonStyle === style.id ? 'border-white bg-white/10' : 'border-white/10 hover:border-white/20 bg-white/5'}`}
+                      className={`w-full p-4 lg:p-5 rounded-xl lg:rounded-2xl border flex items-center justify-between transition-all duration-300 ${selections.buttonStyle === style.id ? 'border-white bg-white/10' : 'border-white/10 hover:border-white/20 bg-white/5'}`}
                     >
                        <div className="text-left pr-4">
                          <span className="font-sans font-medium text-xs lg:text-sm text-white">{style.name}</span>
@@ -274,7 +274,7 @@ export function CustomizationStudio() {
            <button 
              onClick={handleBuild}
              disabled={isBuilding}
-             className="w-full relative group rounded-xl lg:rounded-2xl bg-white text-dark py-3.5 lg:py-4 flex items-center justify-center gap-2 overflow-hidden transition-all hover:bg-white/90 hover:scale-[1.02] active:scale-95"
+             className="w-full relative group rounded-xl lg:rounded-2xl bg-white text-dark py-4 flex items-center justify-center gap-2 overflow-hidden transition-all hover:bg-white/90 hover:scale-[1.02] active:scale-95"
            >
              <span className="relative z-10 font-sans text-xs lg:text-sm font-semibold flex items-center gap-2">
                {isBuilding ? 'Syncing...' : 'Save Configuration'} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -284,13 +284,13 @@ export function CustomizationStudio() {
       </div>
 
       {/* Preview Stage (Main Area) */}
-      <div className="flex-1 lg:order-2 lg:ml-[420px] w-full h-[100dvh] lg:h-screen relative overflow-hidden bg-dark transition-colors duration-1000 flex flex-col">
+      <div className="flex-1 lg:order-1 w-full h-[100dvh] lg:h-screen relative overflow-hidden bg-dark transition-colors duration-1000 flex flex-col">
         
         {/* Editor Top Bar */}
         <div className="h-14 lg:h-14 border-b border-white/5 bg-dark/80 backdrop-blur-xl flex items-center justify-between px-4 lg:px-6 z-10 shrink-0 relative">
            <div className="flex items-center gap-2 text-white/60 font-sans text-[10px] lg:text-xs font-medium truncate">
-             <button onClick={() => navigate(-1)} className="lg:hidden flex items-center justify-center w-8 h-8 rounded-full bg-white/5 border border-white/10 text-white/80 hover:text-white mr-1 shrink-0">
-               <ChevronLeft className="w-4 h-4" />
+             <button onClick={() => navigate(-1)} className="lg:hidden flex items-center justify-center w-10 h-10 -ml-1 rounded-full bg-transparent hover:bg-white/5 text-white/80 hover:text-white mr-1 shrink-0 transition-colors">
+               <ChevronLeft className="w-5 h-5" />
              </button>
              <span className="hidden sm:inline">Prototype Layer</span>
              <span className="opacity-40 hidden sm:inline">/</span> 
@@ -298,11 +298,11 @@ export function CustomizationStudio() {
            </div>
            
            <div className="flex items-center gap-1 bg-white/5 p-1 rounded-md lg:rounded-lg border border-white/10 shrink-0">
-             <button onClick={() => setDeviceView('desktop')} className={`px-2 lg:px-3 py-1 lg:py-1.5 rounded-sm lg:rounded-md transition-all ${deviceView === 'desktop' ? 'bg-white/10 text-white shadow-sm' : 'text-white/40 hover:text-white'}`}>
-               <Monitor className="w-3.5 h-3.5" />
+             <button onClick={() => setDeviceView('desktop')} className={`px-3 lg:px-3 py-2 lg:py-1.5 rounded-sm lg:rounded-md transition-all ${deviceView === 'desktop' ? 'bg-white/10 text-white shadow-sm' : 'text-white/60 hover:text-white'}`}>
+               <Monitor className="w-4 h-4 md:w-3.5 md:h-3.5" />
              </button>
-             <button onClick={() => setDeviceView('mobile')} className={`px-2 lg:px-3 py-1 lg:py-1.5 rounded-sm lg:rounded-md transition-all ${deviceView === 'mobile' ? 'bg-white/10 text-white shadow-sm' : 'text-white/40 hover:text-white'}`}>
-               <SmartphoneIcon className="w-3.5 h-3.5" />
+             <button onClick={() => setDeviceView('mobile')} className={`px-3 lg:px-3 py-2 lg:py-1.5 rounded-sm lg:rounded-md transition-all ${deviceView === 'mobile' ? 'bg-white/10 text-white shadow-sm' : 'text-white/60 hover:text-white'}`}>
+               <SmartphoneIcon className="w-4 h-4 md:w-3.5 md:h-3.5" />
              </button>
            </div>
         </div>
@@ -312,11 +312,11 @@ export function CustomizationStudio() {
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
         </div>
         
-        <div className={`flex-1 overflow-auto flex items-center justify-center relative z-10 ${deviceView === 'mobile' ? 'p-0 lg:p-8' : 'p-4 lg:p-8'}`}>
+        <div className={`flex-1 overflow-y-scroll overflow-x-hidden flex items-center justify-center relative z-10 ${deviceView === 'mobile' ? 'p-0 lg:p-8' : 'p-4 lg:p-8'}`}>
            
            {/* Rendering Engine Container */}
            <motion.div 
-             key={`${selections.theme}-${selections.layout}-${selections.font}-${selections.buttonStyle}-${deviceView}`}
+             key={deviceView}
              initial={{ opacity: 0, scale: 0.98 }}
              animate={{ opacity: 1, scale: 1 }}
              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -482,7 +482,7 @@ export function CustomizationStudio() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               className="bg-white/[0.03] border border-white/10 rounded-3xl p-10 max-w-xl w-full text-center relative overflow-hidden shadow-2xl"
             >
-               <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-electric-blue/10 blur-[120px] rounded-full pointer-events-none" />
+               <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-premium-gold/10 blur-[120px] rounded-full pointer-events-none" />
                
                <div className="w-20 h-20 bg-white/5 border border-white/10 rounded-full flex items-center justify-center mx-auto mb-8 relative">
                  <div className="absolute inset-0 border border-green-400/50 rounded-full animate-ping opacity-30" />
@@ -495,7 +495,7 @@ export function CustomizationStudio() {
                </p>
                
                <div className="bg-dark/50 border border-white/5 p-5 rounded-2xl text-left mb-8">
-                  <p className="text-xs font-sans uppercase tracking-[0.1em] text-white/40 mb-3 font-semibold">Active Matrix</p>
+                  <p className="text-xs font-sans uppercase tracking-[0.1em] text-white/50 mb-3 font-semibold">Active Matrix</p>
                   <ul className="space-y-2 font-sans text-sm text-white/70">
                      <li className="flex justify-between border-b border-white/5 pb-2"><span>Aesthetic:</span> <span className="text-white font-medium">{activeThemeObj.name}</span></li>
                      <li className="flex justify-between border-b border-white/5 pb-2"><span>Layout:</span> <span className="text-white font-medium">{layouts.find(l=>l.id===selections.layout)?.name}</span></li>

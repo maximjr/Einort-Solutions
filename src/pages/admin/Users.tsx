@@ -53,14 +53,14 @@ export function AdminUsers() {
              <input 
                type="text" 
                placeholder="Search identifiers..." 
-               className="w-full bg-dark border border-white/10 rounded-lg py-2 pl-10 pr-4 text-sm font-mono text-white focus:outline-none focus:border-electric-blue transition-colors"
+               className="w-full bg-dark border border-white/10 rounded-lg py-2 pl-10 pr-4 text-sm font-mono text-white focus:outline-none focus:border-premium-gold transition-colors"
              />
            </div>
            <div className="flex gap-2 w-full md:w-auto">
               <button className="flex items-center gap-2 px-4 py-2 bg-dark border border-white/10 rounded-lg text-xs font-mono uppercase text-silver-metallic hover:text-white transition-colors">
                 <Filter className="w-4 h-4" /> Filter
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-electric-blue text-white rounded-lg text-xs font-mono uppercase geometric-clip-button hover:bg-neon-blue transition-colors">
+              <button className="flex items-center gap-2 px-4 py-2 bg-premium-gold text-white rounded-lg text-xs font-mono uppercase geometric-clip-button hover:bg-oxblood transition-colors">
                 Export Data
               </button>
            </div>
@@ -70,7 +70,7 @@ export function AdminUsers() {
         <div className="flex-1 overflow-auto custom-scrollbar">
           {loading ? (
              <div className="flex flex-col items-center justify-center h-64 gap-4">
-                <Cpu className="w-8 h-8 text-electric-blue animate-pulse" />
+                <Cpu className="w-8 h-8 text-premium-gold animate-pulse" />
                 <p className="font-mono text-xs uppercase tracking-widest text-silver-metallic">Syncing Data...</p>
              </div>
           ) : users.length === 0 ? (

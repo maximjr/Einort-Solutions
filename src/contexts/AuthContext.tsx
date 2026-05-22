@@ -30,22 +30,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(currentUser);
       
       if (currentUser) {
-        // Quick check for the hardcoded super admin
-        if (currentUser.email === 'njeirheinard@gmail.com') {
-          setIsAdmin(true);
-        } else {
-          // Check for admin document
-          try {
-            const adminDoc = await getDoc(doc(db, 'admins', currentUser.uid));
-            setIsAdmin(adminDoc.exists() && ['admin', 'super_admin'].includes(adminDoc.data()?.role));
-          } catch (e: any) {
-            if (e?.code === 'unavailable' || e?.message?.includes('offline')) {
-              console.warn("Could not check admin status: Client is offline");
-            } else {
-              console.error("Error checking admin status:", e);
-            }
-            setIsAdmin(false);
+        // Check for admin/role document in firestore
+        try {
+          const adminDoc = await getDoc(doc(db, 'admins', currentUser.uid));
+          if (adminDoc.exists()) {
+             const role = adminDoc.data()?.role;
+             setIsAdmin(['admin', 'super_admin'].includes(role));
+          } else {
+             setIsAdmin(false);
           }
+        } catch (e: any) {
+          if (e?.code === 'unavailable' || e?.message?.includes('offline')) {
+            console.warn("Could not check admin status: Client is offline");
+          } else {
+            console.error("Error checking admin status:", e);
+          }
+          setIsAdmin(false);
         }
       } else {
         setIsAdmin(false);
@@ -77,27 +77,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         await setDoc(userRef, { lastLogin: serverTimestamp() }, { merge: true });
       }
-
-      // Auto-provision Super Admin on first login if it's the specific email
-      if (user.email === 'njeirheinard@gmail.com') {
-        const adminRef = doc(db, 'admins', user.uid);
-        const adminSnap = await getDoc(adminRef);
-        if (!adminSnap.exists()) {
-          await setDoc(adminRef, {
-            uid: user.uid,
-            name: user.displayName,
-            email: user.email,
-            role: 'super_admin',
-            permissions: ['full_access'],
-            createdAt: serverTimestamp(),
-            lastLogin: serverTimestamp(),
-            isActive: true
-          });
-        } else {
-          await setDoc(adminRef, { lastLogin: serverTimestamp() }, { merge: true });
-        }
-      }
-
     } catch (err) {
       console.warn("Could not sync user to Firestore (database might not be initialized): ", err);
     }
@@ -109,8 +88,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
-      await updateProfile(result.user, { displayName: fullName });
-      await syncUserToFirestore(result.user, { fullName, phoneNumber });
+      // Run slower profile updates and database sync in the background
+      updateProfile(result.user, { displayName: fullName }).catch(console.error);
+      syncUserToFirestore(result.user, { fullName, phoneNumber }).catch(console.error);
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
         throw new Error('User already exists. Sign in?');
@@ -125,7 +105,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
-      await syncUserToFirestore(result.user);
+      // Run database sync in the background
+      syncUserToFirestore(result.user).catch(console.error);
     } catch (error: any) {
       if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
         throw new Error('Password or Email Incorrect');

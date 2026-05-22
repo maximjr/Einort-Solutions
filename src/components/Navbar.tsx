@@ -25,9 +25,10 @@ export function Navbar() {
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Services', href: '/services' },
-    { name: 'Process', href: '/process' },
     { name: 'Work', href: '/work' },
     { name: 'About', href: '/about' },
+    { name: 'Pricing', href: '/pricing' },
+    { name: 'FAQ', href: '/faq' },
   ];
 
   return (
@@ -120,7 +121,7 @@ export function Navbar() {
           )}
 
           <Link
-            to="/contact"
+            to="/book"
             className="px-5 py-2 bg-white text-dark rounded-full text-[13px] font-sans font-semibold hover:bg-white/90 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-sm"
           >
             Start Project
@@ -186,7 +187,7 @@ export function Navbar() {
                 )}
 
                 <Link
-                  to="/contact"
+                  to="/book"
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full text-center px-6 py-3 bg-white text-dark rounded-full font-sans text-sm font-semibold transition-colors hover:bg-white/90"
                 >

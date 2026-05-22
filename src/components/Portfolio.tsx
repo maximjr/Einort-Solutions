@@ -72,7 +72,7 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
         {/* Top Header */}
         <div className="flex justify-between items-start">
            <div className="flex items-center gap-3 bg-dark/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-2 group-hover:translate-y-0">
-             <div className="w-1.5 h-1.5 bg-electric-blue rounded-full" />
+             <div className="w-1.5 h-1.5 bg-premium-gold rounded-full" />
              <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-silver-metallic font-medium">Protocol {String(project.id).padStart(3, '0')}</span>
            </div>
         </div>
@@ -82,7 +82,7 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
         
         <div className="relative z-30 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-[0.16,1,0.3,1]">
           <div className="flex items-center gap-3 mb-3">
-            <span className="w-6 h-[1px] bg-electric-blue/50" />
+            <span className="w-6 h-[1px] bg-premium-gold/50" />
             <p className="text-white/70 font-mono font-medium tracking-[0.1em] uppercase text-[9px] md:text-xs">
               {project.category}
             </p>
@@ -119,7 +119,7 @@ export function Portfolio() {
   return (
     <section id="work" ref={containerRef} className="relative bg-dark min-h-screen py-24 lg:py-40 pb-32 border-t border-white/5 overflow-hidden">
        {/* Cinematic Deep Background */}
-       <motion.div style={{ y: bgY }} className="absolute top-0 right-0 w-[800px] h-[800px] bg-electric-blue/5 blur-[200px] mix-blend-screen pointer-events-none" />
+       <motion.div style={{ y: bgY }} className="absolute top-0 right-0 w-[800px] h-[800px] bg-premium-gold/5 blur-[200px] mix-blend-screen pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 w-full mt-10">
         <div className="mb-20 md:mb-28">
@@ -129,7 +129,7 @@ export function Portfolio() {
             viewport={{ once: true }}
             className="flex items-center gap-3 mb-6"
           >
-            <div className="w-1.5 h-1.5 bg-electric-blue rounded-full" />
+            <div className="w-1.5 h-1.5 bg-premium-gold rounded-full" />
             <span className="text-[11px] font-mono font-medium uppercase tracking-[0.2em] text-silver-metallic">Selected Architecture</span>
           </motion.div>
           <motion.h2 

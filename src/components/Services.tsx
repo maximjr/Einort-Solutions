@@ -28,10 +28,12 @@ function ServiceCard({ service, index }: { service: typeof services[0]; index: n
       onMouseLeave={() => setIsHovered(false)}
       className="group relative p-8 lg:p-10 bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all duration-500 overflow-hidden h-full flex flex-col rounded-3xl"
     >
+      <Link to={`/services/${serviceSlug}`} className="absolute inset-0 z-20" aria-label={`Explore ${service.title}`} />
+      
       {/* Subtle Glow Overlay on Hover */}
       <div 
         className={cn(
-          "absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-electric-blue/10 via-transparent to-transparent opacity-0 transition-opacity duration-700 pointer-events-none",
+          "absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-premium-gold/10 via-transparent to-transparent opacity-0 transition-opacity duration-700 pointer-events-none",
           isHovered && "opacity-100"
         )}
       />
@@ -68,7 +70,7 @@ function ServiceCard({ service, index }: { service: typeof services[0]; index: n
         </p>
         
         <div className="mt-auto pt-6 border-t border-white/5 relative flex">
-          <Link to={`/services/${serviceSlug}`} className="flex items-center gap-2 text-[12px] font-sans font-medium text-white/50 group-hover:text-white transition-colors cursor-pointer w-fit group/btn">
+          <div className="flex items-center gap-2 text-[12px] font-sans font-medium text-white/50 group-hover:text-white transition-colors w-fit group/btn relative z-10">
             <span>Explore Capability</span>
             <motion.div 
               animate={{ x: isHovered ? 4 : 0 }}
@@ -77,7 +79,7 @@ function ServiceCard({ service, index }: { service: typeof services[0]; index: n
             >
               <ArrowRight className="w-3.5 h-3.5" />
             </motion.div>
-          </Link>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -97,7 +99,7 @@ export function Services() {
     <section id="services" ref={containerRef} className="py-24 lg:py-40 relative text-white bg-dark overflow-hidden">
       {/* Background Subtleties */}
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-      <motion.div style={{ y, opacity }} className="absolute right-0 top-1/4 w-[600px] h-[600px] bg-electric-blue/5 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
+      <motion.div style={{ y, opacity }} className="absolute right-0 top-1/4 w-[600px] h-[600px] bg-premium-gold/5 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-10">
@@ -108,7 +110,7 @@ export function Services() {
               viewport={{ once: true }}
               className="flex items-center gap-3 mb-6"
             >
-              <div className="w-1.5 h-1.5 bg-electric-blue rounded-full" />
+              <div className="w-1.5 h-1.5 bg-premium-gold rounded-full" />
               <span className="text-[11px] font-mono font-medium uppercase tracking-[0.2em] text-silver-metallic">Core Capabilities</span>
             </motion.div>
 

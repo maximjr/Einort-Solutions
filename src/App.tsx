@@ -14,12 +14,21 @@ import { SEO } from './components/SEO';
 
 // Lazy loading components for performance
 const Hero = lazy(() => import('./components/Hero').then(m => ({ default: m.Hero })));
+const HomeSummary = lazy(() => import('./components/HomeSummary').then(m => ({ default: m.HomeSummary })));
 const Services = lazy(() => import('./components/Services').then(m => ({ default: m.Services })));
 const Portfolio = lazy(() => import('./components/Portfolio').then(m => ({ default: m.Portfolio })));
 const About = lazy(() => import('./components/About').then(m => ({ default: m.About })));
 const Process = lazy(() => import('./components/Process').then(m => ({ default: m.Process })));
 const Testimonials = lazy(() => import('./components/Testimonials').then(m => ({ default: m.Testimonials })));
 const Contact = lazy(() => import('./components/Contact').then(m => ({ default: m.Contact })));
+const Pricing = lazy(() => import('./pages/Pricing').then(m => ({ default: m.Pricing })));
+const FAQ = lazy(() => import('./pages/FAQ').then(m => ({ default: m.FAQ })));
+const Booking = lazy(() => import('./pages/Booking').then(m => ({ default: m.Booking })));
+const AIAudit = lazy(() => import('./pages/AIAudit').then(m => ({ default: m.AIAudit })));
+const ClientPortal = lazy(() => import('./pages/client/ClientPortal').then(m => ({ default: m.ClientPortal })));
+const LocalizedService = lazy(() => import('./pages/LocalizedService').then(m => ({ default: m.LocalizedService })));
+const InsightHub = lazy(() => import('./pages/InsightHub').then(m => ({ default: m.InsightHub })));
+const InsightArticle = lazy(() => import('./pages/InsightArticle').then(m => ({ default: m.InsightArticle })));
 const Dashboard = lazy(() => import('./components/Dashboard').then(m => ({ default: m.Dashboard })));
 const ServiceExperience = lazy(() => import('./components/ServiceExperience').then(m => ({ default: m.ServiceExperience })));
 const CustomizationStudio = lazy(() => import('./components/CustomizationStudio').then(m => ({ default: m.CustomizationStudio })));
@@ -31,10 +40,11 @@ const Overview = lazy(() => import('./pages/admin/Overview').then(m => ({ defaul
 const AdminUsers = lazy(() => import('./pages/admin/Users').then(m => ({ default: m.AdminUsers })));
 const AdminProjects = lazy(() => import('./pages/admin/Projects').then(m => ({ default: m.AdminProjects })));
 const AdminAnalytics = lazy(() => import('./pages/admin/Analytics').then(m => ({ default: m.AdminAnalytics })));
+const AdminCRM = lazy(() => import('./pages/admin/CRM').then(m => ({ default: m.AdminCRM })));
 
 const LoadingFallback = () => (
   <div className="min-h-[100dvh] flex items-center justify-center bg-dark">
-    <div className="w-12 h-12 border-2 border-electric-blue/20 border-t-electric-blue rounded-full animate-spin"></div>
+    <div className="w-12 h-12 border-2 border-premium-gold/20 border-t-premium-gold rounded-full animate-spin"></div>
   </div>
 );
 
@@ -48,12 +58,12 @@ export default function App() {
   const hideGlobalLayout = isStudioRoute || isAdminRoute || isCustomProjectRoute;
 
   return (
-    <div className="bg-dark min-h-screen text-white selection:bg-electric-blue selection:text-white font-sans relative overflow-x-hidden">
+    <div className="bg-dark min-h-screen text-white selection:bg-premium-gold selection:text-white font-sans relative overflow-x-hidden">
       <SEO />
       {!hideGlobalLayout && (
         <>
           <div className="fixed inset-0 z-0 opacity-20 pointer-events-none mix-blend-screen" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, #1A73E8 1px, transparent 0)", backgroundSize: "32px 32px" }}></div>
-          <div className="fixed -top-[100px] -right-[100px] w-[500px] h-[500px] bg-electric-blue opacity-10 rounded-full blur-[120px] pointer-events-none"></div>
+          <div className="fixed -top-[100px] -right-[100px] w-[500px] h-[500px] bg-premium-gold opacity-10 rounded-full blur-[120px] pointer-events-none"></div>
           <div className="fixed -bottom-[200px] -left-[100px] w-[600px] h-[600px] bg-dark-blue opacity-30 rounded-full blur-[150px] pointer-events-none"></div>
         </>
       )}
@@ -69,11 +79,16 @@ export default function App() {
                     <CinematicTransition>
                       <Hero />
                       <Testimonials />
+                      <HomeSummary />
+                      <Contact />
                     </CinematicTransition>
                   } />
                   <Route path="/services" element={
                     <CinematicTransition>
-                      <div className="pt-24 min-h-screen"><Services /></div>
+                      <div className="pt-24 min-h-screen">
+                        <Services />
+                        <Contact />
+                      </div>
                     </CinematicTransition>
                   } />
                   <Route path="/services/:serviceId" element={
@@ -91,6 +106,7 @@ export default function App() {
                   {/* Admin Routes */}
                   <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<Overview />} />
+                    <Route path="crm" element={<AdminCRM />} />
                     <Route path="users" element={<AdminUsers />} />
                     <Route path="projects" element={<AdminProjects />} />
                     <Route path="analytics" element={<AdminAnalytics />} />
@@ -99,12 +115,18 @@ export default function App() {
 
                   <Route path="/work" element={
                     <CinematicTransition>
-                      <div className="pt-24"><Portfolio /></div>
+                      <div className="pt-24">
+                        <Portfolio />
+                        <Contact />
+                      </div>
                     </CinematicTransition>
                   } />
                   <Route path="/about" element={
                     <CinematicTransition>
-                      <div className="pt-24 min-h-screen"><About /></div>
+                      <div className="pt-24 min-h-screen">
+                        <About />
+                        <Contact />
+                      </div>
                     </CinematicTransition>
                   } />
                   <Route path="/process" element={
@@ -117,6 +139,14 @@ export default function App() {
                       <div className="pt-24 min-h-screen"><Contact /></div>
                     </CinematicTransition>
                   } />
+                  <Route path="/pricing" element={<Pricing />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/book" element={<Booking />} />
+                  <Route path="/audit" element={<AIAudit />} />
+                  <Route path="/client" element={<ClientPortal />} />
+                  <Route path="/agency/:slug" element={<LocalizedService />} />
+                  <Route path="/insights" element={<InsightHub />} />
+                  <Route path="/insights/:slug" element={<InsightArticle />} />
                   <Route path="/dashboard" element={
                     <CinematicTransition>
                       <Dashboard />

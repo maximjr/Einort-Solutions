@@ -13,7 +13,7 @@ export function CinematicTransition({ children }: { children: ReactNode }) {
         animate={{ scaleY: 0 }}
         exit={{ scaleY: 0 }}
         transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed inset-0 z-[100] bg-black origin-top pointer-events-none flex flex-col items-center justify-center border-b border-electric-blue/30"
+        className="fixed inset-0 z-[100] bg-dark origin-top pointer-events-none flex flex-col items-center justify-center border-b border-premium-gold/30"
       >
         <span className="text-white/20 text-[10px] tracking-[0.5em] font-bold uppercase animate-pulse">
            INITIALIZING SEQUENCE
@@ -32,7 +32,7 @@ export function CinematicTransition({ children }: { children: ReactNode }) {
         animate={{ scaleY: 0 }}
         exit={{ scaleY: 1 }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed inset-0 z-[100] bg-black origin-bottom pointer-events-none flex flex-col items-center justify-center border-t border-electric-blue/30"
+        className="fixed inset-0 z-[100] bg-dark origin-bottom pointer-events-none flex flex-col items-center justify-center border-t border-premium-gold/30"
       >
         <img 
           src="https://i.imgur.com/6V1ecDU.png" 

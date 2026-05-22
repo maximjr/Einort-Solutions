@@ -377,7 +377,7 @@ export function ServiceExperience() {
       <SEO title={`${title} - Case Studies`} />
 
       {/* Ambient Lighting Background */}
-      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-electric-blue/5 blur-[150px] mix-blend-screen pointer-events-none rounded-full" />
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-premium-gold/5 blur-[150px] mix-blend-screen pointer-events-none rounded-full" />
       <div className="absolute inset-0 bg-[#ffffff02] mix-blend-overlay pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 w-full mt-10 lg:mt-0">
@@ -439,7 +439,7 @@ export function ServiceExperience() {
               {/* Status Header */}
               <div className="relative z-20 p-6 flex justify-between items-start">
                  <div className="flex items-center gap-2 bg-dark/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/5">
-                   <div className="w-1.5 h-1.5 rounded-full bg-electric-blue animate-pulse" />
+                   <div className="w-1.5 h-1.5 rounded-full bg-premium-gold animate-pulse" />
                    <span className="text-[10px] font-sans font-medium uppercase tracking-[0.1em] text-white/80">Architecture Ready</span>
                  </div>
               </div>
@@ -478,7 +478,7 @@ export function ServiceExperience() {
                      <p className="text-[10px] font-sans font-medium text-white/60 mb-2 ml-1">Interactive Triggers</p>
                      <div className="flex flex-wrap gap-1.5">
                        {category.interactiveStates.map((state: string, i: number) => (
-                         <span key={i} className="text-[10px] text-electric-blue border border-electric-blue/30 bg-electric-blue/5 px-2 py-1 rounded-sm">
+                         <span key={i} className="text-[10px] text-premium-gold border border-premium-gold/30 bg-premium-gold/5 px-2 py-1 rounded-sm">
                            {state}
                          </span>
                        ))}

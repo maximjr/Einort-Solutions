@@ -41,7 +41,7 @@ export function Testimonials() {
   return (
     <section className="py-24 lg:py-40 relative bg-dark overflow-hidden border-t border-white/5">
       {/* Subtle Immersive Environment */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-electric-blue/5 rounded-full blur-[200px] pointer-events-none mix-blend-screen" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-premium-gold/5 rounded-full blur-[200px] pointer-events-none mix-blend-screen" />
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.01] mix-blend-overlay pointer-events-none" />
       
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 mt-10">
@@ -53,7 +53,7 @@ export function Testimonials() {
                viewport={{ once: true }}
                className="flex items-center gap-3 mb-6"
              >
-               <div className="w-1.5 h-1.5 bg-electric-blue rounded-full" />
+               <div className="w-1.5 h-1.5 bg-premium-gold rounded-full" />
                <span className="text-[11px] font-mono font-medium uppercase tracking-[0.2em] text-silver-metallic">Enterprise Validation</span>
              </motion.div>
              <motion.h2 

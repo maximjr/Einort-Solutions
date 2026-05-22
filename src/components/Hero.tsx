@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import { useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 export function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -14,8 +15,8 @@ export function Hero() {
     <section ref={containerRef} className="relative min-h-screen flex items-center pt-24 overflow-hidden bg-dark">
       {/* Immersive Cinematic Background - Refined and Subtle */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <motion.div style={{ y: y1 }} className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] bg-electric-blue/10 blur-[180px] mix-blend-screen" />
-        <motion.div style={{ y: y2 }} className="absolute bottom-[0%] -right-[10%] w-[60%] h-[60%] bg-neon-blue/5 blur-[150px] mix-blend-screen" />
+        <motion.div style={{ y: y1 }} className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] bg-[#0a1936]/40 blur-[150px] mix-blend-screen" />
+        <motion.div style={{ y: y2 }} className="absolute bottom-[0%] -right-[10%] w-[60%] h-[60%] bg-[#1d4ed8]/20 blur-[130px] mix-blend-screen" />
         {/* Subtle Geometric Grid Overlay */}
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] [transform:perspective(1500px)_rotateX(60deg)_translateY(-100px)_translateZ(-200px)_scale(2)] opacity-20" />
       </div>
@@ -30,7 +31,7 @@ export function Hero() {
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
               className="inline-flex items-center gap-3 px-4 py-2 glass-panel-light rounded-full border-white/5 w-fit shadow-sm"
             >
-              <div className="w-2 h-2 bg-electric-blue rounded-full animate-pulse shadow-[0_0_8px_#2563eb]"></div>
+              <div className="w-2 h-2 bg-premium-gold rounded-full animate-pulse shadow-[0_0_8px_#D4AF37]"></div>
               <span className="text-[11px] font-mono font-medium uppercase tracking-widest text-silver-metallic">Next Generation Architecture</span>
             </motion.div>
 
@@ -42,7 +43,7 @@ export function Hero() {
             >
               <h1 className="text-5xl md:text-7xl lg:text-[80px] leading-[1.05] font-bold tracking-tight font-display relative z-10">
                 <span className="block text-white drop-shadow-xl">We Engineer</span>
-                <span className="block text-gradient-metallic mt-1">The Future.</span>
+                <span className="block text-gradient-theme mt-1">The Future.</span>
               </h1>
             </motion.div>
 
@@ -61,17 +62,17 @@ export function Hero() {
               transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="flex flex-col sm:flex-row gap-5 mt-2"
             >
-              <a href="#contact" className="group relative inline-flex items-center justify-center px-8 py-4 bg-white text-dark rounded-full overflow-hidden hover:scale-[1.02] transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+              <Link to="/book" className="group relative inline-flex items-center justify-center px-8 py-4 bg-white text-dark rounded-full overflow-hidden hover:scale-[1.02] transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.15)]">
                 <span className="relative z-10 text-[13px] font-semibold tracking-wide flex items-center gap-2">
-                  Initiate Protocol
+                  Initiate Discovery
                   <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </span>
-              </a>
-              <a href="#work" className="group relative inline-flex items-center justify-center px-8 py-4 rounded-full border border-white/10 hover:bg-white/5 hover:border-white/20 transition-all duration-300">
-                <span className="text-[13px] font-medium tracking-wide text-silver-metallic group-hover:text-white transition-colors flex items-center gap-2">
-                  View Architecture
+              </Link>
+              <Link to="/audit" className="group relative inline-flex items-center justify-center px-8 py-4 rounded-full border border-white/10 hover:bg-white/5 hover:border-premium-gold/30 transition-all duration-300">
+                <span className="text-[13px] font-medium tracking-wide text-silver-metallic group-hover:text-premium-gold transition-colors flex items-center gap-2">
+                  Run AI Site Audit
                 </span>
-              </a>
+              </Link>
             </motion.div>
           </motion.div>
 
@@ -128,7 +129,7 @@ export function Hero() {
                 className="absolute bottom-10 -left-2 lg:left-10 p-4 bg-dark/40 backdrop-blur-md rounded-2xl border border-white/10 shadow-xl z-20"
               >
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="w-1.5 h-1.5 bg-electric-blue rounded-full animate-pulse" />
+                  <div className="w-1.5 h-1.5 bg-premium-gold rounded-full animate-pulse" />
                   <p className="text-[10px] font-mono text-silver-metallic uppercase tracking-widest">Neural Sync</p>
                 </div>
                 <p className="text-lg font-display font-medium text-white tracking-tight">Active State</p>
