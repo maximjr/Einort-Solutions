@@ -1,5 +1,6 @@
 import { motion, useScroll, useTransform } from 'motion/react';
 import { useRef } from 'react';
+import { Authority } from './Authority';
 
 export function About() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -11,6 +12,7 @@ export function About() {
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.3, 1, 0.3]);
 
   return (
+    <>
     <section id="about" ref={containerRef} className="py-32 lg:py-48 relative bg-dark overflow-hidden border-t border-white/5">
       {/* Dynamic Background Elements */}
       <motion.div style={{ y, opacity }} className="absolute left-[-10%] top-1/4 w-[600px] h-[600px] bg-premium-gold/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
@@ -120,5 +122,7 @@ export function About() {
         </div>
       </div>
     </section>
+    <Authority />
+    </>
   );
 }

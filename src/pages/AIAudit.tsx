@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Search, Loader2, ArrowRight, ShieldCheck, Zap, LineChart, Code2 } from 'lucide-react';
 import { CinematicTransition } from '../components/CinematicTransition';
 import { Footer } from '../components/Footer';
