@@ -14,7 +14,7 @@ const sidebarLinks = [
 ];
 
 export function AdminLayout() {
-  const { user, loading, isAdmin, signOut } = useAuth();
+  const { user, loading, isAdmin, userRole, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -113,7 +113,7 @@ export function AdminLayout() {
                )}
                <div className="flex flex-col truncate">
                  <span className="font-mono text-[10px] text-white truncate tracking-wider">{user.displayName || 'Admin'}</span>
-                 <span className="font-mono text-[9px] text-premium-gold truncate tracking-widest uppercase mt-0.5">Level 9 Auth</span>
+                 <span className="font-mono text-[9px] text-premium-gold truncate tracking-widest uppercase mt-0.5">{userRole || 'Admin'}</span>
                </div>
             </div>
             <button onClick={signOut} className="p-2 text-silver-metallic hover:text-red-400 transition-colors shrink-0">

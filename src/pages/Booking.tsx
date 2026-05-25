@@ -3,15 +3,53 @@ import { motion } from 'motion/react';
 import { Calendar, Clock, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { CinematicTransition } from '../components/CinematicTransition';
 import { Footer } from '../components/Footer';
+import { db } from '../lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { calculateLeadScore, getLeadStatus } from '../utils/leadScoring';
+import { logClientActivity } from '../utils/activityLogger';
 
 export function Booking() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({ name: '', email: '', company: '', timeline: '', goals: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const handleNext = () => setStep(2);
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStep(3);
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      const score = calculateLeadScore({
+        value: 0,
+        timeline: formData.timeline,
+        hasCompany: !!formData.company
+      });
+
+      await addDoc(collection(db, 'leads'), {
+        name: formData.company || formData.name,
+        contact: formData.name,
+        email: formData.email,
+        value: 0,
+        stage: 'new',
+        date: new Date().toISOString().split('T')[0],
+        status: getLeadStatus(score),
+        score: score,
+        aiNote: `Booking requested. Goals: ${formData.goals}. Timeline: ${formData.timeline}.`,
+        createdAt: serverTimestamp()
+      });
+      await logClientActivity(null, formData.email, 'booked_consultation', 'Booked via consultation form');
+      setStep(3);
+    } catch (err: any) {
+      console.error("Failed to submit booking", err);
+      setSubmitError(err.message || "Failed to book consultation");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -110,25 +148,32 @@ export function Booking() {
                    <div className="grid md:grid-cols-2 gap-6">
                      <div>
                        <label className="block text-xs uppercase tracking-widest text-white/50 mb-2">Full Name</label>
-                       <input required type="text" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-premium-gold transition-colors" placeholder="John Doe" />
+                       <input required name="name" value={formData.name} onChange={handleChange} type="text" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-premium-gold transition-colors" placeholder="John Doe" />
                      </div>
                      <div>
                        <label className="block text-xs uppercase tracking-widest text-white/50 mb-2">Corporate Email</label>
-                       <input required type="email" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-premium-gold transition-colors" placeholder="john@company.com" />
+                       <input required name="email" value={formData.email} onChange={handleChange} type="email" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-premium-gold transition-colors" placeholder="john@company.com" />
                      </div>
                    </div>
                    <div>
                      <label className="block text-xs uppercase tracking-widest text-white/50 mb-2">Company / Organization</label>
-                     <input type="text" className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-premium-gold transition-colors" placeholder="Company Ltd" />
+                     <input type="text" name="company" value={formData.company} onChange={handleChange} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-premium-gold transition-colors" placeholder="Company Ltd" />
                    </div>
                    <div>
                      <label className="block text-xs uppercase tracking-widest text-white/50 mb-2">Project Brief & Objectives</label>
-                     <textarea required rows={4} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-premium-gold transition-colors" placeholder="Describe the scale and requirements of your architecture..."></textarea>
+                     <textarea required name="goals" value={formData.goals} onChange={handleChange} rows={4} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-premium-gold transition-colors" placeholder="Describe the scale and requirements of your architecture..."></textarea>
                    </div>
+                   
+                   {submitError && (
+                     <div className="p-3 border border-red-500/30 bg-red-500/10 text-red-400 font-mono text-xs rounded-lg">
+                       ⚠️ {submitError}
+                     </div>
+                   )}
+
                    <div className="pt-4 flex justify-between items-center border-t border-white/10">
                      <button type="button" onClick={() => setStep(1)} className="text-white/50 hover:text-white transition-colors text-sm">Back to Calendar</button>
-                     <button type="submit" className="px-8 py-3 bg-premium-gold text-dark rounded-full font-semibold flex items-center gap-2 hover:brightness-110 transition-all shadow-[0_0_20px_rgba(212,175,55,0.2)]">
-                       Confirm Protocol <ArrowRight className="w-4 h-4" />
+                     <button type="submit" disabled={isSubmitting} className="px-8 py-3 bg-premium-gold text-dark rounded-full font-semibold flex items-center gap-2 hover:brightness-110 transition-all shadow-[0_0_20px_rgba(212,175,55,0.2)] disabled:opacity-50">
+                       {isSubmitting ? 'Verifying...' : 'Confirm Protocol'} <ArrowRight className="w-4 h-4" />
                      </button>
                    </div>
                  </div>

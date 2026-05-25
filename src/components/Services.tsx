@@ -1,169 +1,220 @@
-import { motion, useScroll, useTransform } from 'motion/react';
-import { Layers, Lightbulb, ShieldCheck, Box, Workflow, Network, Fingerprint, Lock, Smartphone, ArrowRight } from 'lucide-react';
-import { cn } from '@/src/lib/utils';
-import { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'motion/react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight, Activity, Globe, Database, ShieldCheck, ChevronRight, Check } from 'lucide-react';
+import { cn } from '../lib/utils';
+import { SEO } from './SEO';
 
-const services = [
-  { icon: Layers, title: 'UI/UX Design', description: 'Award-winning digital experiences crafted with pixel-perfect precision, psychological flow, and elite human-centric design protocols.', tag: 'Design' },
-  { icon: Workflow, title: 'Web Development', description: 'High-performance, futuristic software infrastructure built with cutting-edge frameworks and infinitely scalable global architectures.', tag: 'Engineering' },
-  { icon: Smartphone, title: 'Mobile App Development', description: 'Native and fluid cross-platform mobile environments that feel premium, instantaneous, and remarkably intuitive.', tag: 'Mobile' },
-  { icon: Network, title: 'Enterprise/ERP Solutions', description: 'Interconnected, high-availability digital platforms connecting millions of users seamlessly across the globe in real-time.', tag: 'Cloud' },
-  { icon: Fingerprint, title: 'Brand Identity', description: 'Bold, memorable visual identities and digital aesthetics that position your organization as the undisputed industry luminary.', tag: 'Brand' }
+const INDUSTRIES = [
+  { id: 'healthcare', name: 'Healthcare & Medical', desc: 'Secure patient portals, telemedicine, and HIPAA-compliant data systems.' },
+  { id: 'hotel', name: 'Hotel & Hospitality', desc: 'Booking engines, PMS integrations, and premium guest experiences.' },
+  { id: 'restaurant', name: 'Restaurant & Dining', desc: 'Order tracking, POS integrations, and loyalty systems.' },
+  { id: 'education', name: 'Education & EdTech', desc: 'Learning management systems, student portals, and virtual classrooms.' },
+  { id: 'corporate', name: 'Corporate & Enterprise', desc: 'Complex ERPs, operational automation, and global team collaboration.' },
+  { id: 'ngo', name: 'NGO & Non-Profit', desc: 'Donation tracking, volunteer routing, and transparency ledgers.' },
+  { id: 'startup', name: 'High-Growth Startup', desc: 'Scalable MVPs, cloud-native architectures, and investor-ready systems.' },
+  { id: 'realestate', name: 'Real Estate & PropTech', desc: 'Property management, lead routing, and dynamic MLS listing models.' },
+  { id: 'ecommerce', name: 'Retail & Ecommerce', desc: 'Ultra-fast global storefronts, omnichannel sync, and inventory intelligence.' }
 ];
 
-function ServiceCard({ service, index }: { service: typeof services[0]; index: number; key?: string }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const serviceSlug = service.title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+const GOALS = [
+  { id: 'revenue', name: 'Drive Digital Revenue' },
+  { id: 'automation', name: 'Automate Workflows' },
+  { id: 'experience', name: 'Elevate UX/UI Design' },
+  { id: 'scale', name: 'Scale Infrastructure' }
+];
 
-  return (
-    <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 20, scale: 0.98 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="group relative p-8 lg:p-10 bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all duration-500 overflow-hidden h-full flex flex-col rounded-3xl"
-    >
-      <Link to={`/services/${serviceSlug}`} className="absolute inset-0 z-20" aria-label={`Explore ${service.title}`} />
-      
-      {/* Subtle Glow Overlay on Hover */}
-      <div 
-        className={cn(
-          "absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-premium-gold/10 via-transparent to-transparent opacity-0 transition-opacity duration-700 pointer-events-none",
-          isHovered && "opacity-100"
-        )}
-      />
-      
-      {/* Animated Top Line */}
-      <div className={cn(
-        "absolute top-0 left-1/2 -translate-x-1/2 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent transition-all duration-700",
-        isHovered ? "w-2/3 opacity-100" : "w-0 opacity-0"
-      )} />
-
-      <div className="absolute top-8 right-8 opacity-40 text-[10px] font-mono tracking-widest text-silver-metallic group-hover:opacity-100 group-hover:text-white transition-all duration-500">
-        {index < 9 ? `0${index + 1}` : index + 1}
-      </div>
-      
-      <div className="relative z-10 flex flex-col h-full">
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-105 group-hover:bg-white/10 transition-all duration-500 relative overflow-hidden">
-            <service.icon className={cn(
-              "w-5 h-5 text-silver-metallic transition-colors duration-500 relative z-10",
-              isHovered && "text-white"
-            )} />
-          </div>
-          <span className="text-[10px] uppercase tracking-widest font-mono font-medium text-silver-metallic group-hover:text-white transition-colors">
-            {service.tag}
-          </span>
-        </div>
-        
-        <h3 className="text-2xl font-display font-semibold mb-3 text-white tracking-tight transition-all duration-300 relative inline-block">
-          {service.title}
-        </h3>
-        
-        <p className="text-silver-metallic font-sans font-light leading-relaxed mb-10 flex-grow text-sm">
-          {service.description}
-        </p>
-        
-        <div className="mt-auto pt-6 border-t border-white/5 relative flex">
-          <div className="flex items-center gap-2 text-[12px] font-sans font-medium text-white/50 group-hover:text-white transition-colors w-fit group/btn relative z-10">
-            <span>Explore Capability</span>
-            <motion.div 
-              animate={{ x: isHovered ? 4 : 0 }}
-              transition={{ type: 'spring', stiffness: 300 }}
-              className={cn("transition-colors duration-300", isHovered ? "text-white" : "text-white/50")}
-            >
-              <ArrowRight className="w-3.5 h-3.5" />
-            </motion.div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
+const RECOMMENDATIONS: Record<string, { service: string, features: string[], baseCost: number, timeline: string }> = {
+  healthcare: {
+    service: 'MedTech Digital Infrastructure',
+    features: ['Patient Portal & Mobile App', 'HL7/EHR Integration', 'Telemedicine Video Subsystem', 'HIPAA Compliant Datastores'],
+    baseCost: 85000,
+    timeline: '12-16 Weeks'
+  },
+  hotel: {
+    service: 'Hospitality Booking Engine',
+    features: ['Real-time PMS Sync', 'Dynamic Revenue Pricing', 'VIP Concierge Dashboard', 'Immersive UX Flows'],
+    baseCost: 65000,
+    timeline: '8-12 Weeks'
+  },
+  restaurant: {
+    service: 'Omnichannel Dining System',
+    features: ['Direct Mobile Ordering', 'Kitchen Display System (KDS)', 'Loyalty & Rewards Ledger', '3rd-Party Delivery Sync'],
+    baseCost: 45000,
+    timeline: '6-8 Weeks'
+  },
+  education: {
+    service: 'EdTech Learning Platform',
+    features: ['Virtual Classroom Streaming', 'Assessment Engine', 'Student Progress Analytics', 'SCORM Compliant Content'],
+    baseCost: 75000,
+    timeline: '10-14 Weeks'
+  },
+  corporate: {
+    service: 'Enterprise Hub Architecture',
+    features: ['Legacy System Wrap', 'Global SSO/SAML Auth', 'Real-time Dashboards', 'Workflow Automation Core'],
+    baseCost: 150000,
+    timeline: '16+ Weeks'
+  },
+  ngo: {
+    service: 'Impact & Transparency Core',
+    features: ['Secure Donor Ledger', 'Campaign Impact Analytics', 'Volunteer Orchestration', 'CRM Growth Funnels'],
+    baseCost: 40000,
+    timeline: '8-10 Weeks'
+  },
+  realestate: {
+    service: 'PropTech Listing Matrix',
+    features: ['Live MLS Synchronization', 'Virtual Tour Subsystem', 'Lead Scoring Engine', 'Broker CRM Portal'],
+    baseCost: 70000,
+    timeline: '10-12 Weeks'
+  },
+  startup: {
+    service: 'Venture-Backed MVP Layer',
+    features: ['Scalable Serverless Infrastructure', 'React Native App (iOS/Android)', 'Core Business Logic Engine', 'Investor Dashboard'],
+    baseCost: 45000,
+    timeline: '8-10 Weeks'
+  },
+  ecommerce: {
+    service: 'Omnichannel Commerce Engine',
+    features: ['Global CDN Deployment', 'Headless React Frontend', 'Predictive Inventory Algorithms', 'Automated Marketing Flows'],
+    baseCost: 65000,
+    timeline: '10-12 Weeks'
+  }
+};
 
 export function Services() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"]
+  const navigate = useNavigate();
+  const [step, setStep] = useState(1);
+  const [selections, setSelections] = useState({
+    industry: '',
+    goal: ''
   });
-  const y = useTransform(scrollYProgress, [0, 1], [150, -150]);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+
+  const handleNext = () => setStep(p => p + 1);
+
+  const getRecommendation = () => {
+    return RECOMMENDATIONS[selections.industry] || RECOMMENDATIONS['corporate'];
+  };
+
+  const handleInitiateBuilder = () => {
+    navigate('/custom-project');
+  };
 
   return (
-    <section id="services" ref={containerRef} className="py-24 lg:py-40 relative text-white bg-dark overflow-hidden">
-      {/* Background Subtleties */}
-      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-      <motion.div style={{ y, opacity }} className="absolute right-0 top-1/4 w-[600px] h-[600px] bg-premium-gold/5 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
-
-      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
-        <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-10">
-          <div className="max-w-3xl">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="flex items-center gap-3 mb-6"
-            >
-              <div className="w-1.5 h-1.5 bg-premium-gold rounded-full" />
-              <span className="text-[11px] font-mono font-medium uppercase tracking-[0.2em] text-silver-metallic">Core Capabilities</span>
-            </motion.div>
-
-            <motion.h2 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-              className="font-display text-4xl md:text-5xl lg:text-[64px] font-semibold leading-[1.1] tracking-tight"
-            >
-               Architecting The <br className="hidden md:block" />
-              <span className="text-silver-metallic font-light">Unprecedented.</span>
-            </motion.h2>
-          </div>
-
-          <motion.p 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1.2, delay: 0.3 }}
-            className="text-silver-metallic max-w-[360px] font-sans font-light leading-relaxed text-sm lg:text-[15px]"
-          >
-            We deploy elite digital ecosystems designed to dominate markets, process billions in transactions, and inspire generations.
-          </motion.p>
+    <section className="min-h-screen bg-dark text-white relative pt-32 pb-24 border-b border-light/5">
+      <div className="absolute inset-0 bg-dark z-0" />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-premium-gold/5 blur-[150px] pointer-events-none z-0" />
+      
+      <div className="max-w-5xl mx-auto px-6 relative z-10">
+        
+        <div className="mb-16 text-center max-w-2xl mx-auto">
+           <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 geometric-clip mb-6">
+             <Activity className="w-4 h-4 text-premium-gold animate-pulse" />
+             <span className="text-[10px] uppercase font-mono tracking-widest">Intelligent Consultation Engine</span>
+           </div>
+           <h2 className="text-4xl md:text-5xl font-display font-medium tracking-tight mb-4 text-white">System <span className="text-premium-gold italic">Architect</span></h2>
+           <p className="text-white/60 font-light text-sm">We don't sell generic services. Provide your specific operational parameters, and our diagnostic engine will recommend a tailored enterprise-grade architecture.</p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          {services.map((service, idx) => (
-            <ServiceCard key={service.title} service={service} index={idx} />
-          ))}
-
-          {/* Premium CTA Integration Card */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: services.length * 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="group relative p-8 lg:p-10 bg-white text-dark flex flex-col justify-between rounded-3xl overflow-hidden hover:scale-[1.02] transition-transform duration-500"
-          >
-            <div className="relative z-10">
-              <div className="w-12 h-12 mb-6 rounded-full bg-dark/5 flex items-center justify-center">
-                <ArrowRight className="w-5 h-5 text-dark" />
-              </div>
-              <h3 className="text-3xl lg:text-4xl font-display font-semibold mb-3 tracking-tight">Engage<br/>Transformation.</h3>
-              <p className="text-dark/60 font-sans text-sm leading-relaxed max-w-[200px] font-medium">Strategic consultation for enterprise entities.</p>
-            </div>
+        <div className="glass-panel p-8 md:p-12 border border-white/10 geometric-clip min-h-[400px]">
+          <AnimatePresence mode="wait">
             
-            <Link to="/contact" className="inline-flex items-center gap-2 text-[13px] font-semibold text-dark hover:gap-3 transition-all relative z-10 w-fit mt-12 bg-dark text-white px-5 py-2.5 rounded-full hover:bg-dark/90">
-              <span>Initiate Deployment</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </motion.div>
+            {step === 1 && (
+              <motion.div key="step1" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }} className="space-y-8">
+                 <div>
+                   <h3 className="text-xl font-mono uppercase tracking-widest text-silver-metallic border-b border-white/10 pb-4 mb-6">01. Sector Classification</h3>
+                   <div className="grid md:grid-cols-2 gap-4">
+                     {INDUSTRIES.map(ind => (
+                       <button
+                         key={ind.id}
+                         onClick={() => { setSelections(p => ({ ...p, industry: ind.id })); handleNext(); }}
+                         className="p-6 border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-premium-gold/50 transition-all text-left flex flex-col group justify-between"
+                       >
+                         <div>
+                            <h4 className="font-display text-xl mb-2 text-white group-hover:text-premium-gold transition-colors">{ind.name}</h4>
+                            <p className="text-xs text-white/50 font-light leading-relaxed mb-4">{ind.desc}</p>
+                         </div>
+                         <div className="flex items-center text-[10px] font-mono tracking-widest uppercase text-white/30 group-hover:text-white transition-colors">Select <ArrowRight className="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" /></div>
+                       </button>
+                     ))}
+                   </div>
+                 </div>
+              </motion.div>
+            )}
+
+            {step === 2 && (
+              <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+                 <div>
+                   <h3 className="text-xl font-mono uppercase tracking-widest text-silver-metallic border-b border-white/10 pb-4 mb-6">02. Primary Objective</h3>
+                   <div className="grid md:grid-cols-2 gap-4">
+                     {GOALS.map(goal => (
+                       <button
+                         key={goal.id}
+                         onClick={() => { setSelections(p => ({ ...p, goal: goal.id })); handleNext(); }}
+                         className="p-8 border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-premium-gold/50 transition-all text-left flex items-center justify-between group"
+                       >
+                         <h4 className="font-display text-xl text-white group-hover:text-premium-gold transition-colors">{goal.name}</h4>
+                         <ChevronRight className="w-5 h-5 text-white/30 group-hover:text-white transition-colors group-hover:translate-x-1" />
+                       </button>
+                     ))}
+                   </div>
+                 </div>
+                 <button onClick={() => setStep(1)} className="text-[10px] font-mono uppercase tracking-widest text-white/50 hover:text-white mt-8">← Modify Sector</button>
+              </motion.div>
+            )}
+
+            {step === 3 && (
+              <motion.div key="step3" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+                 <div className="border border-premium-gold/30 bg-premium-gold/5 p-8 md:p-12 geometric-clip">
+                    <div className="flex items-center gap-3 mb-8">
+                       <ShieldCheck className="w-6 h-6 text-premium-gold" />
+                       <h3 className="font-mono text-sm uppercase tracking-widest text-premium-gold font-bold">Diagnostic Blueprint Generated</h3>
+                    </div>
+                    
+                    <h4 className="text-3xl md:text-5xl font-display text-white mb-4">{getRecommendation().service}</h4>
+                    <p className="text-white/60 mb-8 font-light text-sm max-w-xl">Based on your operational parameters, our intelligence layer has compiled a reference architecture strictly tailored for {INDUSTRIES.find(i=>i.id === selections.industry)?.name}.</p>
+                    
+                    <div className="grid md:grid-cols-2 gap-10 mb-10">
+                       <div>
+                         <p className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic mb-4 border-b border-white/10 pb-2">Core Component Subsystems</p>
+                         <ul className="space-y-3">
+                           {getRecommendation().features.map(f => (
+                             <li key={f} className="flex items-start gap-3">
+                                <Check className="w-4 h-4 text-premium-gold shrink-0 mt-0.5" />
+                                <span className="text-sm font-light text-white/90">{f}</span>
+                             </li>
+                           ))}
+                         </ul>
+                       </div>
+                       <div>
+                         <div className="bg-dark/50 border border-white/10 p-6 geometric-clip-right h-full flex flex-col justify-center">
+                            <div className="mb-6">
+                               <p className="font-mono text-[9px] uppercase tracking-widest text-white/50 mb-1">Base Investment Floor</p>
+                               <p className="text-2xl font-mono text-white">${getRecommendation().baseCost.toLocaleString()}</p>
+                            </div>
+                            <div>
+                               <p className="font-mono text-[9px] uppercase tracking-widest text-white/50 mb-1">Est. Release Window</p>
+                               <p className="text-2xl font-mono text-white">{getRecommendation().timeline}</p>
+                            </div>
+                         </div>
+                       </div>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4 border-t border-white/10 pt-8">
+                       <button onClick={handleInitiateBuilder} className="bg-premium-gold text-dark font-mono text-xs uppercase font-bold tracking-widest px-8 py-4 geometric-clip-button hover:bg-white transition-colors flex items-center justify-center gap-2">
+                          Launch Blueprint Studio <ArrowRight className="w-4 h-4" />
+                       </button>
+                       <button onClick={() => setStep(1)} className="bg-transparent border border-white/20 text-white font-mono text-xs uppercase font-bold tracking-widest px-8 py-4 geometric-clip-button hover:bg-white/5 transition-colors">
+                          Recalibrate
+                       </button>
+                    </div>
+
+                 </div>
+              </motion.div>
+            )}
+
+          </AnimatePresence>
         </div>
+
       </div>
     </section>
   );

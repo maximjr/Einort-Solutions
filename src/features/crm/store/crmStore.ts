@@ -1,6 +1,16 @@
 import { create } from 'zustand';
+import { db } from '../../../lib/firebase';
+import { collection, query, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, getDoc } from 'firebase/firestore';
 
-export type LeadStage = 'New Lead' | 'Qualified' | 'Proposal Sent' | 'Negotiation' | 'Won' | 'Lost';
+export type LeadStage = 'new' | 'qualified' | 'discovery' | 'proposal_sent' | 'negotiation' | 'won' | 'lost';
+
+export interface ActivityLog {
+  id: string;
+  type: 'Note' | 'Email' | 'Call' | 'Meeting' | 'StatusChange' | 'Follow-Up Scheduled' | 'Proposal' | 'Contract';
+  content: string;
+  timestamp: string;
+  author: string;
+}
 
 export interface Lead {
   id: string;
@@ -14,7 +24,12 @@ export interface Lead {
   score: number;
   aiNote: string;
   lastContact?: string;
+  nextFollowUp?: string;
   forecast?: number;
+  health?: 'At Risk' | 'On Track' | 'Accelerated';
+  contractSent?: boolean;
+  proposalSent?: boolean;
+  activities?: ActivityLog[];
 }
 
 interface CRMState {
@@ -23,26 +38,107 @@ interface CRMState {
   searchQuery: string;
   setActiveStage: (stage: LeadStage | 'All') => void;
   setSearchQuery: (query: string) => void;
-  addLead: (lead: Lead) => void;
-  updateLeadStage: (id: string, stage: LeadStage) => void;
+  // Actions
+  initializeListener: () => () => void;
+  addLead: (lead: Omit<Lead, 'id'>) => Promise<void>;
+  updateLeadStage: (id: string, stage: LeadStage) => Promise<void>;
+  addActivity: (id: string, activity: Omit<ActivityLog, 'id' | 'timestamp'>) => Promise<void>;
 }
 
-const MOCK_LEADS: Lead[] = [
-  { id: '1', name: 'Stark Industries', contact: 'Tony Stark', email: 't.stark@stark.com', value: 120000, stage: 'Qualified', date: '2026-10-15', status: 'Hot', score: 98, aiNote: 'High precision match for enterprise architectural rebuild.', forecast: 85 },
-  { id: '2', name: 'Wayne Enterprises', contact: 'Bruce Wayne', email: 'bruce@wayne.com', value: 250000, stage: 'Negotiation', date: '2026-10-12', status: 'Warm', score: 85, aiNote: 'Requires advanced zero-trust security clearance.', forecast: 60 },
-  { id: '3', name: 'Oscorp', contact: 'Norman Osborn', email: 'norman@oscorp.com', value: 85000, stage: 'New Lead', date: '2026-10-18', status: 'Cold', score: 42, aiNote: 'Timeline constraints identified in early discovery.', forecast: 20 },
-  { id: '4', name: 'Oasis Meta', contact: 'James Halliday', email: 'james@oasis.com', value: 450000, stage: 'Proposal Sent', date: '2026-10-10', status: 'Hot', score: 95, aiNote: 'Massive scale required, perfect match for backend capabilities.', forecast: 90 },
-  { id: '5', name: 'Cyberdyne', contact: 'Miles Dyson', email: 'miles@cyberdyne.com', value: 310000, stage: 'Qualified', date: '2026-10-19', status: 'Warm', score: 88, aiNote: 'AI implementation scale needed. Priority prospect.', forecast: 75 },
-];
-
 export const useCRMStore = create<CRMState>((set) => ({
-  leads: MOCK_LEADS,
+  leads: [],
   activeStage: 'All',
   searchQuery: '',
   setActiveStage: (stage) => set({ activeStage: stage }),
   setSearchQuery: (query) => set({ searchQuery: query }),
-  addLead: (lead) => set((state) => ({ leads: [...state.leads, lead] })),
-  updateLeadStage: (id, stage) => set((state) => ({
-    leads: state.leads.map(lead => lead.id === id ? { ...lead, stage } : lead)
-  }))
+  
+  initializeListener: () => {
+    const q = query(collection(db, 'leads'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const leadsData: Lead[] = [];
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        leadsData.push({
+          id: doc.id,
+          name: data.name,
+          contact: data.contact,
+          email: data.email,
+          value: data.value,
+          stage: data.stage as LeadStage,
+          date: data.date,
+          status: data.status,
+          score: data.score,
+          aiNote: data.aiNote,
+          lastContact: data.lastContact,
+          nextFollowUp: data.nextFollowUp,
+          forecast: data.forecast,
+          health: data.health || (data.score > 80 ? 'Accelerated' : data.score < 40 ? 'At Risk' : 'On Track'),
+          contractSent: !!data.contractSent,
+          proposalSent: !!data.proposalSent,
+          activities: data.activities || []
+        });
+      });
+      set({ leads: leadsData });
+    }, (error) => console.error("Error fetching leads:", error));
+    
+    return unsubscribe;
+  },
+
+  addLead: async (lead) => {
+    try {
+      await addDoc(collection(db, 'leads'), {
+        ...lead,
+        createdAt: serverTimestamp()
+      });
+    } catch (e) {
+      console.error("Failed to add lead", e);
+    }
+  },
+
+  updateLeadStage: async (id, stage) => {
+    try {
+      const leadRef = doc(db, 'leads', id);
+      const activity: ActivityLog = {
+        id: crypto.randomUUID(),
+        type: 'StatusChange',
+        content: `Stage changed to ${stage}`,
+        timestamp: new Date().toISOString(),
+        author: 'System'
+      };
+      
+      const docSnap = await getDoc(leadRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const activities = data.activities || [];
+        await updateDoc(leadRef, { 
+          stage,
+          activities: [activity, ...activities]
+        });
+      }
+    } catch (e) {
+      console.error("Failed to update lead", e);
+    }
+  },
+  
+  addActivity: async (id, activityData) => {
+      try {
+          const leadRef = doc(db, 'leads', id);
+          const activity: ActivityLog = {
+            id: crypto.randomUUID(),
+            ...activityData,
+            timestamp: new Date().toISOString()
+          };
+          
+          const docSnap = await getDoc(leadRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            const activities = data.activities || [];
+            await updateDoc(leadRef, {
+                activities: [activity, ...activities]
+            });
+          }
+      } catch (e) {
+          console.error("Failed to add activity", e);
+      }
+  }
 }));

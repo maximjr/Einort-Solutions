@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
-import { Clock, Star, Settings, FileText, ChevronRight, Activity, ArrowRight, ShieldCheck } from 'lucide-react';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { Clock, Star, Settings, FileText, ChevronRight, Activity, ArrowRight, ShieldCheck, Layout } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 
 interface UserProfile {
@@ -12,30 +12,31 @@ interface UserProfile {
   photoURL?: string;
   accountType?: string;
   lastLogin?: any;
+  onboardingStatus?: string;
 }
 
 export function Dashboard() {
-  const { user, loading } = useAuth();
+  const { user, loading, isAdmin } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
 
   useEffect(() => {
+    let unsub: () => void = () => {};
     if (user) {
-      const fetchProfile = async () => {
-        try {
-          const docRef = doc(db, 'users', user.uid);
-          const docSnap = await getDoc(docRef);
-          if (docSnap.exists()) {
-            setProfile(docSnap.data() as UserProfile);
-          }
-        } catch (err) {
-          console.warn(`Could not fetch profile for user ${user.uid} (database might be offline): `, err);
-        } finally {
-          setProfileLoading(false);
+      const docRef = doc(db, 'users', user.uid);
+      unsub = onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+          setProfile(docSnap.data() as UserProfile);
         }
-      };
-      fetchProfile();
+        setProfileLoading(false);
+      }, (err) => {
+        console.warn(`Could not fetch profile for user ${user.uid}: `, err);
+        setProfileLoading(false);
+      });
+    } else {
+      setProfileLoading(false);
     }
+    return () => unsub();
   }, [user]);
 
   if (loading || profileLoading) {
@@ -48,6 +49,10 @@ export function Dashboard() {
 
   if (!user) {
     return <Navigate to="/" replace />;
+  }
+
+  if (profile && profile.onboardingStatus === 'pending') {
+    return <Navigate to="/onboarding" replace />;
   }
 
   return (
@@ -93,9 +98,16 @@ export function Dashboard() {
           </div>
           
           <div className="flex flex-wrap items-center gap-4 pb-8">
-            <Link to="/admin" className="px-6 py-3 font-mono text-xs font-bold uppercase tracking-[0.2em] bg-white/5 border border-white/10 geometric-clip hover:bg-premium-gold/10 hover:border-premium-gold/50 transition-all duration-300 flex items-center gap-3 group">
-               Terminal <Settings className="w-4 h-4 text-gray-400 group-hover:text-premium-gold transition-colors" />
+            {isAdmin && (
+              <Link to="/admin" className="px-6 py-3 font-mono text-xs font-bold uppercase tracking-[0.2em] bg-white/5 border border-white/10 geometric-clip hover:bg-premium-gold/10 hover:border-premium-gold/50 transition-all duration-300 flex items-center gap-3 group">
+                 Terminal (Admin) <Settings className="w-4 h-4 text-gray-400 group-hover:text-premium-gold transition-colors" />
+              </Link>
+            )}
+            
+            <Link to="/client" className="px-6 py-3 font-mono text-xs font-bold uppercase tracking-[0.2em] bg-white/5 border border-white/10 geometric-clip hover:bg-premium-gold/10 hover:border-premium-gold/50 transition-all duration-300 flex items-center gap-3 group">
+               Client Portal <Layout className="w-4 h-4 text-gray-400 group-hover:text-premium-gold transition-colors" />
             </Link>
+
             <Link to="/contact" className="group relative inline-flex items-center justify-center px-8 py-3 bg-white overflow-hidden geometric-clip-right hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] transition-all duration-300">
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-black/10 to-transparent -translate-x-[150%] skew-x-[-45deg] group-hover:transition-transform group-hover:translate-x-[150%] duration-1000" />
               <span className="relative z-10 tracking-[0.2em] text-xs font-bold uppercase text-dark flex items-center gap-2 font-mono">

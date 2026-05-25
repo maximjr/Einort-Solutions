@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { AuthModal } from './AuthModal';
@@ -7,6 +7,8 @@ import { SEO } from './SEO';
 import { Check, Sparkles, ChevronLeft, Layout, Type, Palette, ArrowRight, Wand2, Monitor, Smartphone as SmartphoneIcon, Code, Layers } from 'lucide-react';
 import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { calculateLeadScore, getLeadStatus } from '../utils/leadScoring';
+import { logClientActivity } from '../utils/activityLogger';
 
 const themes = [
   { id: 'obsidian', name: 'Obsidian Dark', primary: '#020617', secondary: '#0f172a', accent: '#3b82f6', text: '#f8fafc' },
@@ -51,9 +53,15 @@ export function CustomizationStudio() {
   
   const [isBuilding, setIsBuilding] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [aiSuggesting, setAiSuggesting] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [isMobilePanelOpen, setIsMobilePanelOpen] = useState(false);
+
+  // Log activity exactly once when entering Prototype Builder
+  useEffect(() => {
+    logClientActivity(user?.uid || null, user?.email || null, 'started_prototype', `Opened Prototype Builder for ${projectId || 'custom'}`);
+  }, [projectId]);
 
   // Memoized derived state for optimization
   const activeThemeObj = useMemo(() => themes.find(t => t.id === selections.theme) || themes[0], [selections.theme]);
@@ -74,6 +82,7 @@ export function CustomizationStudio() {
     }
     
     setIsBuilding(true);
+    setSubmitError(null);
     try {
       await addDoc(collection(db, 'projectSubmissions'), {
         userId: user.uid,
@@ -84,9 +93,34 @@ export function CustomizationStudio() {
         status: 'pending',
         createdAt: serverTimestamp(),
       });
+
+      const score = calculateLeadScore({
+        value: 2000,
+        timeline: 'flexible',
+        hasCompany: false
+      });
+
+      await addDoc(collection(db, 'leads'), {
+        name: user.displayName || 'Sandbox User',
+        contact: user.displayName || 'Sandbox User',
+        email: user.email,
+        value: 2000,
+        stage: 'new',
+        date: new Date().toISOString().split('T')[0],
+        status: getLeadStatus(score),
+        score: score,
+        aiNote: `Auto-generated Lead from Sandbox Customization Studio. Project ID: ${projectId}. Theme: ${selections.theme}`,
+        lastContact: new Date().toISOString().split('T')[0],
+        forecast: 50,
+        createdAt: serverTimestamp()
+      });
+
+      await logClientActivity(user.uid, user.email, 'completed_prototype', `Completed Sandbox Prototype ${projectId}`);
+
       setShowSuccess(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting project:", error);
+      setSubmitError(error.message || 'Failed to sync architecture');
     } finally {
       setIsBuilding(false);
     }
@@ -95,15 +129,44 @@ export function CustomizationStudio() {
   const triggerAISuggestion = useCallback(() => {
     setAiSuggesting(true);
     setTimeout(() => {
-      const randomTheme = themes[Math.floor(Math.random() * themes.length)].id;
-      const randomLayout = layouts[Math.floor(Math.random() * layouts.length)].id;
-      const randomFont = fonts[Math.floor(Math.random() * fonts.length)].id;
-      const randomBtn = buttonStyles[Math.floor(Math.random() * buttonStyles.length)].id;
-      
-      setSelections({ theme: randomTheme, layout: randomLayout, font: randomFont, buttonStyle: randomBtn });
+      // Deterministic architectural intelligence based on industry/intent
+      let recommendedTheme = 'obsidian';
+      let recommendedLayout = 'bento';
+      let recommendedFont = 'display';
+      let recommendedBtn = 'geometric';
+
+      const intent = (projectId || '').toLowerCase();
+      if (intent.includes('healthcare') || intent.includes('medical') || intent.includes('health')) {
+        recommendedTheme = 'ceramic';
+        recommendedLayout = 'minimal';
+        recommendedFont = 'sans';
+        recommendedBtn = 'soft';
+      } else if (intent.includes('finance') || intent.includes('fintech') || intent.includes('bank')) {
+        recommendedTheme = 'obsidian';
+        recommendedLayout = 'split';
+        recommendedFont = 'mono';
+        recommendedBtn = 'geometric';
+      } else if (intent.includes('ecommerce') || intent.includes('retail') || intent.includes('restaurant')) {
+        recommendedTheme = 'neon';
+        recommendedLayout = 'bento';
+        recommendedFont = 'display';
+        recommendedBtn = 'rounded';
+      } else if (intent.includes('corporate') || intent.includes('enterprise')) {
+        recommendedTheme = 'royal';
+        recommendedLayout = 'split';
+        recommendedFont = 'serif';
+        recommendedBtn = 'geometric';
+      } else if (intent.includes('ngo') || intent.includes('education')) {
+        recommendedTheme = 'ceramic';
+        recommendedLayout = 'bento';
+        recommendedFont = 'sans';
+        recommendedBtn = 'soft';
+      }
+
+      setSelections({ theme: recommendedTheme, layout: recommendedLayout, font: recommendedFont, buttonStyle: recommendedBtn });
       setAiSuggesting(false);
     }, 1500);
-  }, []);
+  }, [projectId]);
 
   if (loading || (!user && !authModalOpen)) {
     // Note: Delaying the un-auth guard so they can see the builder first, 
@@ -271,6 +334,11 @@ export function CustomizationStudio() {
 
         {/* CTA Footer */}
         <div className="p-4 lg:p-6 border-t border-white/5 bg-dark relative z-30 shrink-0">
+           {submitError && (
+             <div className="mb-4 p-3 border border-red-500/30 bg-red-500/10 text-red-400 font-mono text-[10px] uppercase geometric-clip">
+               ⚠️ Sync Failed: {submitError}
+             </div>
+           )}
            <button 
              onClick={handleBuild}
              disabled={isBuilding}

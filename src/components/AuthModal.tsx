@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { X, ArrowRight, Lock, User, Phone, Eye, EyeOff, ChevronLeft, Mail, AlertTriangle } from 'lucide-react';
+import { X, ArrowRight, Lock, User, Phone, Eye, EyeOff, ChevronLeft, Mail, AlertTriangle, Check, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useEffect, FormEvent } from 'react';
 import { isFirebaseConfigured } from '../config/env';
@@ -13,6 +13,32 @@ interface AuthModalProps {
 }
 
 type AuthView = 'signIn' | 'signUp' | 'forgotPassword';
+
+const getPasswordStrength = (pass: string) => {
+  let score = 0;
+  if (!pass) return { score: 0, text: '', hex: '#ffffff', textColor: 'text-white/50', width: '0%' };
+  
+  if (pass.length >= 8) score += 1;
+  if (/[A-Z]/.test(pass)) score += 1;
+  if (/[0-9]/.test(pass)) score += 1;
+  if (/[^a-zA-Z0-9]/.test(pass)) score += 1;
+
+  if (pass.length < 6) return { score: 1, text: 'Weak', hex: '#ef4444', textColor: 'text-red-500', width: '25%' };
+  
+  switch (score) {
+    case 0:
+    case 1:
+      return { score: 1, text: 'Weak', hex: '#ef4444', textColor: 'text-red-500', width: '25%' };
+    case 2:
+      return { score: 2, text: 'Fair', hex: '#eab308', textColor: 'text-yellow-500', width: '50%' };
+    case 3:
+      return { score: 3, text: 'Good', hex: '#3b82f6', textColor: 'text-blue-500', width: '75%' };
+    case 4:
+      return { score: 4, text: 'Strong', hex: '#22c55e', textColor: 'text-green-500', width: '100%' };
+    default:
+      return { score: 1, text: 'Weak', hex: '#ef4444', textColor: 'text-red-500', width: '25%' };
+  }
+};
 
 export function AuthModal({ isOpen, onClose, onSuccess, title, subtitle }: AuthModalProps) {
   const { signUpWithEmail, loginWithEmail, resetPassword } = useAuth();
@@ -97,6 +123,10 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, subtitle }: AuthM
   };
 
   const isConfigured = isFirebaseConfigured();
+
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const hasEmailInput = email.length > 0;
+  const strength = getPasswordStrength(password);
 
   return (
     <AnimatePresence>
@@ -229,7 +259,7 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, subtitle }: AuthM
 
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Mail className="w-4 h-4 text-white/40" />
+                      <Mail className={`w-4 h-4 ${hasEmailInput ? (isEmailValid ? 'text-green-500' : 'text-red-400') : 'text-white/40'} transition-colors`} />
                     </div>
                     <input
                       type="email"
@@ -237,32 +267,77 @@ export function AuthModal({ isOpen, onClose, onSuccess, title, subtitle }: AuthM
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Email"
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.05] transition-all disabled:opacity-50 text-sm font-sans"
+                      className={`w-full bg-white/[0.03] border ${hasEmailInput ? (isEmailValid ? 'border-green-500/30 focus:border-green-500/50' : 'border-red-400/50 focus:border-red-400/80') : 'border-white/10 focus:border-white/30'} rounded-xl py-3 pl-11 pr-11 text-white placeholder:text-white/40 focus:outline-none focus:bg-white/[0.05] transition-all disabled:opacity-50 text-sm font-sans`}
                       disabled={loading || !isConfigured}
                     />
+                    {hasEmailInput && (
+                      <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                        <AnimatePresence mode="wait">
+                          {isEmailValid ? (
+                            <motion.div key="valid" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+                              <Check className="w-4 h-4 text-green-500" />
+                            </motion.div>
+                          ) : (
+                            <motion.div key="invalid" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }} transition={{ duration: 0.2 }}>
+                              <AlertCircle className="w-4 h-4 text-red-500" />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    )}
                   </div>
 
                   {view !== 'forgotPassword' && (
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <Lock className="w-4 h-4 text-white/40" />
+                    <div className="space-y-3">
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                          <Lock className="w-4 h-4 text-white/40" />
+                        </div>
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          required
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Password"
+                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 pl-11 pr-12 text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.05] transition-all disabled:opacity-50 text-sm font-sans"
+                          disabled={loading || !isConfigured}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/40 hover:text-white transition-colors"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
                       </div>
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Password"
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl py-3 pl-11 pr-12 text-white placeholder:text-white/40 focus:outline-none focus:border-white/30 focus:bg-white/[0.05] transition-all disabled:opacity-50 text-sm font-sans"
-                        disabled={loading || !isConfigured}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-white/40 hover:text-white transition-colors"
-                      >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
+                      
+                      {view === 'signUp' && (
+                        <AnimatePresence>
+                          {password.length > 0 && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                              animate={{ opacity: 1, height: 'auto', marginTop: '12px' }}
+                              exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="flex justify-between items-center mb-1.5 px-1">
+                                <span className="text-[10px] text-white/50 uppercase tracking-wider font-mono">Password Strength</span>
+                                <span className={`text-[10px] font-mono uppercase tracking-wider ${strength.textColor}`}>
+                                  {strength.text}
+                                </span>
+                              </div>
+                              <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: strength.width, backgroundColor: strength.hex }}
+                                  transition={{ duration: 0.3, ease: 'easeOut' }}
+                                  className="h-full rounded-full"
+                                />
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      )}
                     </div>
                   )}
 

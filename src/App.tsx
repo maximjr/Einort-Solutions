@@ -26,6 +26,7 @@ const FAQ = lazy(() => import('./pages/FAQ').then(m => ({ default: m.FAQ })));
 const Booking = lazy(() => import('./pages/Booking').then(m => ({ default: m.Booking })));
 const AIAudit = lazy(() => import('./pages/AIAudit').then(m => ({ default: m.AIAudit })));
 const ClientPortal = lazy(() => import('./pages/client/ClientPortal').then(m => ({ default: m.ClientPortal })));
+const Onboarding = lazy(() => import('./pages/Onboarding').then(m => ({ default: m.Onboarding })));
 const LocalizedService = lazy(() => import('./pages/LocalizedService').then(m => ({ default: m.LocalizedService })));
 const InsightHub = lazy(() => import('./pages/InsightHub').then(m => ({ default: m.InsightHub })));
 const InsightArticle = lazy(() => import('./pages/InsightArticle').then(m => ({ default: m.InsightArticle })));
@@ -142,11 +143,9 @@ export default function App() {
                   <Route path="/pricing" element={<Pricing />} />
                   <Route path="/faq" element={<FAQ />} />
                   <Route path="/book" element={<Booking />} />
-                  <Route path="/audit" element={<AIAudit />} />
+                  <Route path="/onboarding" element={<Onboarding />} />
                   <Route path="/client" element={<ClientPortal />} />
                   <Route path="/agency/:slug" element={<LocalizedService />} />
-                  <Route path="/insights" element={<InsightHub />} />
-                  <Route path="/insights/:slug" element={<InsightArticle />} />
                   <Route path="/dashboard" element={
                     <CinematicTransition>
                       <Dashboard />

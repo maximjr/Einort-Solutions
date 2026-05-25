@@ -3,12 +3,19 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Search, Loader2, ArrowRight, ShieldCheck, Zap, LineChart, Code2 } from 'lucide-react';
 import { CinematicTransition } from '../components/CinematicTransition';
 import { Footer } from '../components/Footer';
+import { db } from '../lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { logClientActivity } from '../utils/activityLogger';
+import { calculateLeadScore, getLeadStatus } from '../utils/leadScoring';
 
 export function AIAudit() {
   const [url, setUrl] = useState('');
+  const [email, setEmail] = useState('');
   const [isScanning, setIsScanning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [scanComplete, setScanComplete] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     if (isScanning) {
@@ -32,6 +39,41 @@ export function AIAudit() {
       setIsScanning(true);
       setProgress(0);
       setScanComplete(false);
+      setSubmitted(false);
+    }
+  };
+
+  const handleSendReport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    
+    setSubmitting(true);
+    try {
+      const score = calculateLeadScore({
+        value: 0,
+        timeline: 'flexible',
+        hasCompany: false
+      });
+
+      await addDoc(collection(db, 'leads'), {
+        name: email.split('@')[0], 
+        contact: email.split('@')[0],
+        email: email,
+        value: 0,
+        stage: 'new',
+        date: new Date().toISOString().split('T')[0],
+        status: getLeadStatus(score),
+        score: score,
+        aiNote: `Requested AIAudit for ${url}.`,
+        createdAt: serverTimestamp()
+      });
+      
+      await logClientActivity(null, email, 'custom_action', `Requested AIAudit for ${url}`);
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Failed to submit", err);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -147,12 +189,27 @@ export function AIAudit() {
                        <div className="bg-dark/50 border border-white/5 rounded-2xl p-6 mb-8 text-left">
                          <h4 className="font-mono text-xs uppercase tracking-widest text-white/40 mb-4">Unlock Full Engineering Report</h4>
                          <p className="text-sm text-white/60 mb-6">Enter your details to generate the comprehensive PDF report and receive a priority architectural consultation.</p>
-                         <div className="flex flex-col sm:flex-row gap-4">
-                           <input type="email" placeholder="Corporate Email" className="block w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-premium-gold transition-colors text-sm" />
-                           <button className="px-8 py-3 bg-white text-dark rounded-xl font-bold uppercase tracking-widest text-[11px] hover:bg-white/90 transition-all shrink-0">
-                             Send Report
-                           </button>
-                         </div>
+                         {submitted ? (
+                           <div className="text-premium-gold font-medium">Request received. Our engineers will reach out shortly.</div>
+                         ) : (
+                           <form onSubmit={handleSendReport} className="flex flex-col sm:flex-row gap-4">
+                             <input 
+                               type="email" 
+                               required
+                               value={email}
+                               onChange={(e) => setEmail(e.target.value)}
+                               placeholder="Corporate Email" 
+                               className="block w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-premium-gold transition-colors text-sm" 
+                             />
+                             <button 
+                               type="submit" 
+                               disabled={submitting}
+                               className="px-8 py-3 bg-white text-dark rounded-xl font-bold uppercase tracking-widest text-[11px] hover:bg-white/90 transition-all shrink-0 flex items-center gap-2 justify-center"
+                             >
+                               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send Report'}
+                             </button>
+                           </form>
+                         )}
                        </div>
                      </div>
                    </motion.div>

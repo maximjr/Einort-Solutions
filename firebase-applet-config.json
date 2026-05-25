@@ -3,7 +3,7 @@
   "appId": "1:254828728723:web:c0b148ab5acbd186075866",
   "apiKey": "AIzaSyD4rkzKGjM22RtylSeNt5tFqADIceyW9X8",
   "authDomain": "einortsolution.firebaseapp.com",
-  "firestoreDatabaseId": "",
+  "firestoreDatabaseId": "(default)",
   "storageBucket": "einortsolution.firebasestorage.app",
   "messagingSenderId": "254828728723",
   "measurementId": ""
