@@ -2,60 +2,27 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../../contexts/AuthContext';
 import { SEO } from '../../components/SEO';
-import { LayoutDashboard, Users, Folders, BarChart3, LogOut, ShieldAlert, Activity, Command, Bell, X, Zap, Target, Clock, Globe } from 'lucide-react';
-import { useEffect, useState, useMemo } from 'react';
-import { db } from '../../lib/firebase';
-import { collection, query, orderBy, limit } from 'firebase/firestore';
-import { formatDistanceToNow } from 'date-fns';
-import { useDebouncedSnapshot } from '../../hooks/useDebouncedSnapshot';
+import { LayoutDashboard, Users, Folders, BarChart3, Settings, LogOut, ShieldAlert, Activity, Command } from 'lucide-react';
+import { useEffect } from 'react';
 
 const sidebarLinks = [
-  { name: 'Executive Overview', path: '/admin', icon: LayoutDashboard },
-  { name: 'Live Intel Feed', path: '/admin/users', icon: Activity },
-  { name: 'Pipeline CRM', path: '/admin/crm', icon: Users },
-  { name: 'Project Operations', path: '/admin/projects', icon: Folders },
-  { name: 'Business Analytics', path: '/admin/analytics', icon: BarChart3 }
+  { name: 'Overview', path: '/admin', icon: LayoutDashboard },
+  { name: 'CRM & Leads', path: '/admin/crm', icon: Activity },
+  { name: 'User Intelligence', path: '/admin/users', icon: Users },
+  { name: 'Project Orders', path: '/admin/projects', icon: Folders },
+  { name: 'System Analytics', path: '/admin/analytics', icon: BarChart3 }
 ];
 
 export function AdminLayout() {
   const { user, loading, isAdmin, userRole, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     if (!loading && !user) {
       navigate('/dashboard'); // or a specific admin login page
     }
   }, [user, loading, navigate]);
-
-  const qNotifications = useMemo(() => {
-    if (!isAdmin) return null;
-    return query(collection(db, 'clientActivity'), orderBy('timestamp', 'desc'), limit(10));
-  }, [isAdmin]);
-
-  useDebouncedSnapshot(qNotifications, (snap) => {
-    const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    setNotifications(data);
-    // Simple unread logic - if menu is closed, count goes up, otherwise 0
-    if (!showNotifications) setUnreadCount(prev => prev + 1);
-  }, 1000);
-
-  const viewNotifications = () => {
-    setShowNotifications(!showNotifications);
-    if (!showNotifications) setUnreadCount(0);
-  };
-
-  const getActionFormat = (type: string) => {
-     const t = type || '';
-     if (t.includes('started_prototype')) return { color: 'text-blue-400', icon: Zap };
-     if (t.includes('completed_prototype')) return { color: 'text-green-400', icon: Target };
-     if (t.includes('booked_consultation')) return { color: 'text-premium-gold', icon: Clock };
-     if (t.includes('opened_services')) return { color: 'text-silver-metallic', icon: Globe };
-     return { color: 'text-white/50', icon: Activity };
-  };
 
   if (loading || !user) {
     return (
@@ -118,7 +85,7 @@ export function AdminLayout() {
                 to={link.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg geometric-clip font-mono text-xs tracking-widest uppercase transition-all duration-300 relative group overflow-hidden ${
                   isActive 
-                    ? 'text-white border border-premium-gold/30 bg-premium-gold/10 shadow-[0_0_15px_rgba(212,175,55,0.1)]'
+                    ? 'text-white border border-premium-gold/30 bg-premium-gold/10 shadow-[0_0_15px_rgba(59,130,246,0.1)]' 
                     : 'text-silver-metallic hover:text-white hover:bg-white/5 border border-transparent'
                 }`}
               >
@@ -161,74 +128,17 @@ export function AdminLayout() {
         {/* Top Header */}
         <header className="h-20 border-b border-white/5 bg-[#020617]/80 backdrop-blur-md flex items-center justify-between px-8 z-20 shrink-0">
            <div className="flex items-center gap-4">
-             <div className="relative flex h-2 w-2">
-               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-premium-gold opacity-75"></span>
-               <span className="relative inline-flex rounded-full h-2 w-2 bg-premium-gold"></span>
-             </div>
-             <span className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold text-silver-metallic">Ops Normal <span className="mx-2 text-white/20">|</span> Server: U.S. Core</span>
+             <div className="w-2 h-2 rounded-full bg-premium-gold animate-pulse" />
+             <span className="font-mono text-xs uppercase tracking-widest text-silver-metallic">Environment: Production</span>
            </div>
            
-           <div className="flex items-center gap-6 relative">
-              <div className="hidden md:flex items-center gap-2 px-3 py-1 border border-white/10 rounded-sm bg-white/[0.02] text-[9px] font-mono tracking-[0.2em] uppercase geometric-clip">
-                <span className="text-silver-metallic">Architecture:</span>
-                <span className="text-premium-gold">Live</span>
+           <div className="flex items-center gap-6">
+              <div className="hidden md:flex items-center gap-2 px-3 py-1 border border-white/10 rounded-full bg-white/5 text-[10px] font-mono tracking-widest uppercase">
+                <span className="text-silver-metallic">System Status:</span>
+                <span className="text-oxblood">Optimal</span>
               </div>
-
-              {/* Notification Engine */}
-              <div className="relative flex items-center">
-                <button 
-                  onClick={viewNotifications}
-                  className="relative p-2 text-silver-metallic hover:text-white transition-colors hover:bg-white/5 rounded-sm geometric-clip"
-                >
-                  <Bell className="w-4 h-4" />
-                  {unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-[#020617] animate-pulse"></span>
-                  )}
-                </button>
-
-                <AnimatePresence>
-                  {showNotifications && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute top-[calc(100%+15px)] right-0 w-80 bg-[#060B1E] border border-white/10 rounded-sm geometric-clip shadow-[0_20px_60px_rgba(0,0,0,0.8)] overflow-hidden z-50 flex flex-col max-h-[400px]"
-                    >
-                      <div className="p-3 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
-                         <span className="font-mono text-[9px] uppercase tracking-[0.2em] font-bold text-white flex items-center gap-2"><Activity className="w-3 h-3 text-premium-gold" /> LIVE ACTIVITY LOG</span>
-                         <button onClick={() => setShowNotifications(false)} className="text-white/40 hover:text-white transition-colors">
-                           <X className="w-3 h-3" />
-                         </button>
-                      </div>
-                      <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
-                         {notifications.map(notif => {
-                           const format = getActionFormat(notif.type);
-                           const Icon = format.icon;
-                           return (
-                             <div key={notif.id} className="p-3 bg-dark/40 hover:bg-white/5 border border-white/5 rounded-sm transition-colors group">
-                               <div className="flex items-start gap-3">
-                                  <div className={`mt-0.5 ${format.color}`}>
-                                     <Icon className="w-3 h-3" />
-                                  </div>
-                                  <div className="flex-1">
-                                    <p className="font-sans text-xs text-white/90 leading-tight mb-1 truncate">{notif.details || notif.type.replace('_', ' ')}</p>
-                                    <div className="flex items-center justify-between">
-                                      <span className="font-mono text-[8px] uppercase tracking-widest text-silver-metallic truncate max-w-[150px]">{notif.email || notif.userId || 'Ghost user'}</span>
-                                      <span className="font-mono text-[8px] uppercase tracking-widest text-white/30">{notif.timestamp?.toDate ? formatDistanceToNow(notif.timestamp.toDate(), { addSuffix: true }) : 'Just now'}</span>
-                                    </div>
-                                  </div>
-                               </div>
-                             </div>
-                           );
-                         })}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              <button onClick={() => navigate('/')} className="text-[10px] font-mono tracking-[0.2em] font-bold uppercase border border-white/10 px-4 py-2 hover:bg-white/5 transition-colors geometric-clip-button">
-                VISIT NEXUS
+              <button onClick={() => navigate('/')} className="text-xs font-mono uppercase tracking-[0.2em] text-silver-metallic hover:text-white transition-colors border-b border-transparent hover:border-white pb-0.5">
+                View Website
               </button>
            </div>
         </header>

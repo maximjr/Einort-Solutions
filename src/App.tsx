@@ -13,8 +13,6 @@ import { CinematicTransition } from './components/CinematicTransition';
 import { SEO } from './components/SEO';
 import { AnalyticsRouteTracker } from './AnalyticsRouteTracker';
 
-import { AuthRedirector } from './components/AuthRedirector';
-
 // Lazy loading components for performance
 const Hero = lazy(() => import('./components/Hero').then(m => ({ default: m.Hero })));
 const HomeSummary = lazy(() => import('./components/HomeSummary').then(m => ({ default: m.HomeSummary })));
@@ -33,6 +31,7 @@ const Onboarding = lazy(() => import('./pages/Onboarding').then(m => ({ default:
 const LocalizedService = lazy(() => import('./pages/LocalizedService').then(m => ({ default: m.LocalizedService })));
 const InsightHub = lazy(() => import('./pages/InsightHub').then(m => ({ default: m.InsightHub })));
 const InsightArticle = lazy(() => import('./pages/InsightArticle').then(m => ({ default: m.InsightArticle })));
+const Dashboard = lazy(() => import('./components/Dashboard').then(m => ({ default: m.Dashboard })));
 const ServiceExperience = lazy(() => import('./components/ServiceExperience').then(m => ({ default: m.ServiceExperience })));
 const CustomizationStudio = lazy(() => import('./components/CustomizationStudio').then(m => ({ default: m.CustomizationStudio })));
 const CustomProjectRequest = lazy(() => import('./pages/CustomProjectRequest').then(m => ({ default: m.CustomProjectRequest })));
@@ -150,7 +149,9 @@ export default function App() {
                   <Route path="/client" element={<ClientPortal />} />
                   <Route path="/agency/:slug" element={<LocalizedService />} />
                   <Route path="/dashboard" element={
-                    <AuthRedirector />
+                    <CinematicTransition>
+                      <Dashboard />
+                    </CinematicTransition>
                   } />
                 </Routes>
               </Suspense>

@@ -52,18 +52,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           // 1. Check if user exists in the admin hierarchy
           let adminDoc;
-          
-          // Check local cache first
-          const cacheKey = `role_${currentUser.uid}`;
-          const cachedRole = localStorage.getItem(cacheKey);
-          if (cachedRole) {
-             const role = cachedRole as UserRole;
-             setUserRole(role);
-             setIsAdmin(['super_admin', 'admin', 'manager'].includes(role));
-             setLoading(false);
-             // We continue to fetch in background to verify
-          }
-
           try {
             adminDoc = await getDoc(doc(db, 'admins', currentUser.uid));
           } catch (err: any) {
@@ -76,7 +64,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
              const role = adminDoc.data()?.role as UserRole;
              setIsAdmin(['super_admin', 'admin', 'manager'].includes(role));
              setUserRole(role);
-             localStorage.setItem(cacheKey, role);
           } else {
              // 2. Otherwise consult general users directory
              let userDoc;
@@ -96,12 +83,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                }
                setIsAdmin(false);
                setUserRole(role);
-               localStorage.setItem(cacheKey, role);
              } else {
                // Fallback if neither document was successfully read or exists
                setIsAdmin(false);
                setUserRole('client');
-               localStorage.setItem(cacheKey, 'client');
              }
           }
         } catch (e: any) {
@@ -228,9 +213,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     if (!auth) return;
     try {
-      if (user) {
-        localStorage.removeItem(`role_${user.uid}`);
-      }
       await firebaseSignOut(auth);
     } catch (error) {
       console.error("Error signing out", error);

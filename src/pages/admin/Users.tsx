@@ -1,47 +1,35 @@
-import { motion, AnimatePresence } from 'motion/react';
-import { useState, useMemo } from 'react';
+import { motion } from 'motion/react';
+import { useState, useEffect } from 'react';
 import { db } from '../../lib/firebase';
-import { collection, query, orderBy, limit } from 'firebase/firestore';
-import { Activity, ShieldCheck, Globe, Clock, Zap, Target, ArrowRight, Monitor } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { useDebouncedSnapshot } from '../../hooks/useDebouncedSnapshot';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { Search, Filter, MoreVertical, ShieldAlert, Cpu } from 'lucide-react';
 
-interface LogData {
+interface UserData {
   id: string;
-  type: string;
-  details?: string;
-  email?: string;
-  userId?: string;
-  timestamp: any;
-  industry?: string;
-  location?: string;
-  userAgent?: string;
+  email: string;
+  displayName: string;
+  phoneNumber?: string;
+  photoURL?: string;
+  createdAt?: any;
 }
 
 export function AdminUsers() {
-  const [logs, setLogs] = useState<LogData[]>([]);
+  const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const q = useMemo(() => query(collection(db, 'clientActivity'), orderBy('timestamp', 'desc'), limit(150)), []);
-  useDebouncedSnapshot(q, (snap) => {
-    const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as LogData));
-    setLogs(data);
-    setLoading(false);
-  }, 1000, (err) => {
-    console.error("Error fetching logs:", err);
-    setLoading(false);
-  });
-
-  const getActionFormat = (log: LogData) => {
-     const t = log.type || '';
-     if (t.includes('started_prototype')) return { color: 'text-blue-400', bg: 'bg-blue-400/10', label: 'PROTOTYPE STARTED', icon: Zap };
-     if (t.includes('completed_prototype')) return { color: 'text-green-400', bg: 'bg-green-400/10', label: 'PROTOTYPE COMPLETED', icon: Target };
-     if (t.includes('booked_consultation')) return { color: 'text-premium-gold', bg: 'bg-premium-gold/10', label: 'CONSULTATION BOOKED', icon: Clock };
-     if (t.includes('abandon')) return { color: 'text-oxblood', bg: 'bg-oxblood/10', label: 'ABANDONED', icon: ShieldCheck };
-     if (t.includes('opened_services')) return { color: 'text-white', bg: 'bg-white/5', label: 'SERVICE VIEW', icon: Globe };
-     if (t.includes('signed_up') || t.includes('logged_in')) return { color: 'text-purple-400', bg: 'bg-purple-400/10', label: 'AUTHENTICATION', icon: ShieldCheck };
-     return { color: 'text-silver-metallic', bg: 'bg-white/5', label: t.toUpperCase().replace('_', ' '), icon: Activity };
-  };
+  useEffect(() => {
+    const q = query(collection(db, 'users')); // Note: requires proper rules indexing if adding orderBy
+    const unsubscribe = onSnapshot(q, (snap) => {
+      const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as UserData));
+      setUsers(data);
+      setLoading(false);
+    }, (err) => {
+      console.error("Error fetching users:", err);
+      setLoading(false);
+    });
+    
+    return () => unsubscribe();
+  }, []);
 
   return (
     <motion.div
@@ -52,83 +40,95 @@ export function AdminUsers() {
     >
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="font-display text-4xl text-white font-medium tracking-tight mb-2">Live Intel Feed</h1>
-              <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 border border-green-500/20 rounded">
-                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
-                <span className="font-mono text-[9px] uppercase tracking-widest text-green-400">Streaming</span>
-              </div>
-            </div>
-            <p className="font-mono text-xs uppercase tracking-widest text-silver-metallic">Real-time surveillance of user behaviors and conversion tracking.</p>
+            <h1 className="font-display text-4xl text-white font-medium tracking-tight mb-2">User Intelligence</h1>
+            <p className="font-mono text-xs uppercase tracking-widest text-silver-metallic">Monitor and manage ecosystem identities.</p>
          </div>
       </div>
 
-      <div className="glass-panel geometric-clip border border-white/5 bg-dark/50 flex flex-col flex-1 overflow-hidden relative shadow-[0_8px_30px_rgb(0,0,0,0.5)]">
-        
+      <div className="glass-panel geometric-clip border border-white/5 bg-dark/50 flex flex-col flex-1 overflow-hidden">
+        {/* Toolbar */}
+        <div className="p-4 border-b border-white/5 flex flex-col md:flex-row gap-4 justify-between items-center bg-white/[0.02]">
+           <div className="relative w-full md:w-96">
+             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-silver-metallic" />
+             <input 
+               type="text" 
+               placeholder="Search identifiers..." 
+               className="w-full bg-dark border border-white/10 rounded-lg py-2 pl-10 pr-4 text-sm font-mono text-white focus:outline-none focus:border-premium-gold transition-colors"
+             />
+           </div>
+           <div className="flex gap-2 w-full md:w-auto">
+              <button className="flex items-center gap-2 px-4 py-2 bg-dark border border-white/10 rounded-lg text-xs font-mono uppercase text-silver-metallic hover:text-white transition-colors">
+                <Filter className="w-4 h-4" /> Filter
+              </button>
+              <button className="flex items-center gap-2 px-4 py-2 bg-premium-gold text-white rounded-lg text-xs font-mono uppercase geometric-clip-button hover:bg-oxblood transition-colors">
+                Export Data
+              </button>
+           </div>
+        </div>
+
         {/* Table / List */}
-        <div className="flex-1 overflow-auto custom-scrollbar p-6">
+        <div className="flex-1 overflow-auto custom-scrollbar">
           {loading ? (
-             <div className="flex flex-col items-center justify-center h-full gap-4">
-                <div className="w-8 h-8 rounded-full border-2 border-premium-gold border-t-transparent animate-spin" />
-                <p className="font-mono text-xs uppercase tracking-widest text-silver-metallic">Establishing Uplink...</p>
+             <div className="flex flex-col items-center justify-center h-64 gap-4">
+                <Cpu className="w-8 h-8 text-premium-gold animate-pulse" />
+                <p className="font-mono text-xs uppercase tracking-widest text-silver-metallic">Syncing Data...</p>
              </div>
-          ) : logs.length === 0 ? (
-             <div className="flex flex-col items-center justify-center h-full gap-4">
-                <ShieldCheck className="w-8 h-8 text-silver-metallic" />
-                <p className="font-mono text-xs uppercase tracking-widest text-silver-metallic">No Network Activity Detected</p>
+          ) : users.length === 0 ? (
+             <div className="flex flex-col items-center justify-center h-64 gap-4">
+                <ShieldAlert className="w-8 h-8 text-silver-metallic" />
+                <p className="font-mono text-xs uppercase tracking-widest text-silver-metallic">No Identities Found</p>
              </div>
           ) : (
-             <div className="space-y-4">
-               <AnimatePresence>
-                 {logs.map((log) => {
-                   const format = getActionFormat(log);
-                   const Icon = format.icon;
-                   return (
-                     <motion.div 
-                       initial={{ opacity: 0, x: -20 }}
-                       animate={{ opacity: 1, x: 0 }}
-                       key={log.id} 
-                       className="group border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-all p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden"
-                     >
-                        <div className={`absolute left-0 top-0 bottom-0 w-[3px] opacity-20 group-hover:opacity-100 transition-opacity ${format.color.replace('text-', 'bg-')}`} />
-                        
-                        <div className="flex items-center gap-5 w-full md:w-1/3 shrink-0">
-                           <div className={`w-10 h-10 geometric-clip flex items-center justify-center border border-white/10 group-hover:border-white/30 transition-colors ${format.bg}`}>
-                              <Icon className={`w-4 h-4 ${format.color}`} />
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-white/5">
+                  <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-normal">Identity</th>
+                  <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-normal">UID</th>
+                  <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-normal">Activity</th>
+                  <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-normal">Status</th>
+                  <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-normal text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((u, i) => (
+                  <tr key={u.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
+                    <td className="p-4">
+                      <div className="flex items-center gap-4">
+                         {u.photoURL ? (
+                           <img src={u.photoURL} alt={u.displayName} className="w-10 h-10 geometric-clip border border-white/10" />
+                         ) : (
+                           <div className="w-10 h-10 geometric-clip bg-white/5 flex items-center justify-center border border-white/10">
+                              <span className="font-display font-medium">{u.displayName?.substring(0,2).toUpperCase() || 'UN'}</span>
                            </div>
-                           <div className="min-w-0">
-                              <span className={`font-mono text-[9px] uppercase tracking-[0.2em] px-2 py-0.5 rounded-sm bg-white/5 border border-white/10 mb-2 inline-block ${format.color}`}>{format.label}</span>
-                              <div className="font-sans text-sm font-medium text-white truncate max-w-[200px]">{log.email || log.userId || 'Anonymous Ghost'}</div>
-                           </div>
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                           <p className="font-mono text-[11px] text-silver-metallic leading-relaxed tracking-wider break-words"><span className="text-white/30 mr-2">&gt;</span>{log.details || 'System event recorded without details.'}</p>
-                           
-                           <div className="flex items-center gap-4 mt-3">
-                              {log.industry && (
-                                <div className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-premium-gold bg-premium-gold/5 px-2 py-1 rounded">
-                                  <Globe className="w-3 h-3" /> {log.industry}
-                                </div>
-                              )}
-                              {log.userAgent && (
-                                <div className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-blue-400 bg-blue-400/5 px-2 py-1 rounded max-w-[120px] truncate">
-                                  <Monitor className="w-3 h-3" /> {log.userAgent.split(' ')[0]}
-                                </div>
-                              )}
-                           </div>
-                        </div>
-
-                        <div className="shrink-0 flex items-center justify-end w-32">
-                           <div className="font-mono text-[10px] text-silver-metallic text-right">
-                              {log.timestamp?.toDate ? formatDistanceToNow(log.timestamp.toDate(), { addSuffix: true }) : 'Just now'}
-                           </div>
-                        </div>
-                     </motion.div>
-                   );
-                 })}
-               </AnimatePresence>
-             </div>
+                         )}
+                         <div>
+                           <p className="font-sans text-sm font-medium text-white">{u.displayName || 'Unknown Entity'}</p>
+                           <p className="font-mono text-[10px] text-silver-metallic">{u.email}</p>
+                           {u.phoneNumber && <p className="font-mono text-[10px] text-silver-metallic mt-0.5 opacity-80">{u.phoneNumber}</p>}
+                         </div>
+                      </div>
+                    </td>
+                    <td className="p-4 font-mono text-[10px] text-silver-metallic">{u.id}</td>
+                    <td className="p-4 font-mono text-[10px] text-silver-metallic">
+                      <div className="space-y-1">
+                        <p><span className="text-gray-500">Joined:</span> {u.createdAt?.toDate ? new Date(u.createdAt.toDate()).toLocaleDateString() : 'Unknown'}</p>
+                        <p><span className="text-gray-500">Last seen:</span> {(u as any).lastLogin?.toDate ? new Date((u as any).lastLogin.toDate()).toLocaleDateString() : 'Unknown'}</p>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                       <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-green-500/10 text-green-400 text-[9px] font-mono uppercase tracking-wider">
+                         <span className="w-1 h-1 rounded-full bg-green-400" /> Active
+                       </span>
+                    </td>
+                    <td className="p-4 text-right">
+                       <button className="p-2 text-silver-metallic hover:text-white transition-colors opacity-0 group-hover:opacity-100">
+                          <MoreVertical className="w-4 h-4" />
+                       </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
         </div>
       </div>

@@ -1,6 +1,10 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
     function isSignedIn() {
       return request.auth != null;
     }
@@ -9,40 +13,36 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    function getRole() {
-      return exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ? get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role : 'client';
-    }
-
     function isAdmin() {
       return isSignedIn() && (
-        ('email' in request.auth.token && request.auth.token.email == 'njeirheinard@gmail.com') ||
-        getRole() in ['super_admin', 'admin', 'manager', 'developer', 'designer']
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        (request.auth.token.email != null && request.auth.token.email == 'njeirheinard@gmail.com')
       );
     }
 
     function isSuperAdmin() {
       return isSignedIn() && (
-        ('email' in request.auth.token && request.auth.token.email == 'njeirheinard@gmail.com') ||
-        getRole() == 'super_admin'
+        (exists(/databases/$(database)/documents/admins/$(request.auth.uid)) && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'super_admin') ||
+        (request.auth.token.email != null && request.auth.token.email == 'njeirheinard@gmail.com')
       );
     }
 
-    // Global bypass for super_admin
-    match /{document=**} {
-      allow read, write: if isSuperAdmin();
-    }
-
     match /admins/{adminId} {
+      // Admins can read their own status. Other admins can read all admins.
       allow get: if isSignedIn() && request.auth.uid == adminId;
       allow read: if isAdmin();
+      allow write: if isSuperAdmin();
     }
 
     match /users/{userId} {
+      // Users can read and write their own data. Admins can read all.
       allow read: if isOwner(userId) || isAdmin();
-      allow create, update: if isOwner(userId);
+      allow write: if isOwner(userId);
+      allow delete: if isSuperAdmin();
     }
 
     match /projectSubmissions/{submissionId} {
+      // Users can read/write their own submissions. Admins can manage all.
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
       allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow read, write: if isAdmin();
@@ -55,37 +55,14 @@ service cloud.firestore {
     }
 
     match /leads/{leadId} {
-      allow create: if true;
+      allow create: if true; // Public or anonymous can submit leads
       allow read, write: if isAdmin();
     }
 
     match /clientActivity/{activityId} {
-      allow create: if true;
+      allow create: if true; // System routes track activity freely
       allow read: if isAdmin();
-    }
-
-    match /notifications/{notificationId} {
-      allow create: if isAdmin();
-      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow read, write: if isAdmin();
-    }
-
-    match /messages/{messageId} {
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow read, write: if isAdmin();
-    }
-
-    match /bookings/{bookingId} {
-      allow create: if true;
-      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow read, write: if isAdmin();
-    }
-
-    match /projects/{projectId} {
-      allow create: if isAdmin();
-      allow read, update: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow read, write: if isAdmin();
+      allow write: if isSuperAdmin();
     }
   }
 }

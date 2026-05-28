@@ -33,17 +33,6 @@ export function SEO({
 }: SEOProps) {
   const metaTitle = title.includes("EINORT") ? title : `${title} | EINORT SOLUTIONS`;
   const canonicalUrl = canonical || url;
-  
-  // High-value global and local keywords
-  const finalKeywords = [keywords, 
-    "Top Software Agency worldwide", 
-    "Best Custom Web Application Developer in the United States", 
-    "Premium SaaS Development Firm in Dubai", 
-    "Elite Software Architects in London",
-    "Digital Transformation US",
-    "Enterprise Software Solutions UK",
-    "Premium Web Agency UAE"
-  ].filter(Boolean).join(", ");
 
   const baseSchema = {
     "@context": "https://schema.org",
@@ -59,26 +48,15 @@ export function SEO({
           "width": 512,
           "height": 512
         },
-        "description": "World-class digital agency engineering enterprise web applications for clients in Dubai, London, New York, and worldwide.",
+        "description": "World-class digital agency engineering enterprise web applications.",
         "image": image,
         "priceRange": "$$$$",
-        "address": [
-           {
-             "@type": "PostalAddress",
-             "addressLocality": "New York",
-             "addressCountry": "US"
-           },
-           {
-             "@type": "PostalAddress",
-             "addressLocality": "London",
-             "addressCountry": "UK"
-           },
-           {
-             "@type": "PostalAddress",
-             "addressLocality": "Dubai",
-             "addressCountry": "AE"
-           }
-        ],
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Virtual HQ",
+          "addressLocality": "Global",
+          "addressCountry": "US"
+        },
         "sameAs": [
           "https://twitter.com/einortsolutions",
           "https://linkedin.com/company/einort"
@@ -135,7 +113,7 @@ export function SEO({
       <html lang="en-US" />
       <title>{metaTitle}</title>
       <meta name="description" content={description} />
-      <meta name="keywords" content={finalKeywords} />
+      <meta name="keywords" content={keywords} />
       <meta name="theme-color" content="#000000" />
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
       <link rel="canonical" href={canonicalUrl} />
@@ -144,7 +122,7 @@ export function SEO({
       <link rel="alternate" hrefLang="en-US" href={`${canonicalUrl}`} />
       <link rel="alternate" hrefLang="en-GB" href={`${canonicalUrl}`} />
       <link rel="alternate" hrefLang="en-CA" href={`${canonicalUrl}`} />
-      <link rel="alternate" hrefLang="en-AE" href={`${canonicalUrl}`} />
+      <link rel="alternate" hrefLang="en-ZA" href={`${canonicalUrl}`} />
       <link rel="alternate" hrefLang="x-default" href={`${canonicalUrl}`} />
       {/* End standard metadata tags */}
       
