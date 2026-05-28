@@ -8,6 +8,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { calculateLeadScore, getLeadStatus } from '../utils/leadScoring';
 import { logClientActivity } from '../utils/activityLogger';
 import { SEO } from '../components/SEO';
+import { AuthModal } from '../components/AuthModal';
 
 const INDUSTRIES = [
   'Healthcare & Medical', 'Hotel & Hospitality', 'Restaurant & Dining',
@@ -39,49 +40,66 @@ export function CustomProjectRequest() {
     category: '',
     features: [] as string[],
     goals: [] as string[],
+    integrations: [] as string[],
     competitors: '',
     timeline: '',
     budget: '',
-    complexity: 'Low',
+    complexityInput: 'Medium',
     customFeature: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  
+  // AI Outputs
   const [suggestedStack, setSuggestedStack] = useState<string[]>(['React', 'Node.js', 'PostgreSQL']);
   const [estimatedCost, setEstimatedCost] = useState(0);
+  const [aiComplexity, setAiComplexity] = useState('Medium');
+  const [projectPhases, setProjectPhases] = useState<string[]>([]);
+  const [timelineEst, setTimelineEst] = useState('8-12 Weeks');
 
   useEffect(() => {
     // Recalculate intelligence behind the scenes
     let newStack = ['React', 'Node.js', 'PostgreSQL'];
-    let complexityLevel = 'Medium';
+    let complexityLevel = formData.complexityInput || 'Medium';
     let baseCost = 15000;
+    let phases = ['Discovery & Architecture', 'Core Foundation', 'Frontend Implementation', 'QA & Launch'];
+    let timelineWeeks = '8-12 Weeks';
 
     switch(formData.industry) {
       case 'Healthcare & Medical':
         newStack = ['Next.js', 'Node.js', 'PostgreSQL', 'HL7 Engines', 'HIPAA AWS'];
         baseCost = 85000;
         complexityLevel = 'Enterprise';
+        phases = ['Compliance Audit', 'Secure Architecture (HIPAA)', 'Core Systems', 'EHR Interop', 'Security Testing & Launch'];
+        timelineWeeks = '16-24 Weeks';
         break;
       case 'Hotel & Hospitality':
         newStack = ['React', 'Node.js', 'Redis', 'Stripe Connect'];
         baseCost = 65000;
         complexityLevel = 'High';
+        phases = ['UX Strategy', 'Booking Engine Development', 'CRM Integration', 'Property Management Sync', 'Launch'];
+        timelineWeeks = '12-16 Weeks';
         break;
       case 'Restaurant & Dining':
         newStack = ['React Native', 'Firebase', 'Node.js', 'Square API'];
         baseCost = 45000;
         complexityLevel = 'Medium';
+        timelineWeeks = '8-12 Weeks';
         break;
       case 'Education & EdTech':
         newStack = ['React', 'Django', 'PostgreSQL', 'WebRTC'];
         baseCost = 75000;
         complexityLevel = 'High';
+        timelineWeeks = '14-20 Weeks';
         break;
       case 'Corporate & Enterprise':
         newStack = ['Next.js', 'Java Spring', 'Kubernetes', 'OAuth2'];
         baseCost = 150000;
         complexityLevel = 'Enterprise';
+        phases = ['Requirements Gathering', 'Microservices Architecture', 'System Integration', 'UAT', 'Phased Rollout'];
+        timelineWeeks = '20-30+ Weeks';
         break;
       case 'NGO & Non-Profit':
         newStack = ['React', 'Node.js', 'Firebase', 'Stripe'];
@@ -92,11 +110,14 @@ export function CustomProjectRequest() {
         newStack = ['Next.js', 'Node.js', 'PostGIS', 'ElasticSearch'];
         baseCost = 70000;
         complexityLevel = 'High';
+        timelineWeeks = '12-18 Weeks';
         break;
       case 'Retail & Ecommerce':
         newStack = ['Next.js', 'Shopify Plus', 'Redis', 'ElasticSearch'];
         baseCost = 65000;
         complexityLevel = 'High';
+        phases = ['Catalog Strategy', 'Custom Headless Build', 'ERP/PIM Integration', 'Performance Tuning', 'Launch'];
+        timelineWeeks = '12-16 Weeks';
         break;
       case 'High-Growth Startup':
       default:
@@ -106,31 +127,41 @@ export function CustomProjectRequest() {
     }
 
     if (formData.features.includes('AI Processing') || formData.features.includes('Machine Learning')) {
-      newStack.push('Python', 'TensorFlow');
-      complexityLevel = complexityLevel === 'Enterprise' ? 'Enterprise' : 'High';
-      baseCost += 15000;
+      newStack.unshift('Python', 'TensorFlow/PyTorch');
+      baseCost += 40000;
+      complexityLevel = 'Enterprise';
     }
 
     if (formData.budget === '$15k-$50k') baseCost = Math.max(baseCost, 25000);
     else if (formData.budget === '$50k+') baseCost = Math.max(baseCost, 60000);
 
-    setSuggestedStack(newStack.slice(0, 5));
-    setFormData(prev => ({ ...prev, complexity: complexityLevel }));
+    setSuggestedStack(newStack.slice(0, 6));
+    setAiComplexity(complexityLevel);
     setEstimatedCost(baseCost);
-  }, [formData.industry, formData.category, formData.features, formData.budget]);
+    setProjectPhases(phases);
+    setTimelineEst(timelineWeeks);
+  }, [formData.industry, formData.category, formData.features, formData.budget, formData.integrations]);
 
   const handleNext = () => setStep(p => Math.min(p + 1, totalSteps));
   const handleBack = () => setStep(p => Math.max(p - 1, 1));
 
-  const toggleArrayItem = (field: 'features' | 'goals', item: string) => {
+  const toggleArrayItem = (field: 'features' | 'goals' | 'integrations', item: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: prev[field].includes(item) ? prev[field].filter(i => i !== item) : [...prev[field], item]
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleIntentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      setAuthModalOpen(true);
+      return;
+    }
+    executeSubmit();
+  };
+
+  const executeSubmit = async () => {
     setIsSubmitting(true);
     
     try {
@@ -140,17 +171,20 @@ export function CustomProjectRequest() {
         status: 'pending',
         suggestedStack,
         estimatedCost,
+        projectPhases,
+        timelineEst,
+        aiComplexity,
         createdAt: serverTimestamp()
       });
 
       const leadValue = estimatedCost;
-      const forecastProb = formData.complexity === 'Enterprise' ? 20 : formData.complexity === 'High' ? 40 : 70;
+      const forecastProb = aiComplexity === 'Enterprise' ? 20 : aiComplexity === 'High' ? 40 : 70;
       
       const score = calculateLeadScore({
         budget: formData.budget,
         value: leadValue,
         timeline: formData.timeline,
-        complexity: formData.complexity,
+        complexity: aiComplexity,
         featuresCount: formData.features.length,
         hasCompany: !!formData.company,
         industry: formData.industry,
@@ -165,7 +199,8 @@ export function CustomProjectRequest() {
         date: new Date().toISOString().split('T')[0],
         status: getLeadStatus(score),
         score: score,
-        aiNote: `Auto-generated Lead from Project Blueprint. Industry: ${formData.industry}. Stack: ${suggestedStack.join(', ')}.`,
+        company: formData.company || formData.industry || 'Unknown',
+        aiNote: `AI PROJECT ARCHITECT generation: Industry: ${formData.industry}. Stack: ${suggestedStack.join(', ')}. Est: $${estimatedCost.toLocaleString()}. Project Type: ${formData.category}. Integrations: ${formData.integrations.join(', ')}.`,
         lastContact: new Date().toISOString().split('T')[0],
         forecast: forecastProb,
         createdAt: serverTimestamp()
@@ -210,31 +245,6 @@ export function CustomProjectRequest() {
       case 2:
         return (
           <div className="space-y-6">
-            <h2 className="text-2xl font-display mb-4">Project Type</h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              {CATEGORIES.map(c => (
-                <button key={c} type="button" onClick={() => { setFormData(p => ({...p, category: c})); handleNext(); }} className={`p-4 border text-left font-mono text-sm tracking-widest uppercase transition-colors ${formData.category === c ? 'border-premium-gold bg-premium-gold/10 text-premium-gold' : 'border-white/10 text-white/70 hover:border-white/30'}`}>{c}</button>
-              ))}
-            </div>
-          </div>
-        );
-      case 3:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-display mb-4">Required Capabilities</h2>
-            <div className="grid md:grid-cols-2 gap-4 mb-4">
-              {['User Authentication', 'Payment Processing', 'Real-time Chat', 'AI Processing', 'Admin Dashboard', 'Analytics', 'File Storage', 'Third-party Integrations'].map(f => (
-                <button key={f} type="button" onClick={() => toggleArrayItem('features', f)} className={`p-4 border text-left font-mono text-xs tracking-widest uppercase flex justify-between ${formData.features.includes(f) ? 'border-premium-gold bg-premium-gold/10 text-premium-gold' : 'border-white/10 text-white/70 hover:border-white/30'}`}>
-                  {f} {formData.features.includes(f) && <Check className="w-4 h-4" />}
-                </button>
-              ))}
-            </div>
-            <input type="text" placeholder="Other specific feature..." value={formData.customFeature} onChange={e => setFormData(p => ({...p, customFeature: e.target.value}))} className="w-full bg-dark border border-white/10 p-4 text-white font-mono text-sm uppercase outline-none focus:border-premium-gold" />
-          </div>
-        );
-      case 4:
-        return (
-          <div className="space-y-6">
             <h2 className="text-2xl font-display mb-4">Primary Business Goals</h2>
             <div className="grid gap-4">
               {['Increase Revenue', 'Automate Operations', 'Improve User Experience', 'Scale Infrastructure', 'Launch MVP'].map(g => (
@@ -245,14 +255,63 @@ export function CustomProjectRequest() {
             </div>
           </div>
         );
+      case 3:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-display mb-4">Project Type</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {CATEGORIES.map(c => (
+                <button key={c} type="button" onClick={() => { setFormData(p => ({...p, category: c})); handleNext(); }} className={`p-4 border text-left font-mono text-sm tracking-widest uppercase transition-colors ${formData.category === c ? 'border-premium-gold bg-premium-gold/10 text-premium-gold' : 'border-white/10 text-white/70 hover:border-white/30'}`}>{c}</button>
+              ))}
+            </div>
+          </div>
+        );
+      case 4:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-display mb-4">Required Features</h2>
+            <div className="grid md:grid-cols-2 gap-4 mb-4">
+              {['User Authentication', 'Payment Processing', 'Real-time Chat', 'AI Processing', 'Admin Dashboard', 'Analytics', 'File Storage', 'Third-party Integrations'].map(f => (
+                <button key={f} type="button" onClick={() => toggleArrayItem('features', f)} className={`p-4 border text-left font-mono text-xs tracking-widest uppercase flex justify-between ${formData.features.includes(f) ? 'border-premium-gold bg-premium-gold/10 text-premium-gold' : 'border-white/10 text-white/70 hover:border-white/30'}`}>
+                  {f} {formData.features.includes(f) && <Check className="w-4 h-4" />}
+                </button>
+              ))}
+            </div>
+            <input type="text" placeholder="Other specific feature..." value={formData.customFeature} onChange={e => setFormData(p => ({...p, customFeature: e.target.value}))} className="w-full bg-dark border border-white/10 p-4 text-white font-mono text-sm uppercase outline-none focus:border-premium-gold" />
+          </div>
+        );
       case 5:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-display mb-4">External Integrations</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              {['Stripe/PayPal', 'Salesforce/HubSpot CRM', 'Firebase Auth', 'AWS/GCP Connect', 'Twilio/SendGrid SMS', 'Custom Internal API'].map(i => (
+                <button key={i} type="button" onClick={() => toggleArrayItem('integrations', i)} className={`p-4 border text-left font-mono text-xs tracking-widest uppercase flex justify-between ${formData.integrations.includes(i) ? 'border-premium-gold bg-premium-gold/10 text-premium-gold' : 'border-white/10 text-white/70 hover:border-white/30'}`}>
+                  {i} {formData.integrations.includes(i) && <Check className="w-4 h-4" />}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      case 6:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-display mb-4">Competitive Landscape</h2>
             <textarea placeholder="List your main competitors or inspiration (URLs)..." rows={5} value={formData.competitors} onChange={e => setFormData(p => ({...p, competitors: e.target.value}))} className="w-full bg-dark border border-white/10 p-4 text-white font-mono text-sm outline-none focus:border-premium-gold custom-scrollbar" />
           </div>
         );
-      case 6:
+      case 7:
+        return (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-display mb-4">Investment Strategy (Budget)</h2>
+            <div className="grid gap-4">
+              {BUDGETS.map(b => (
+                <button key={b} type="button" onClick={() => { setFormData(p => ({...p, budget: b})); handleNext(); }} className={`p-4 border text-left font-mono text-sm tracking-widest uppercase transition-colors ${formData.budget === b ? 'border-premium-gold bg-premium-gold/10 text-premium-gold' : 'border-white/10 text-white/70 hover:border-white/30'}`}>{b}</button>
+              ))}
+            </div>
+          </div>
+        );
+      case 8:
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-display mb-4">Target Timeline</h2>
@@ -263,52 +322,59 @@ export function CustomProjectRequest() {
             </div>
           </div>
         );
-      case 7:
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-display mb-4">Investment Strategy</h2>
-            <div className="grid gap-4">
-              {BUDGETS.map(b => (
-                <button key={b} type="button" onClick={() => { setFormData(p => ({...p, budget: b})); handleNext(); }} className={`p-4 border text-left font-mono text-sm tracking-widest uppercase transition-colors ${formData.budget === b ? 'border-premium-gold bg-premium-gold/10 text-premium-gold' : 'border-white/10 text-white/70 hover:border-white/30'}`}>{b}</button>
-              ))}
-            </div>
-          </div>
-        );
-      case 8:
-        return (
-           <div className="space-y-6">
-            <h2 className="text-2xl font-display mb-4">Project Entity (Name)</h2>
-            <input required type="text" placeholder="Project Name / Codename" value={formData.title} onChange={e => setFormData(p => ({...p, title: e.target.value}))} className="w-full bg-dark border border-white/10 p-4 text-white font-mono text-sm outline-none focus:border-premium-gold mb-4" />
-            <input required type="text" placeholder="Your Full Name" value={formData.fullName} onChange={e => setFormData(p => ({...p, fullName: e.target.value}))} className="w-full bg-dark border border-white/10 p-4 text-white font-mono text-sm outline-none focus:border-premium-gold mb-4" />
-            <input required type="email" placeholder="Email Address" value={formData.email} onChange={e => setFormData(p => ({...p, email: e.target.value}))} className="w-full bg-dark border border-white/10 p-4 text-white font-mono text-sm outline-none focus:border-premium-gold" />
-          </div>
-        );
       case 9:
         return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-display mb-4">AI Diagnostic Intelligence</h2>
-            <div className="glass-panel p-6 border border-premium-gold/30 bg-premium-gold/5">
-               <div className="flex items-center gap-3 mb-6">
-                 <Cpu className="w-6 h-6 text-premium-gold animate-pulse" />
-                 <h3 className="font-mono text-sm font-bold uppercase tracking-widest">Calculated Trajectory</h3>
-               </div>
-               <div className="space-y-4 font-mono text-xs text-white/80">
-                 <div className="flex justify-between border-b border-white/10 pb-2"><span>Complexity:</span> <span className="text-premium-gold">{formData.complexity}</span></div>
-                 <div className="flex justify-between border-b border-white/10 pb-2"><span>Recommended Stack:</span> <span className="text-right">{suggestedStack.join(', ')}</span></div>
-                 <div className="flex justify-between pb-2"><span>Estimated Base Investment:</span> <span className="text-white">${estimatedCost.toLocaleString()}</span></div>
-               </div>
+           <div className="space-y-6">
+            <h2 className="text-2xl font-display mb-4">Perceived Complexity</h2>
+            <div className="grid md:grid-cols-3 gap-4">
+              {['Standard', 'High', 'Enterprise'].map(comp => (
+                <button key={comp} type="button" onClick={() => { setFormData(p => ({...p, complexityInput: comp})); handleNext(); }} className={`p-4 border text-left font-mono text-sm tracking-widest uppercase transition-colors ${formData.complexityInput === comp ? 'border-premium-gold bg-premium-gold/10 text-premium-gold' : 'border-white/10 text-white/70 hover:border-white/30'}`}>{comp}</button>
+              ))}
             </div>
           </div>
         );
       case 10:
         return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-display mb-4">Final Submission Verification</h2>
-            <div className="glass-panel p-6 border border-white/10 space-y-4 font-mono text-xs text-white">
-               <p><span className="text-white/50 tracking-widest uppercase">Project:</span> {formData.title}</p>
-               <p><span className="text-white/50 tracking-widest uppercase">Target:</span> {formData.category}</p>
-               <p><span className="text-white/50 tracking-widest uppercase">Capabilities:</span> {formData.features.join(', ')}</p>
-               <p><span className="text-white/50 tracking-widest uppercase">Client:</span> {formData.fullName} ({formData.email})</p>
+          <div className="space-y-8">
+            <div className="glass-panel p-6 border border-premium-gold/30 bg-premium-gold/5 relative overflow-hidden">
+               <div className="absolute top-0 right-0 p-4 opacity-50"><Cpu className="w-24 h-24 text-premium-gold" /></div>
+               <div className="flex items-center gap-3 mb-6 relative z-10">
+                 <Sparkles className="w-6 h-6 text-premium-gold animate-pulse" />
+                 <h3 className="font-mono text-sm font-bold uppercase tracking-widest">AI Project Architect Recommendation</h3>
+               </div>
+               
+               <div className="grid md:grid-cols-2 gap-8 relative z-10">
+                 <div className="space-y-4 font-mono text-xs text-white/80">
+                   <div className="flex justify-between border-b border-white/10 pb-2"><span>Analyzed Complexity:</span> <span className="text-premium-gold font-bold">{aiComplexity}</span></div>
+                   <div className="flex justify-between border-b border-white/10 pb-2"><span>Estimated Investment:</span> <span className="text-white">${estimatedCost.toLocaleString()}</span></div>
+                   <div className="flex justify-between border-b border-white/10 pb-2"><span>Estimated Timeline:</span> <span className="text-white">{timelineEst}</span></div>
+                 </div>
+                 <div className="space-y-4 font-mono text-xs text-white/80">
+                   <p className="tracking-widest uppercase text-premium-gold mb-2">Recommended Stack</p>
+                   <div className="flex flex-wrap gap-2">
+                     {suggestedStack.map(s => <span key={s} className="px-2 py-1 bg-white/5 border border-white/10 text-[10px]">{s}</span>)}
+                   </div>
+                 </div>
+               </div>
+               
+               <div className="mt-6 relative z-10">
+                 <p className="tracking-widest uppercase text-premium-gold mb-3 font-mono text-xs">Roadmap Phases</p>
+                 <div className="flex flex-wrap gap-2">
+                   {projectPhases.map((phase, i) => (
+                     <div key={phase} className="flex items-center gap-2 bg-dark/50 px-3 py-1.5 border border-white/10 rounded-full font-mono text-[10px] text-white">
+                       <span className="text-premium-gold font-bold">{i+1}</span>
+                       <span>{phase}</span>
+                     </div>
+                   ))}
+                 </div>
+               </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-display">Finalize Submission</h3>
+              <input required type="text" placeholder="Project Name / Codename" value={formData.title} onChange={e => setFormData(p => ({...p, title: e.target.value}))} className="w-full bg-dark border border-white/10 p-4 text-white font-mono text-sm outline-none focus:border-premium-gold" />
+              <input required type="text" placeholder="Your Full Name" value={formData.fullName} onChange={e => setFormData(p => ({...p, fullName: e.target.value}))} className="w-full bg-dark border border-white/10 p-4 text-white font-mono text-sm outline-none focus:border-premium-gold" />
+              <input required type="email" placeholder="Email Address" value={formData.email} onChange={e => setFormData(p => ({...p, email: e.target.value}))} className="w-full bg-dark border border-white/10 p-4 text-white font-mono text-sm outline-none focus:border-premium-gold" />
             </div>
           </div>
         );
@@ -332,7 +398,7 @@ export function CustomProjectRequest() {
            </div>
         </div>
 
-        <form onSubmit={step === totalSteps ? handleSubmit : (e) => { e.preventDefault(); handleNext(); }}>
+        <form onSubmit={step === totalSteps ? handleIntentSubmit : (e) => { e.preventDefault(); handleNext(); }}>
           <AnimatePresence mode="wait">
             <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="min-h-[400px]">
               {renderStep()}
@@ -349,6 +415,13 @@ export function CustomProjectRequest() {
           </div>
         </form>
 
+        <AuthModal 
+          isOpen={authModalOpen} 
+          onClose={() => setAuthModalOpen(false)} 
+          onSuccess={() => { setAuthModalOpen(false); executeSubmit(); }}
+          title="Account Required"
+          subtitle="Please sign in or create an account to submit your project blueprint."
+        />
       </div>
     </div>
   );

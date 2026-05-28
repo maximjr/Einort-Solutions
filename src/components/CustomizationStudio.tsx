@@ -75,7 +75,7 @@ export function CustomizationStudio() {
   }, [selections.font]);
   const activeButtonClass = useMemo(() => buttonStyles.find(b => b.id === selections.buttonStyle)?.className || 'rounded-none', [selections.buttonStyle]);
 
-  const handleBuild = useCallback(async () => {
+   const handleBuild = useCallback(async () => {
     if (!user) {
       setAuthModalOpen(true);
       return;
@@ -84,6 +84,36 @@ export function CustomizationStudio() {
     setIsBuilding(true);
     setSubmitError(null);
     try {
+      // Real business intelligence: Dynamically calculate baseline cost and complexity
+      let baseValue = 5000;
+      let complexityMultiplier = 1.0;
+      let calculatedTimeline: 'urgent' | 'flexible' | 'standard' = 'standard';
+      
+      const intent = (projectId || '').toLowerCase();
+      
+      // Intent based scaling
+      if (intent.includes('enterprise') || intent.includes('healthcare') || intent.includes('finance')) {
+        baseValue = 15000;
+        complexityMultiplier = 1.8;
+      } else if (intent.includes('ecommerce') || intent.includes('retail')) {
+        baseValue = 8500;
+        complexityMultiplier = 1.4;
+      } else if (intent.includes('saas') || intent.includes('portal')) {
+        baseValue = 12000;
+        complexityMultiplier = 1.5;
+      }
+      
+      // Architecture based scaling
+      if (selections.layout === 'bento') {
+         complexityMultiplier += 0.2; // Requires more component orchestration
+         baseValue += 1500;
+      } else if (selections.layout === 'split') {
+         complexityMultiplier += 0.1;
+      }
+      
+      const finalValue = Math.round(baseValue * complexityMultiplier);
+      const estimatedDeliveryWeeks = Math.max(4, Math.ceil((finalValue / 1000) * 0.4));
+      
       await addDoc(collection(db, 'projectSubmissions'), {
         userId: user.uid,
         userEmail: user.email,
@@ -91,31 +121,34 @@ export function CustomizationStudio() {
         projectId,
         selections,
         status: 'pending',
+        estimatedValue: finalValue,
+        estimatedDeliveryWeeks,
         createdAt: serverTimestamp(),
       });
 
       const score = calculateLeadScore({
-        value: 2000,
-        timeline: 'flexible',
-        hasCompany: false
+        value: finalValue,
+        timeline: calculatedTimeline,
+        hasCompany: true
       });
 
       await addDoc(collection(db, 'leads'), {
         name: user.displayName || 'Sandbox User',
         contact: user.displayName || 'Sandbox User',
         email: user.email,
-        value: 2000,
+        value: finalValue,
         stage: 'new',
         date: new Date().toISOString().split('T')[0],
         status: getLeadStatus(score),
         score: score,
-        aiNote: `Auto-generated Lead from Sandbox Customization Studio. Project ID: ${projectId}. Theme: ${selections.theme}`,
+        company: intent ? intent : 'Startup',
+        aiNote: `Auto-generated Lead from Sandbox Customization Studio. Intent: ${projectId}. Complexity Multiplier: ${complexityMultiplier.toFixed(2)}x. Architecture: ${selections.theme} theme with ${selections.layout} layout. Algorithmic base estimate: $${finalValue} / ${estimatedDeliveryWeeks} weeks.`,
         lastContact: new Date().toISOString().split('T')[0],
         forecast: 50,
         createdAt: serverTimestamp()
       });
 
-      await logClientActivity(user.uid, user.email, 'completed_prototype', `Completed Sandbox Prototype ${projectId}`);
+      await logClientActivity(user.uid, user.email, 'completed_prototype', `Completed Sandbox Prototype ${projectId} (Est: $${finalValue})`);
 
       setShowSuccess(true);
     } catch (error: any) {

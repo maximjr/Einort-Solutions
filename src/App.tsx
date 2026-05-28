@@ -11,6 +11,9 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'motion/react';
 import { CinematicTransition } from './components/CinematicTransition';
 import { SEO } from './components/SEO';
+import { AnalyticsRouteTracker } from './AnalyticsRouteTracker';
+
+import { AuthRedirector } from './components/AuthRedirector';
 
 // Lazy loading components for performance
 const Hero = lazy(() => import('./components/Hero').then(m => ({ default: m.Hero })));
@@ -30,7 +33,6 @@ const Onboarding = lazy(() => import('./pages/Onboarding').then(m => ({ default:
 const LocalizedService = lazy(() => import('./pages/LocalizedService').then(m => ({ default: m.LocalizedService })));
 const InsightHub = lazy(() => import('./pages/InsightHub').then(m => ({ default: m.InsightHub })));
 const InsightArticle = lazy(() => import('./pages/InsightArticle').then(m => ({ default: m.InsightArticle })));
-const Dashboard = lazy(() => import('./components/Dashboard').then(m => ({ default: m.Dashboard })));
 const ServiceExperience = lazy(() => import('./components/ServiceExperience').then(m => ({ default: m.ServiceExperience })));
 const CustomizationStudio = lazy(() => import('./components/CustomizationStudio').then(m => ({ default: m.CustomizationStudio })));
 const CustomProjectRequest = lazy(() => import('./pages/CustomProjectRequest').then(m => ({ default: m.CustomProjectRequest })));
@@ -61,6 +63,7 @@ export default function App() {
   return (
     <div className="bg-dark min-h-screen text-white selection:bg-premium-gold selection:text-white font-sans relative overflow-x-hidden">
       <SEO />
+      <AnalyticsRouteTracker />
       {!hideGlobalLayout && (
         <>
           <div className="fixed inset-0 z-0 opacity-20 pointer-events-none mix-blend-screen" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, #1A73E8 1px, transparent 0)", backgroundSize: "32px 32px" }}></div>
@@ -147,9 +150,7 @@ export default function App() {
                   <Route path="/client" element={<ClientPortal />} />
                   <Route path="/agency/:slug" element={<LocalizedService />} />
                   <Route path="/dashboard" element={
-                    <CinematicTransition>
-                      <Dashboard />
-                    </CinematicTransition>
+                    <AuthRedirector />
                   } />
                 </Routes>
               </Suspense>

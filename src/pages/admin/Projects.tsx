@@ -1,9 +1,10 @@
 import { motion } from 'motion/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { db } from '../../lib/firebase';
-import { collection, query, orderBy, onSnapshot, doc, updateDoc } from 'firebase/firestore';
-import { Layers, ChevronRight, Inbox, Clock, CheckCircle, TerminalSquare, ChevronDown } from 'lucide-react';
+import { collection, query, orderBy, doc, updateDoc } from 'firebase/firestore';
+import { Layers, ChevronRight, Inbox, Clock, CheckCircle, TerminalSquare, ChevronDown, Rocket, Activity, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
+import { useDebouncedSnapshot } from '../../hooks/useDebouncedSnapshot';
 
 interface ProjectOrder {
   id: string;
@@ -32,84 +33,70 @@ interface ProjectOrder {
 
 export function AdminProjects() {
   const [projects, setProjects] = useState<ProjectOrder[]>([]);
+  const [sandboxProjects, setSandboxProjects] = useState<ProjectOrder[]>([]);
+  const [customProjects, setCustomProjects] = useState<ProjectOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'sandbox' | 'custom'>('all');
 
+  const qSandbox = useMemo(() => query(collection(db, 'projectSubmissions'), orderBy('createdAt', 'desc')), []);
+  useDebouncedSnapshot(qSandbox, (snap) => {
+    const data = snap.docs.map(doc => ({ 
+      id: doc.id, 
+      type: 'sandbox',
+      ...doc.data() 
+    } as ProjectOrder));
+    setSandboxProjects(data);
+    setLoading(false);
+  }, 1000, (err) => {
+    console.error("Error fetching sandbox projects:", err);
+    setError(err.message);
+    setLoading(false);
+  });
+
+  const qCustom = useMemo(() => query(collection(db, 'customProjects'), orderBy('createdAt', 'desc')), []);
+  useDebouncedSnapshot(qCustom, (snap) => {
+    const data = snap.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        type: 'custom',
+        title: data.title,
+        userEmail: data.email,
+        userName: data.fullName,
+        status: data.status,
+        createdAt: data.createdAt,
+        customDetails: {
+          industry: data.industry,
+          category: data.category,
+          budget: data.budget,
+          timeline: data.timeline,
+          suggestedStack: data.suggestedStack || [],
+          complexity: data.complexity
+        }
+      } as ProjectOrder;
+    });
+    setCustomProjects(data);
+    setLoading(false);
+  }, 1000, (err) => {
+    console.error("Error fetching custom projects:", err);
+    setError(err.message);
+    setLoading(false);
+  });
+
   useEffect(() => {
-    let sandboxData: ProjectOrder[] = [];
-    let customData: ProjectOrder[] = [];
-    let isSandboxLoaded = false;
-    let isCustomLoaded = false;
-
-    const mergeData = () => {
-      // Only set state when BOTH data streams have reported at least once
-      if (!isSandboxLoaded || !isCustomLoaded) return;
-      
-      const merged = [...sandboxData, ...customData].sort((a, b) => {
-        const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
-        const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
-        return timeB - timeA;
-      });
-      setProjects(merged);
-      setLoading(false);
-    };
-
-    const qSandbox = query(collection(db, 'projectSubmissions'), orderBy('createdAt', 'desc'));
-    const unsubSandbox = onSnapshot(qSandbox, (snap) => {
-      sandboxData = snap.docs.map(doc => ({ 
-        id: doc.id, 
-        type: 'sandbox',
-        ...doc.data() 
-      } as ProjectOrder));
-      isSandboxLoaded = true;
-      mergeData();
-    }, (err) => {
-      console.error("Error fetching sandbox projects:", err);
-      setError(err.message);
-      setLoading(false);
+    const merged = [...sandboxProjects, ...customProjects].sort((a, b) => {
+      const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+      const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+      return timeB - timeA;
     });
-
-    const qCustom = query(collection(db, 'customProjects'), orderBy('createdAt', 'desc'));
-    const unsubCustom = onSnapshot(qCustom, (snap) => {
-      customData = snap.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          type: 'custom',
-          title: data.title,
-          userEmail: data.email,
-          userName: data.fullName,
-          status: data.status,
-          createdAt: data.createdAt,
-          customDetails: {
-            industry: data.industry,
-            category: data.category,
-            budget: data.budget,
-            timeline: data.timeline,
-            suggestedStack: data.suggestedStack || [],
-            complexity: data.complexity
-          }
-        } as ProjectOrder;
-      });
-      isCustomLoaded = true;
-      mergeData();
-    }, (err) => {
-      console.error("Error fetching custom projects:", err);
-      setError(err.message);
-      setLoading(false);
-    });
-    
-    return () => {
-      unsubSandbox();
-      unsubCustom();
-    };
-  }, []);
+    setProjects(merged);
+  }, [sandboxProjects, customProjects]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20';
-      case 'active': return 'text-premium-gold bg-premium-gold/10 border-premium-gold/20';
+      case 'active': return 'text-blue-400 bg-blue-400/10 border-blue-400/20';
       case 'completed': return 'text-green-400 bg-green-400/10 border-green-400/20';
       default: return 'text-silver-metallic bg-white/5 border-white/10';
     }
@@ -128,6 +115,10 @@ export function AdminProjects() {
 
   const filteredProjects = projects.filter(p => activeTab === 'all' || p.type === activeTab);
 
+  // Derive extra risk metric
+  const pendingProjects = projects.filter(p => p.status === 'pending');
+  const delayedRisk = pendingProjects.length > 5 ? 'Elevated' : 'Nominal';
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -137,39 +128,45 @@ export function AdminProjects() {
     >
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
          <div>
-            <h1 className="font-display text-4xl text-white font-medium tracking-tight mb-2">Project Orders</h1>
-            <p className="font-mono text-xs uppercase tracking-widest text-silver-metallic">Manage architectural submissions and custom leads.</p>
+            <h1 className="font-display text-4xl text-white font-medium tracking-tight mb-2">Project Operations Center</h1>
+            <p className="font-mono text-xs uppercase tracking-widest text-silver-metallic">Real-time status tracking and architectural delivery pipeline.</p>
          </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-         <div className="glass-panel geometric-clip border border-white/5 p-6 flex flex-col gap-2 relative overflow-hidden group hover:border-premium-gold/30 transition-colors">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-premium-gold/5 blur-[50px] rounded-full pointer-events-none group-hover:bg-premium-gold/10 transition-colors" />
-            <Inbox className="w-5 h-5 text-premium-gold mb-2" />
-            <span className="font-display text-3xl">{projects.length}</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-bold">Total Transmissions</span>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+         <div className="glass-panel geometric-clip border border-white/5 p-6 flex flex-col gap-2 relative overflow-hidden group hover:border-white/20 transition-colors">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-[50px] rounded-full pointer-events-none group-hover:bg-white/10 transition-colors" />
+            <Inbox className="w-5 h-5 text-white mb-2" />
+            <span className="font-display text-3xl text-white">{projects.length}</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-bold">Total Operations</span>
          </div>
          <div className="glass-panel geometric-clip border border-white/5 p-6 flex flex-col gap-2 relative overflow-hidden group hover:border-yellow-400/30 transition-colors">
             <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-400/5 blur-[50px] rounded-full pointer-events-none group-hover:bg-yellow-400/10 transition-colors" />
             <Clock className="w-5 h-5 text-yellow-400 mb-2" />
-            <span className="font-display text-3xl">{projects.filter(p => p.status === 'pending').length}</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-bold">Awaiting Engineering Review</span>
+            <span className="font-display text-3xl text-yellow-400">{pendingProjects.length}</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-bold">Blocked / PENDING</span>
          </div>
-         <div className="glass-panel geometric-clip border border-white/5 p-6 flex flex-col gap-2 relative overflow-hidden group hover:border-green-400/30 transition-colors">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-green-400/5 blur-[50px] rounded-full pointer-events-none group-hover:bg-green-400/10 transition-colors" />
-            <CheckCircle className="w-5 h-5 text-green-400 mb-2" />
-            <span className="font-display text-3xl">{projects.filter(p => p.status === 'completed').length}</span>
-            <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-bold">Architecture Deployed</span>
+         <div className="glass-panel geometric-clip border border-white/5 p-6 flex flex-col gap-2 relative overflow-hidden group hover:border-blue-400/30 transition-colors">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-400/5 blur-[50px] rounded-full pointer-events-none group-hover:bg-blue-400/10 transition-colors" />
+            <Activity className="w-5 h-5 text-blue-400 mb-2" />
+            <span className="font-display text-3xl text-blue-400">{projects.filter(p => p.status === 'active').length}</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-bold">In Progress</span>
+         </div>
+         <div className="glass-panel geometric-clip border border-white/5 p-6 flex flex-col gap-2 relative overflow-hidden group hover:border-oxblood/40 transition-colors">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-oxblood/10 blur-[50px] rounded-full pointer-events-none group-hover:bg-oxblood/20 transition-colors" />
+            <AlertTriangle className={`w-5 h-5 ${delayedRisk === 'Elevated' ? 'text-red-400' : 'text-silver-metallic'} mb-2`} />
+            <span className={`font-display text-3xl ${delayedRisk === 'Elevated' ? 'text-red-400' : 'text-silver-metallic'}`}>{delayedRisk}</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-silver-metallic font-bold">Delivery Risk Signal</span>
          </div>
       </div>
 
       <div className="glass-panel geometric-clip border border-white/5 bg-dark/50">
         <div className="p-4 border-b border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
-           <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold text-white">Transmission Log</h3>
+           <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold text-white flex items-center gap-2"><Rocket className="w-4 h-4 text-premium-gold"/> active deployments</h3>
            <div className="flex gap-2">
-             <button onClick={() => setActiveTab('all')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'all' ? 'bg-premium-gold/20 border-premium-gold/50 text-premium-gold' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>All</button>
-             <button onClick={() => setActiveTab('sandbox')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'sandbox' ? 'bg-premium-gold/20 border-premium-gold/50 text-premium-gold' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>Sandbox</button>
-             <button onClick={() => setActiveTab('custom')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'custom' ? 'bg-premium-gold/20 border-premium-gold/50 text-premium-gold' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>Custom</button>
+             <button onClick={() => setActiveTab('all')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'all' ? 'bg-premium-gold/20 border-premium-gold/50 text-premium-gold' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>GLOBAL</button>
+             <button onClick={() => setActiveTab('sandbox')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'sandbox' ? 'bg-premium-gold/20 border-premium-gold/50 text-premium-gold' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>PROTOTYPES</button>
+             <button onClick={() => setActiveTab('custom')} className={`px-4 py-1.5 font-mono text-[9px] uppercase tracking-widest border border-white/10 ${activeTab === 'custom' ? 'bg-premium-gold/20 border-premium-gold/50 text-premium-gold' : 'text-silver-metallic hover:text-white hover:bg-white/5'}`}>CUSTOM OPS</button>
            </div>
         </div>
         <div className="divide-y divide-white/5">

@@ -26,6 +26,7 @@ export interface Lead {
   lastContact?: string;
   nextFollowUp?: string;
   forecast?: number;
+  company?: string;
   health?: 'At Risk' | 'On Track' | 'Accelerated';
   contractSent?: boolean;
   proposalSent?: boolean;
@@ -72,6 +73,7 @@ export const useCRMStore = create<CRMState>((set) => ({
           lastContact: data.lastContact,
           nextFollowUp: data.nextFollowUp,
           forecast: data.forecast,
+          company: data.company,
           health: data.health || (data.score > 80 ? 'Accelerated' : data.score < 40 ? 'At Risk' : 'On Track'),
           contractSent: !!data.contractSent,
           proposalSent: !!data.proposalSent,

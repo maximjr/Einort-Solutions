@@ -62,6 +62,8 @@ export function ClientPortal() {
       } as Project));
       isSandboxLoaded = true;
       mergeData();
+    }, (error) => {
+      console.warn("Error fetching sandbox projects:", error);
     });
 
     const qCustom = query(collection(db, 'customProjects'), where('userId', '==', user.uid));
@@ -73,6 +75,8 @@ export function ClientPortal() {
       } as Project));
       isCustomLoaded = true;
       mergeData();
+    }, (error) => {
+      console.warn("Error fetching custom projects:", error);
     });
 
     return () => {
