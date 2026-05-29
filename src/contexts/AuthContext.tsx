@@ -37,45 +37,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (currentUser) {
         // Resolve Role Status
         try {
-          // Automatic bootstrap for the designated super admin
-          if (currentUser.email === 'njeirheinard@gmail.com') { // Super admin fallback
-            try {
-              const adminRef = doc(db, 'admins', currentUser.uid);
-              const adminSnap = await getDoc(adminRef);
-              if (!adminSnap.exists()) {
-                await setDoc(adminRef, { role: 'super_admin', email: currentUser.email });
-              }
-            } catch (bootstrapErr) {
-              console.warn("Could not bootstrap super admin:", bootstrapErr);
-            }
-          }
-
           // 1. Check if user exists in the admin hierarchy
           let adminDoc;
+          
+          // Check local cache first
+          const cacheKey = `role_${currentUser.uid}`;
+          const cachedRole = localStorage.getItem(cacheKey);
+          if (cachedRole) {
+             const role = cachedRole as UserRole;
+             setUserRole(role);
+             setIsAdmin(['super_admin', 'admin', 'manager'].includes(role));
+             setLoading(false);
+             // We continue to fetch in background to verify
+          }
+
+          const fetchWithTimeout = (docRef: any, ms = 5000) => {
+            return Promise.race([
+              getDoc(docRef),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms))
+            ]);
+          };
+
           try {
-            adminDoc = await getDoc(doc(db, 'admins', currentUser.uid));
+            adminDoc = await fetchWithTimeout(doc(db, 'admins', currentUser.uid));
           } catch (err: any) {
              // If they don't have permission to read the admins collection, they definitely aren't an admin.
              // We can safely swallow this and fall back to the users collection.
              adminDoc = { exists: () => false, data: () => null };
           }
 
-          if (adminDoc.exists()) {
+          if (adminDoc && typeof adminDoc.exists === 'function' && adminDoc.exists()) {
              const role = adminDoc.data()?.role as UserRole;
              setIsAdmin(['super_admin', 'admin', 'manager'].includes(role));
              setUserRole(role);
+             localStorage.setItem(cacheKey, role);
           } else {
              // 2. Otherwise consult general users directory
              let userDoc;
              try {
-                userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+                userDoc = await fetchWithTimeout(doc(db, 'users', currentUser.uid));
              } catch (err: any) {
                 // If this fails and it's a permission error, they might be freshly signed up
                 // and the backend triggers haven't populated the DB, or rules are strict.
                 userDoc = { exists: () => false, data: () => null };
              }
              
-             if (userDoc.exists()) {
+             if (userDoc && typeof userDoc.exists === 'function' && userDoc.exists()) {
                let role = (userDoc.data()?.accountType as UserRole) || 'client';
                // Prevent users from granting themselves admin roles via userDoc accountType
                if (['super_admin', 'admin', 'manager'].includes(role)) {
@@ -83,10 +90,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                }
                setIsAdmin(false);
                setUserRole(role);
+               localStorage.setItem(cacheKey, role);
              } else {
                // Fallback if neither document was successfully read or exists
                setIsAdmin(false);
                setUserRole('client');
+               localStorage.setItem(cacheKey, 'client');
              }
           }
         } catch (e: any) {
@@ -112,33 +121,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const syncUserToFirestore = async (user: User, additionalData?: { phoneNumber?: string, fullName?: string }) => {
     if (!db) return;
     const userRef = doc(db, 'users', user.uid);
-    try {
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) {
-        const newUserData: Record<string, any> = {
-          uid: user.uid,
-          email: user.email,
-          createdAt: serverTimestamp(),
-          lastLogin: serverTimestamp(),
-          accountType: 'client',
-          onboardingStatus: 'pending'
-        };
+    
+    // Instead of getDoc which might fail due to strict rules or race conditions,
+    // we boldly set/merge the document.
+    const newUserData: Record<string, any> = {
+      uid: user.uid,
+      email: user.email,
+      lastLogin: serverTimestamp(),
+      accountType: 'client',
+    };
 
-        const displayName = additionalData?.fullName || user.displayName;
-        if (displayName) newUserData.displayName = displayName;
+    const displayName = additionalData?.fullName || user.displayName;
+    if (displayName) newUserData.displayName = displayName;
 
-        const phone = additionalData?.phoneNumber || user.phoneNumber;
-        if (phone) newUserData.phoneNumber = phone;
+    const phone = additionalData?.phoneNumber || user.phoneNumber;
+    if (phone) newUserData.phoneNumber = phone;
 
-        if (user.photoURL) newUserData.photoURL = user.photoURL;
+    if (user.photoURL) newUserData.photoURL = user.photoURL;
 
-        await setDoc(userRef, newUserData);
-      } else {
-        await setDoc(userRef, { lastLogin: serverTimestamp() }, { merge: true });
+    // Retry logic to handle race conditions where Auth token isn't fully propagated to Firestore
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        await setDoc(userRef, newUserData, { merge: true });
+        return; // Success
+      } catch (err: any) {
+        retries--;
+        if (retries === 0) {
+          console.warn("Could not sync user to Firestore [syncUserToFirestore]: ", err.message, err);
+          // We no longer throw an error here to prevent the rollback of the auth user.
+          // The user account is valid, and the profile can be created on next login.
+          console.warn(`Profile sync failed after retries. Details: ${err.message}`);
+          return;
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
-    } catch (err) {
-      console.warn("Could not sync user to Firestore: ", err);
-      throw err;
     }
   };
 
@@ -159,10 +176,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         sendEmailVerification(userRecord!).catch(console.error);
       });
       
-      // Sync to Firestore immediately so that the role/user doc is ready
+      // Note: Ideally, this Firestore profile initialization should be handled by a secure 'onAuth'
+      // trigger or an 'admin-sdk' backend function to completely bypass client-side permission deadlocks.
+      // Since this is a pure client setup without Cloud Functions, we use a robust retry-and-merge
+      // strategy here to ensure the client-side permission deadlock is bypassed during signup.
       await syncUserToFirestore(userRecord, { fullName, phoneNumber });
       
-      logClientActivity(userRecord.uid, userRecord.email, 'logged_in', 'User registered and logged in');
+      try {
+        logClientActivity(userRecord.uid, userRecord.email, 'logged_in', 'User registered and logged in');
+      } catch (logErr) {
+        console.warn("Failed to log activity during signup, ignoring...", logErr);
+      }
     } catch (error: any) {
       // Rollback auth user creation if Firestore sync fails or any other error happens after auth creation
       if (userRecord && error.code !== 'auth/email-already-in-use') {
@@ -189,7 +213,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Run database sync sequentially
       await syncUserToFirestore(result.user);
       
-      logClientActivity(result.user.uid, result.user.email, 'logged_in', 'User authenticated');
+      try {
+        logClientActivity(result.user.uid, result.user.email, 'logged_in', 'User authenticated');
+      } catch (logErr) {
+        console.warn("Failed to log activity during login, ignoring...", logErr);
+      }
     } catch (error: any) {
       if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
         throw new Error('Password or Email Incorrect');
@@ -213,6 +241,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     if (!auth) return;
     try {
+      if (user) {
+        localStorage.removeItem(`role_${user.uid}`);
+      }
       await firebaseSignOut(auth);
     } catch (error) {
       console.error("Error signing out", error);

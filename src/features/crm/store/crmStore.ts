@@ -46,6 +46,9 @@ interface CRMState {
   addActivity: (id: string, activity: Omit<ActivityLog, 'id' | 'timestamp'>) => Promise<void>;
 }
 
+let activeCRMListener: (() => void) | null = null;
+let listenerCount = 0;
+
 export const useCRMStore = create<CRMState>((set) => ({
   leads: [],
   activeStage: 'All',
@@ -54,36 +57,46 @@ export const useCRMStore = create<CRMState>((set) => ({
   setSearchQuery: (query) => set({ searchQuery: query }),
   
   initializeListener: () => {
-    const q = query(collection(db, 'leads'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const leadsData: Lead[] = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        leadsData.push({
-          id: doc.id,
-          name: data.name,
-          contact: data.contact,
-          email: data.email,
-          value: data.value,
-          stage: data.stage as LeadStage,
-          date: data.date,
-          status: data.status,
-          score: data.score,
-          aiNote: data.aiNote,
-          lastContact: data.lastContact,
-          nextFollowUp: data.nextFollowUp,
-          forecast: data.forecast,
-          company: data.company,
-          health: data.health || (data.score > 80 ? 'Accelerated' : data.score < 40 ? 'At Risk' : 'On Track'),
-          contractSent: !!data.contractSent,
-          proposalSent: !!data.proposalSent,
-          activities: data.activities || []
+    listenerCount++;
+    if (!activeCRMListener) {
+      const q = query(collection(db, 'leads'));
+      activeCRMListener = onSnapshot(q, (snapshot) => {
+        const leadsData: Lead[] = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          leadsData.push({
+            id: doc.id,
+            name: data.name,
+            contact: data.contact,
+            email: data.email,
+            value: data.value,
+            stage: data.stage as LeadStage,
+            date: data.date,
+            status: data.status,
+            score: data.score,
+            aiNote: data.aiNote,
+            lastContact: data.lastContact,
+            nextFollowUp: data.nextFollowUp,
+            forecast: data.forecast,
+            company: data.company,
+            health: data.health || (data.score > 80 ? 'Accelerated' : data.score < 40 ? 'At Risk' : 'On Track'),
+            contractSent: !!data.contractSent,
+            proposalSent: !!data.proposalSent,
+            activities: data.activities || []
+          });
         });
-      });
-      set({ leads: leadsData });
-    }, (error) => console.error("Error fetching leads:", error));
+        set({ leads: leadsData });
+      }, (error) => console.error("Error fetching leads:", error));
+    }
     
-    return unsubscribe;
+    return () => {
+      listenerCount--;
+      if (listenerCount <= 0 && activeCRMListener) {
+        activeCRMListener();
+        activeCRMListener = null;
+        listenerCount = 0;
+      }
+    };
   },
 
   addLead: async (lead) => {

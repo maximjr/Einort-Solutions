@@ -7,7 +7,6 @@ import { collection, query, onSnapshot, getDocs } from 'firebase/firestore';
 export function AdminAnalytics() {
   const [loading, setLoading] = useState(true);
   const [retentionData, setRetentionData] = useState<{name: string, value: number}[]>([]);
-  const [deviceStats, setDeviceStats] = useState({ desktop: 65, mobile: 25, other: 10 });
   
   const [metrics, setMetrics] = useState({
     totalLeads: 0,
@@ -20,79 +19,77 @@ export function AdminAnalytics() {
     let unsubLeads: () => void;
     let unsubProjects: () => void;
 
-    const aggregateData = async () => {
-      const qProjects = query(collection(db, 'projectSubmissions'));
-      const qCustom = query(collection(db, 'customProjects'));
-      const qUsers = query(collection(db, 'users'));
-      const qActivity = query(collection(db, 'clientActivity'));
+      const aggregateData = async () => {
+      try {
+        const qProjects = query(collection(db, 'projectSubmissions'));
+        const qCustom = query(collection(db, 'customProjects'));
+        const qUsers = query(collection(db, 'users'));
+        const qActivity = query(collection(db, 'clientActivity'));
 
-      const [projectDocs, customDocs, userDocs, activityDocs] = await Promise.all([
-        getDocs(qProjects), getDocs(qCustom), getDocs(qUsers), getDocs(qActivity)
-      ]);
-
-      const totalUsers = Math.max(1, userDocs.docs.length);
-      const customRequests = customDocs.docs.length;
-      
-      let protoStarted = 0;
-      let protoCompleted = 0;
-      let totalEvents = activityDocs.docs.length;
-
-      activityDocs.docs.forEach(doc => {
-        const d = doc.data();
-        if (d.type === 'started_prototype') protoStarted++;
-        if (d.type === 'completed_prototype') protoCompleted++;
-      });
-
-      setDeviceStats({
-          desktop: totalUsers,
-          mobile: protoStarted,
-          other: customRequests
-      });
-
-      const qLeads = query(collection(db, 'leads'));
-      unsubLeads = onSnapshot(qLeads, async (snap) => {
-        let pipValue = 0;
-        let wValue = 0;
-        let hLeads = 0;
-        let count = snap.docs.length;
-        
-        let qualifiedLeads = 0;
-        let wonLeads = 0;
-
-        snap.docs.forEach(doc => {
-          const data = doc.data();
-          if (data.stage === 'Won' || data.stage === 'won') {
-            wValue += data.value || 0;
-            wonLeads++;
-          } else if (data.stage !== 'Lost' && data.stage !== 'lost') {
-            pipValue += data.value || 0;
-            if (data.stage !== 'new') qualifiedLeads++;
-          }
-          if (data.status === 'Hot') hLeads++;
-        });
-
-        // Genuine Funnel from CRM + Activity Event Tracking
-        setRetentionData([
-          { name: 'Total Users', value: totalUsers },
-          { name: 'Started Prototype', value: protoStarted },
-          { name: 'Req. Custom', value: customRequests },
-          { name: 'Leads Gen', value: count },
-          { name: 'Qualified', value: qualifiedLeads },
-          { name: 'Won', value: wonLeads }
+        const [projectDocs, customDocs, userDocs, activityDocs] = await Promise.all([
+          getDocs(qProjects), getDocs(qCustom), getDocs(qUsers), getDocs(qActivity)
         ]);
 
-        setMetrics({
-          totalLeads: count,
-          totalPipelineValue: pipValue,
-          wonValue: wValue,
-          hotLeads: hLeads
-        });
+        const totalUsers = Math.max(1, userDocs.docs.length);
+        const customRequests = customDocs.docs.length;
         
+        let protoStarted = 0;
+        let protoCompleted = 0;
+
+        activityDocs.docs.forEach(doc => {
+          const d = doc.data();
+          if (d.type === 'started_prototype') protoStarted++;
+          if (d.type === 'completed_prototype') protoCompleted++;
+        });
+
+        const qLeads = query(collection(db, 'leads'));
+        unsubLeads = onSnapshot(qLeads, async (snap) => {
+          let pipValue = 0;
+          let wValue = 0;
+          let hLeads = 0;
+          let count = snap.docs.length;
+          
+          let qualifiedLeads = 0;
+          let wonLeads = 0;
+
+          snap.docs.forEach(doc => {
+            const data = doc.data();
+            if (data.stage === 'Won' || data.stage === 'won') {
+              wValue += data.value || 0;
+              wonLeads++;
+            } else if (data.stage !== 'Lost' && data.stage !== 'lost') {
+              pipValue += data.value || 0;
+              if (data.stage !== 'new') qualifiedLeads++;
+            }
+            if (data.status === 'Hot') hLeads++;
+          });
+
+          // Genuine Funnel from CRM + Activity Event Tracking
+          setRetentionData([
+            { name: 'Total Users', value: totalUsers },
+            { name: 'Started Prototype', value: protoStarted },
+            { name: 'Req. Custom', value: customRequests },
+            { name: 'Leads Gen', value: count },
+            { name: 'Qualified', value: qualifiedLeads },
+            { name: 'Won', value: wonLeads }
+          ]);
+
+          setMetrics({
+            totalLeads: count,
+            totalPipelineValue: pipValue,
+            wonValue: wValue,
+            hotLeads: hLeads
+          });
+          
+          setLoading(false);
+        }, (err) => {
+          console.error("Error fetching leads:", err);
+          setLoading(false);
+        });
+      } catch (err) {
+        console.error("Error aggregating analytics data:", err);
         setLoading(false);
-      }, (err) => {
-        console.error("Error fetching leads:", err);
-        setLoading(false);
-      });
+      }
       
     };
 
