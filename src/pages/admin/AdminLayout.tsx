@@ -32,6 +32,17 @@ export function AdminLayout() {
   const navigate = useNavigate();
 
   const [timeStr, setTimeStr] = useState<string>("");
+  const [forceLoad, setForceLoad] = useState(false);
+
+  useEffect(() => {
+    // If auth state is hanging for more than 4s, force the layout to resolve
+    const timer = setTimeout(() => {
+      if (loading) {
+        setForceLoad(true);
+      }
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   useEffect(() => {
     const updateTime = () =>
@@ -42,12 +53,12 @@ export function AdminLayout() {
   }, []);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if ((!loading || forceLoad) && !user) {
       navigate("/dashboard"); // or a specific admin login page
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, forceLoad]);
 
-  if (loading || !user) {
+  if ((loading && !forceLoad) || !user) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center">
         <div className="w-8 h-8 flex items-center justify-center relative">

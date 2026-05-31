@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, signOut as firebaseSignOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile, AuthErrorCodes, AuthError } from 'firebase/auth';
+import { User, signOut as firebaseSignOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile, deleteUser, AuthErrorCodes, AuthError } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import { logClientActivity } from '../utils/activityLogger';
@@ -40,17 +40,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // 1. Check if user exists in the admin hierarchy
           let adminDoc;
           
-          // Check local cache first
-          const cacheKey = `role_${currentUser.uid}`;
-          const cachedRole = localStorage.getItem(cacheKey);
-          if (cachedRole) {
-             const role = cachedRole as UserRole;
-             setUserRole(role);
-             setIsAdmin(['super_admin', 'admin', 'manager'].includes(role));
-             setLoading(false);
-             // We continue to fetch in background to verify
-          }
-
           const fetchWithTimeout = (docRef: any, ms = 5000) => {
             return Promise.race([
               getDoc(docRef),
@@ -62,7 +51,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             adminDoc = await fetchWithTimeout(doc(db, 'admins', currentUser.uid));
           } catch (err: any) {
              // If they don't have permission to read the admins collection, they definitely aren't an admin.
-             // We can safely swallow this and fall back to the users collection.
              adminDoc = { exists: () => false, data: () => null };
           }
 
@@ -70,32 +58,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
              const role = adminDoc.data()?.role as UserRole;
              setIsAdmin(['super_admin', 'admin', 'manager'].includes(role));
              setUserRole(role);
-             localStorage.setItem(cacheKey, role);
+             localStorage.setItem(`role_${currentUser.uid}`, role);
           } else {
              // 2. Otherwise consult general users directory
              let userDoc;
              try {
                 userDoc = await fetchWithTimeout(doc(db, 'users', currentUser.uid));
              } catch (err: any) {
-                // If this fails and it's a permission error, they might be freshly signed up
-                // and the backend triggers haven't populated the DB, or rules are strict.
                 userDoc = { exists: () => false, data: () => null };
              }
              
              if (userDoc && typeof userDoc.exists === 'function' && userDoc.exists()) {
                let role = (userDoc.data()?.accountType as UserRole) || 'client';
-               // Prevent users from granting themselves admin roles via userDoc accountType
                if (['super_admin', 'admin', 'manager'].includes(role)) {
                  role = 'client';
                }
                setIsAdmin(false);
                setUserRole(role);
-               localStorage.setItem(cacheKey, role);
+               localStorage.setItem(`role_${currentUser.uid}`, role);
              } else {
-               // Fallback if neither document was successfully read or exists
                setIsAdmin(false);
                setUserRole('client');
-               localStorage.setItem(cacheKey, 'client');
+               localStorage.setItem(`role_${currentUser.uid}`, 'client');
              }
           }
         } catch (e: any) {
@@ -149,10 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         retries--;
         if (retries === 0) {
           console.warn("Could not sync user to Firestore [syncUserToFirestore]: ", err.message, err);
-          // We no longer throw an error here to prevent the rollback of the auth user.
-          // The user account is valid, and the profile can be created on next login.
-          console.warn(`Profile sync failed after retries. Details: ${err.message}`);
-          return;
+          throw new Error("Unable to create account. Permission issue detected.");
         }
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
@@ -191,7 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Rollback auth user creation if Firestore sync fails or any other error happens after auth creation
       if (userRecord && error.code !== 'auth/email-already-in-use') {
         try {
-          await userRecord.delete();
+          await deleteUser(userRecord);
         } catch (delError) {
           console.error("Failed to rollback user creation:", delError);
         }
@@ -200,7 +181,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error.code === 'auth/email-already-in-use') {
         throw new Error('User already exists. Sign in?');
       }
-      throw error;
+      
+      if (error.message && error.message.includes('Unable to create account')) {
+         throw error;
+      }
+      
+      throw new Error("Unable to create account. Please try again.");
     }
   };
 
@@ -222,7 +208,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
         throw new Error('Password or Email Incorrect');
       }
-      throw error;
+      throw new Error('Unable to log in. Please try again.');
     }
   };
 

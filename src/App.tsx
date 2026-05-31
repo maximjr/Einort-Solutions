@@ -36,6 +36,8 @@ const InsightArticle = lazy(() => import('./pages/InsightArticle').then(m => ({ 
 const ServiceExperience = lazy(() => import('./components/ServiceExperience').then(m => ({ default: m.ServiceExperience })));
 const CustomizationStudio = lazy(() => import('./components/CustomizationStudio').then(m => ({ default: m.CustomizationStudio })));
 const CustomProjectRequest = lazy(() => import('./pages/CustomProjectRequest').then(m => ({ default: m.CustomProjectRequest })));
+const Legal = lazy(() => import('./pages/Legal').then(m => ({ default: m.Legal })));
+const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
 
 // Admin Layout and Pages
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
@@ -149,9 +151,17 @@ export default function App() {
                   <Route path="/onboarding" element={<Onboarding />} />
                   <Route path="/client" element={<ClientPortal />} />
                   <Route path="/agency/:slug" element={<LocalizedService />} />
+                  <Route path="/audit" element={<AIAudit />} />
+                  <Route path="/insights" element={<InsightHub />} />
+                  <Route path="/insights/:slug" element={<InsightArticle />} />
+                  <Route path="/privacy" element={<Legal />} />
+                  <Route path="/terms" element={<Legal />} />
                   <Route path="/dashboard" element={
                     <AuthRedirector />
                   } />
+                  
+                  {/* 404 Catch-All */}
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
             </div>

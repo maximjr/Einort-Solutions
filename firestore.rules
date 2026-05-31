@@ -39,24 +39,20 @@ service cloud.firestore {
     }
 
     match /projectSubmissions/{submissionId} {
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow read, write: if isAdmin();
+      allow read, write: if isSignedIn();
     }
 
     match /customProjects/{projectId} {
-      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
-      allow read, update, delete: if request.auth != null && resource.data.userId == request.auth.uid;
-      allow read, write: if isAdmin();
+      allow read, write: if isSignedIn();
     }
 
     match /leads/{leadId} {
-      allow create: if true;
+      allow create: if isSignedIn();
       allow read, write: if isAdmin();
     }
 
     match /clientActivity/{activityId} {
-      allow create: if true;
+      allow create: if isSignedIn();
       allow read: if isAdmin();
     }
 
@@ -73,7 +69,7 @@ service cloud.firestore {
     }
 
     match /bookings/{bookingId} {
-      allow create: if true;
+      allow create: if isSignedIn();
       allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow read, write: if isAdmin();
     }

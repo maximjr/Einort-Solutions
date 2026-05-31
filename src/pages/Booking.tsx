@@ -7,12 +7,16 @@ import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { calculateLeadScore, getLeadStatus } from '../utils/leadScoring';
 import { logClientActivity } from '../utils/activityLogger';
+import { useAuth } from '../contexts/AuthContext';
+import { AuthModal } from '../components/AuthModal';
 
 export function Booking() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({ name: '', email: '', company: '', timeline: '', goals: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const { user } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const handleNext = () => setStep(2);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -21,6 +25,10 @@ export function Booking() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      setAuthModalOpen(true);
+      return;
+    }
     setIsSubmitting(true);
     setSubmitError(null);
     try {
@@ -31,6 +39,7 @@ export function Booking() {
       });
 
       await addDoc(collection(db, 'leads'), {
+        userId: null,
         name: formData.company || formData.name,
         contact: formData.name,
         email: formData.email,
@@ -199,6 +208,10 @@ export function Booking() {
         </div>
       </div>
       <Footer />
+      <AuthModal 
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
     </CinematicTransition>
   );
 }

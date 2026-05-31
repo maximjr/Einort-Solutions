@@ -133,7 +133,8 @@ export function CustomizationStudio() {
       });
 
       await addDoc(collection(db, 'leads'), {
-        name: user.displayName || 'Sandbox User',
+        userId: user?.uid || null,
+        name: user?.displayName || 'Sandbox User',
         contact: user.displayName || 'Sandbox User',
         email: user.email,
         value: finalValue,

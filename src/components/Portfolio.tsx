@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
@@ -101,9 +102,9 @@ function ProjectCard({ project, index }: { project: typeof projects[0]; index: n
               </div>
             </div>
             
-            <a href="#" className="pointer-events-auto shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-full bg-white text-dark flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-500 ease-[0.16,1,0.3,1] hover:scale-110 custom-shadow cursor-pointer">
+            <Link to="/contact" className="pointer-events-auto shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-full bg-white text-dark flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-500 ease-[0.16,1,0.3,1] hover:scale-110 custom-shadow cursor-pointer">
                <ArrowUpRight className="w-5 h-5 md:w-6 md:h-6" />
-            </a>
+            </Link>
           </div>
         </div>
       </div>

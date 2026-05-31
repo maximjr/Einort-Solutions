@@ -7,6 +7,8 @@ import { db } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { logClientActivity } from '../utils/activityLogger';
 import { calculateLeadScore, getLeadStatus } from '../utils/leadScoring';
+import { useAuth } from '../contexts/AuthContext';
+import { AuthModal } from '../components/AuthModal';
 
 export function AIAudit() {
   const [url, setUrl] = useState('');
@@ -16,6 +18,8 @@ export function AIAudit() {
   const [scanComplete, setScanComplete] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const { user } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   useEffect(() => {
     if (isScanning) {
@@ -46,6 +50,10 @@ export function AIAudit() {
   const handleSendReport = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
+    if (!user) {
+      setAuthModalOpen(true);
+      return;
+    }
     
     setSubmitting(true);
     try {
@@ -56,6 +64,7 @@ export function AIAudit() {
       });
 
       await addDoc(collection(db, 'leads'), {
+        userId: user.uid,
         name: email.split('@')[0], 
         contact: email.split('@')[0],
         email: email,
@@ -220,6 +229,10 @@ export function AIAudit() {
         </div>
       </div>
       <Footer />
+      <AuthModal 
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
     </CinematicTransition>
   );
 }

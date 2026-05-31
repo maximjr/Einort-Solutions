@@ -191,6 +191,7 @@ export function CustomProjectRequest() {
       });
 
       await addDoc(collection(db, 'leads'), {
+        userId: user?.uid || null,
         name: formData.company || formData.fullName || 'Anonymous Prospect',
         contact: formData.fullName,
         email: formData.email,

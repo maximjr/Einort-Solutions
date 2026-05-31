@@ -118,7 +118,10 @@ export function Overview() {
         setTrafficData(orderedData);
         setLoadingTraffic(false);
       },
-      (err) => console.error("Error fetching traffic:", err),
+      (err) => {
+        console.error("Error fetching traffic:", err);
+        setLoadingTraffic(false);
+      }
     );
 
     return () => unsubActivityTraffic();

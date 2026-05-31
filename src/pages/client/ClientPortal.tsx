@@ -54,8 +54,14 @@ export function ClientPortal() {
         const qCustom = query(collection(db, 'customProjects'), where('userId', '==', user.uid), limit(5));
         
         const [sandboxDocs, customDocs] = await Promise.all([
-          getDocs(qSandbox),
-          getDocs(qCustom)
+          getDocs(qSandbox).catch(e => {
+            console.error("Sandbox query failed:", e);
+            throw e;
+          }),
+          getDocs(qCustom).catch(e => {
+            console.error("Custom query failed:", e);
+            throw e;
+          })
         ]);
 
         if (!isMounted) return;
@@ -74,12 +80,10 @@ export function ClientPortal() {
           setActiveProjectId(merged[0].id);
         }
         
-        // Immediate UI reveal
-        setInitialLoad(false);
-
       } catch (err) {
         console.error("Failed to load project data", err);
-        setInitialLoad(false);
+      } finally {
+        if (isMounted) setInitialLoad(false);
       }
     };
 
@@ -108,7 +112,7 @@ export function ClientPortal() {
     });
 
     return () => unsubProject();
-  }, [activeProjectId, user]);
+  }, [activeProjectId, user, projects.length]);
 
   const activeProject = projects.find(p => p.id === activeProjectId) || projects[0] || null;
 
@@ -126,10 +130,6 @@ export function ClientPortal() {
     return 'Discovery';
   };
 
-  if (initialLoad) {
-    return <DashboardSkeleton />;
-  }
-
   return (
     <CinematicTransition>
       <div className="min-h-screen bg-dark pt-24 pb-20 selection:bg-premium-gold/30">
@@ -141,19 +141,21 @@ export function ClientPortal() {
               <h1 className="text-3xl font-display font-medium text-white mb-2">
                 Welcome back, <span className="text-premium-gold">{user?.displayName?.split(' ')[0] || 'Client'}</span>
               </h1>
-              {activeProject ? (
-                <div className="flex pl-1 items-center gap-3 text-sm font-mono text-white/50 tracking-widest uppercase">
+              {initialLoad ? (
+                <div className="h-4 w-64 bg-white/5 animate-pulse rounded mt-2"></div>
+              ) : activeProject ? (
+                <div className="flex pl-1 items-center gap-3 text-sm font-mono text-white/50 tracking-widest uppercase mt-2">
                   <span>Current: {activeProject.type === 'sandbox' ? activeProject.projectId?.toUpperCase() : activeProject.title}</span>
                   <span className="w-1 h-1 rounded-full bg-white/20"></span>
                   <span className="flex items-center gap-1.5"><Activity className="w-3 h-3 text-premium-gold" /> {activeProject.status}</span>
                 </div>
               ) : (
-                <p className="text-sm font-mono text-white/40 tracking-widest uppercase">No active projects found.</p>
+                <p className="text-sm font-mono text-white/40 tracking-widest uppercase mt-2">No active projects found.</p>
               )}
             </div>
             
             {/* Quick Navigation Tabs - Premium minimal pill selector */}
-            {activeProject && (
+            {!initialLoad && activeProject && (
               <div className="flex flex-wrap items-center bg-[#111] p-1.5 rounded-2xl border border-white/5">
                 {[
                   { id: 'overview', icon: Activity, label: 'Overview' },
@@ -178,7 +180,18 @@ export function ClientPortal() {
             )}
           </div>
 
-          {!activeProject ? (
+          {initialLoad ? (
+             <div className="grid lg:grid-cols-12 gap-8 animate-pulse">
+               <div className="lg:col-span-8 space-y-8">
+                 <div className="h-64 bg-white/5 rounded-[2rem]"></div>
+                 <div className="h-96 bg-white/5 rounded-[2rem]"></div>
+               </div>
+               <div className="lg:col-span-4 space-y-6">
+                 <div className="h-48 bg-white/5 rounded-3xl"></div>
+                 <div className="h-48 bg-white/5 rounded-3xl"></div>
+               </div>
+             </div>
+          ) : !activeProject ? (
             <EmptyState />
           ) : (
             <div className="grid lg:grid-cols-12 gap-8">
