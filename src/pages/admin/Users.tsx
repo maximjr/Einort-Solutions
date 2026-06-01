@@ -95,7 +95,7 @@ export function AdminUsers() {
                     <td className="p-4">
                       <div className="flex items-center gap-4">
                          {u.photoURL ? (
-                           <img src={u.photoURL} alt={u.displayName} className="w-10 h-10 geometric-clip border border-white/10" />
+                           <img src={u.photoURL} alt={u.displayName} loading="lazy" className="w-10 h-10 geometric-clip border border-white/10" />
                          ) : (
                            <div className="w-10 h-10 geometric-clip bg-white/5 flex items-center justify-center border border-white/10">
                               <span className="font-display font-medium">{u.displayName?.substring(0,2).toUpperCase() || 'UN'}</span>

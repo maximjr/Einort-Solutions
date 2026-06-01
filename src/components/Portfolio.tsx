@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import React, { useState, useRef } from 'react';
+import { SEO } from './SEO';
 
 const projects = [
   {
@@ -119,6 +120,7 @@ export function Portfolio() {
   
   return (
     <section id="work" ref={containerRef} className="relative bg-dark min-h-screen py-24 lg:py-40 pb-32 border-t border-white/5 overflow-hidden">
+      <SEO title="Our Work & Portfolio | EINORT SOLUTIONS" description="Explore our legacy of elite execution, enterprise web applications, and premium software architectures." />
        {/* Cinematic Deep Background */}
        <motion.div style={{ y: bgY }} className="absolute top-0 right-0 w-[800px] h-[800px] bg-premium-gold/5 blur-[200px] mix-blend-screen pointer-events-none" />
 
@@ -133,7 +135,7 @@ export function Portfolio() {
             <div className="w-1.5 h-1.5 bg-premium-gold rounded-full" />
             <span className="text-[11px] font-mono font-medium uppercase tracking-[0.2em] text-silver-metallic">Selected Architecture</span>
           </motion.div>
-          <motion.h2 
+          <motion.h1 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -142,7 +144,7 @@ export function Portfolio() {
           >
             A legacy of <br className="hidden md:block"/>
             <span className="text-silver-metallic font-light">elite execution.</span>
-          </motion.h2>
+          </motion.h1>
           <motion.p
              initial={{ opacity: 0, y: 20 }}
              whileInView={{ opacity: 1, y: 0 }}

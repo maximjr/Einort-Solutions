@@ -1,9 +1,11 @@
 import { motion } from 'motion/react';
 import { ArrowRight, Mail, MapPin } from 'lucide-react';
+import { SEO } from './SEO';
 
 export function Contact() {
   return (
     <section id="contact" className="relative bg-dark py-32 lg:py-48 overflow-hidden border-t border-white/5">
+      <SEO title="Contact Us | EINORT SOLUTIONS" description="Partner with EINORT SOLUTIONS to engineer your enterprise digital future. We transform ambitious visions into dominant market realities." />
       <div className="absolute inset-x-0 bottom-0 min-h-screen bg-gradient-to-t from-premium-gold/5 to-transparent pointer-events-none" />
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.02] mix-blend-overlay pointer-events-none" />
 
@@ -23,7 +25,7 @@ export function Contact() {
                <span className="text-xs font-mono font-bold uppercase tracking-[0.3em] text-premium-gold">Initialize Comm-Link</span>
              </motion.div>
              
-             <motion.h2 
+             <motion.h1 
                initial={{ opacity: 0, y: 30 }}
                whileInView={{ opacity: 1, y: 0 }}
                viewport={{ once: true }}
@@ -32,7 +34,7 @@ export function Contact() {
              >
                Architect the <br className="hidden lg:block"/>
                <span className="text-gradient-metallic font-display italic font-light opacity-90">Impossible.</span>
-             </motion.h2>
+             </motion.h1>
              
              <motion.p
                initial={{ opacity: 0, y: 20 }}

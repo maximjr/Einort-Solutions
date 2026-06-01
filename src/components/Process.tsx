@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { cn } from '@/src/lib/utils';
+import { SEO } from './SEO';
 
 const steps = [
   { id: '01', title: 'Discovery Architecture', desc: 'Deep-dive analysis of your business infrastructure and market positioning.' },
@@ -14,6 +15,7 @@ const steps = [
 export function Process() {
   return (
     <section id="process" className="py-24 lg:py-40 relative bg-dark border-t border-white/5 overflow-hidden">
+      <SEO title="Our Process & Engineering | EINORT SOLUTIONS" description="A systematic, engineering-first approach to building flawless digital infrastructure from absolute zero to global scale." />
       {/* Background Subtlety */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff02_1px,transparent_1px),linear-gradient(to_bottom,#ffffff02_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-30" />
       <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-premium-gold/5 blur-[150px] mix-blend-screen pointer-events-none" />
@@ -31,7 +33,7 @@ export function Process() {
                <span className="text-[11px] font-mono font-medium uppercase tracking-[0.2em] text-silver-metallic">Evolution Framework</span>
              </div>
           </motion.div>
-          <motion.h2 
+          <motion.h1 
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -42,7 +44,7 @@ export function Process() {
             <span className="text-silver-metallic font-light">
               Digital Creation.
             </span>
-          </motion.h2>
+          </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

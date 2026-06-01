@@ -9,6 +9,7 @@ import { calculateLeadScore, getLeadStatus } from '../utils/leadScoring';
 import { logClientActivity } from '../utils/activityLogger';
 import { useAuth } from '../contexts/AuthContext';
 import { AuthModal } from '../components/AuthModal';
+import { SEO } from '../components/SEO';
 
 export function Booking() {
   const [step, setStep] = useState(1);
@@ -17,6 +18,8 @@ export function Booking() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { user } = useAuth();
   const [authModalOpen, setAuthModalOpen] = useState(false);
+
+  // Remove the bad content I added
 
   const handleNext = () => setStep(2);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -63,6 +66,7 @@ export function Booking() {
 
   return (
     <CinematicTransition>
+      <SEO title="Book Consultation | EINORT SOLUTIONS" description="Schedule a strategic discovery session with our lead architects to discuss your enterprise objectives." />
       <div className="pt-32 pb-24 min-h-screen bg-dark">
         <div className="container mx-auto px-6 max-w-4xl">
           <div className="mb-12 text-center">

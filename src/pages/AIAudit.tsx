@@ -9,6 +9,7 @@ import { logClientActivity } from '../utils/activityLogger';
 import { calculateLeadScore, getLeadStatus } from '../utils/leadScoring';
 import { useAuth } from '../contexts/AuthContext';
 import { AuthModal } from '../components/AuthModal';
+import { SEO } from '../components/SEO';
 
 export function AIAudit() {
   const [url, setUrl] = useState('');
@@ -88,6 +89,7 @@ export function AIAudit() {
 
   return (
     <CinematicTransition>
+      <SEO title="Free Performance Audit | EINORT SOLUTIONS" description="Uncover architectural bottlenecks in your existing application. Run a comprehensive technical audit against enterprise performance benchmarks." />
       <div className="pt-32 pb-24 min-h-screen bg-dark overflow-hidden relative">
         {/* Background Elements */}
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-premium-gold/5 blur-[120px] rounded-full pointer-events-none mix-blend-screen" />

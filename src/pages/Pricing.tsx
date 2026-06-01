@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { Check, ArrowRight } from 'lucide-react';
 import { CinematicTransition } from '../components/CinematicTransition';
 import { Footer } from '../components/Footer';
+import { SEO } from '../components/SEO';
 
 const plans = [
   {
@@ -51,6 +52,7 @@ const plans = [
 export function Pricing() {
   return (
     <CinematicTransition>
+      <SEO title="Plans & Pricing | EINORT SOLUTIONS" description="Choose the architecture that aligns with your scale. Transparent pricing for premium enterprise custom software solutions." />
       <div className="pt-32 pb-24 min-h-screen bg-dark">
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="mb-20 text-center max-w-3xl mx-auto">

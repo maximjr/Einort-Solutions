@@ -15,15 +15,17 @@ import { AnalyticsRouteTracker } from './AnalyticsRouteTracker';
 
 import { AuthRedirector } from './components/AuthRedirector';
 
+// Eagerly loaded components for fast first contentful paint
+import { Hero } from './components/Hero';
+import { HomeSummary } from './components/HomeSummary';
+import { Testimonials } from './components/Testimonials';
+import { Contact } from './components/Contact';
+
 // Lazy loading components for performance
-const Hero = lazy(() => import('./components/Hero').then(m => ({ default: m.Hero })));
-const HomeSummary = lazy(() => import('./components/HomeSummary').then(m => ({ default: m.HomeSummary })));
 const Services = lazy(() => import('./components/Services').then(m => ({ default: m.Services })));
 const Portfolio = lazy(() => import('./components/Portfolio').then(m => ({ default: m.Portfolio })));
 const About = lazy(() => import('./components/About').then(m => ({ default: m.About })));
 const Process = lazy(() => import('./components/Process').then(m => ({ default: m.Process })));
-const Testimonials = lazy(() => import('./components/Testimonials').then(m => ({ default: m.Testimonials })));
-const Contact = lazy(() => import('./components/Contact').then(m => ({ default: m.Contact })));
 const Pricing = lazy(() => import('./pages/Pricing').then(m => ({ default: m.Pricing })));
 const FAQ = lazy(() => import('./pages/FAQ').then(m => ({ default: m.FAQ })));
 const Booking = lazy(() => import('./pages/Booking').then(m => ({ default: m.Booking })));

@@ -156,10 +156,10 @@ export function Hero() {
           className="mt-16 lg:mt-24 grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 border-t border-white/5 pt-8"
         >
           {[
-            { value: "150+", label: "Ecosystems Deployed" },
-            { value: "$4.2B+", label: "Value Engineered" },
-            { value: "<20ms", label: "Global Latency" },
-            { value: "99.99%", label: "Uptime Fidelity" }
+            { value: "Scalable", label: "Cloud Architectures" },
+            { value: "Secure", label: "Enterprise Grade" },
+            { value: "Global", label: "Deployment Ready" },
+            { value: "Modern", label: "Tech Stack" }
           ].map((metric, idx) => (
             <div 
               key={idx}

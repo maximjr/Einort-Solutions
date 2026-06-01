@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ChevronDown, MessageSquare } from 'lucide-react';
 import { CinematicTransition } from '../components/CinematicTransition';
 import { Footer } from '../components/Footer';
+import { SEO } from '../components/SEO';
 
 const faqs = [
   {
@@ -32,6 +33,7 @@ export function FAQ() {
 
   return (
     <CinematicTransition>
+      <SEO title="FAQ & Intelligence Base | EINORT SOLUTIONS" description="Answers to common questions about our software development process, design paradigms, and enterprise engagements." />
       <div className="pt-32 pb-24 min-h-screen bg-dark">
         <div className="container mx-auto px-6 max-w-4xl">
           <div className="mb-16 text-center">

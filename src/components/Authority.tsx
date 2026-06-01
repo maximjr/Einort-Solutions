@@ -67,7 +67,7 @@ export function Authority() {
                </div>
                <div>
                   <h4 className="font-display font-medium text-white text-lg mb-1">Global Delivery</h4>
-                  <p className="text-sm text-white/50 font-sans leading-relaxed">From New York to Tokyo, our infrastructure reliably serves millions of requests globally with ultra-low latency configurations via Edge nodes.</p>
+                  <p className="text-sm text-white/50 font-sans leading-relaxed">Our infrastructure relies on global edge-network integrations, reliably serving requests worldwide with optimized low-latency configurations.</p>
                </div>
             </div>
             <div className="glass-panel p-6 rounded-2xl border border-white/5 flex items-start gap-4">

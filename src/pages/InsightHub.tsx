@@ -100,7 +100,7 @@ export function InsightHub() {
               >
                 <div className="h-48 relative overflow-hidden">
                   <div className="absolute inset-0 bg-dark/20 group-hover:bg-transparent transition-colors z-10" />
-                  <img src={article.image} alt={article.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
+                  <img src={article.image} alt={article.title} loading="lazy" decoding="async" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" />
                 </div>
                 <div className="p-8 flex flex-col flex-grow">
                   <div className="flex items-center gap-4 mb-4 text-[10px] font-mono text-white/40 uppercase tracking-widest">

@@ -14,6 +14,8 @@ export function Footer() {
                 <img 
                   src="https://i.imgur.com/6V1ecDU.png" 
                   alt="EINORT Logo" 
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-contain transition-transform group-hover:scale-105 duration-300" 
                 />
               </div>
@@ -29,10 +31,10 @@ export function Footer() {
           <div>
             <h4 className="text-white font-mono text-[10px] uppercase tracking-widest mb-6">Global Services</h4>
             <ul className="space-y-4 text-xs text-white/50">
-              <li><Link to="/agency/web-development-agency-in-new-york" className="hover:text-premium-gold transition-colors">Web Development In New York</Link></li>
-              <li><Link to="/agency/ui-ux-design-company-in-toronto" className="hover:text-premium-gold transition-colors">UI/UX Design in Toronto</Link></li>
-              <li><Link to="/agency/software-development-agency-in-london" className="hover:text-premium-gold transition-colors">Software Engineering in London</Link></li>
-              <li><Link to="/agency/enterprise-seo-agency" className="hover:text-premium-gold transition-colors">Enterprise SEO Agency</Link></li>
+              <li><Link to="/agency/healthcare-web-development-usa" className="hover:text-premium-gold transition-colors">Healthcare Web Development USA</Link></li>
+              <li><Link to="/agency/saas-development-canada" className="hover:text-premium-gold transition-colors">SaaS Development Canada</Link></li>
+              <li><Link to="/agency/fintech-software-engineering-europe" className="hover:text-premium-gold transition-colors">Fintech Engineering Europe</Link></li>
+              <li><Link to="/agency/ecommerce-website-design-africa" className="hover:text-premium-gold transition-colors">E-Commerce Design Africa</Link></li>
             </ul>
           </div>
 

@@ -13,7 +13,15 @@ export default defineConfig(() => {
     },
     build: {
       rollupOptions: {
-        output: {}
+        output: {
+          manualChunks: {
+            firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+            motion: ['motion', 'motion/react'],
+            vendor: ['react', 'react-dom', 'react-router-dom', 'lucide-react'],
+            charts: ['recharts'],
+            ui: ['clsx', 'tailwind-merge']
+          }
+        }
       }
     },
     server: {

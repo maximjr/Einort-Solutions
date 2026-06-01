@@ -105,6 +105,8 @@ export function Testimonials() {
                       <img 
                         src={testimonials[currentIndex].image} 
                         alt={testimonials[currentIndex].name}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-all duration-500"
                       />
                     </div>

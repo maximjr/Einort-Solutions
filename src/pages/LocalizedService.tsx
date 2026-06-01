@@ -12,7 +12,7 @@ const formatStr = (str: string) => {
 export function LocalizedService() {
   const { slug } = useParams();
   
-  // Parse slug like "web-development-agency-in-new-york"
+  // Parse slug. E.g "healthcare-web-development-usa" or "web-development-agency-in-new-york"
   let service = "Digital Agency";
   let location = "Global";
   const inIndex = slug?.indexOf('-in-');
@@ -21,7 +21,14 @@ export function LocalizedService() {
     service = formatStr(slug.substring(0, inIndex));
     location = formatStr(slug.substring(inIndex + 4));
   } else if (slug) {
-    service = formatStr(slug);
+    // If there is no "-in-", then the last word is usually the location if we follow "healthcare-web-development-usa"
+    const parts = slug.split('-');
+    if(parts.length > 1) {
+       location = formatStr(parts.pop() || "Global");
+       service = formatStr(parts.join('-'));
+    } else {
+       service = formatStr(slug);
+    }
   }
 
   const title = `Premium ${service} in ${location}`;

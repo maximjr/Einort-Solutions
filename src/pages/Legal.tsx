@@ -1,9 +1,11 @@
 import React from 'react';
 import { CinematicTransition } from '../components/CinematicTransition';
+import { SEO } from '../components/SEO';
 
 export function Legal() {
   return (
     <CinematicTransition>
+      <SEO title="Legal & Privacy | EINORT SOLUTIONS" description="Privacy policy and legal information for EINORT SOLUTIONS." />
       <div className="min-h-screen pt-32 pb-20 px-4 md:px-8 max-w-4xl mx-auto">
         <h1 className="text-3xl font-display font-medium text-white mb-8">Legal Information</h1>
         <div className="prose prose-invert max-w-none text-white/70 font-light">

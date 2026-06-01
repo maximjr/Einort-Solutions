@@ -2,6 +2,8 @@ import { motion, useScroll, useTransform } from 'motion/react';
 import { useRef } from 'react';
 import { Authority } from './Authority';
 
+import { SEO } from './SEO';
+
 export function About() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -13,6 +15,7 @@ export function About() {
 
   return (
     <>
+    <SEO title="About Us | EINORT SOLUTIONS" description="EINORT SOLUTIONS is a global collective of elite strategists, visionary designers, and world-class engineers." />
     <section id="about" ref={containerRef} className="py-32 lg:py-48 relative bg-dark overflow-hidden border-t border-white/5">
       {/* Dynamic Background Elements */}
       <motion.div style={{ y, opacity }} className="absolute left-[-10%] top-1/4 w-[600px] h-[600px] bg-premium-gold/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen" />
@@ -34,7 +37,7 @@ export function About() {
               <span className="text-xs font-mono font-bold uppercase tracking-[0.3em] text-silver-metallic">The EINORT Identity</span>
             </motion.div>
             
-            <motion.h2 
+            <motion.h1 
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -47,7 +50,7 @@ export function About() {
                 <span className="absolute -bottom-2 left-0 w-full h-[2px] bg-gradient-to-r from-premium-gold to-transparent" />
               </span> <br/>
               digital reality.
-            </motion.h2>
+            </motion.h1>
 
             <motion.div 
               initial={{ opacity: 0, y: 30 }}

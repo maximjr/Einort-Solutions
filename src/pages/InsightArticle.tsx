@@ -65,7 +65,7 @@ export function InsightArticle() {
                className="flex items-center gap-4 py-6 border-y border-white/5 mb-12"
              >
                <div className="w-12 h-12 rounded-full overflow-hidden bg-white/10 grayscale border border-white/10">
-                 <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" alt="Lead Architect" className="w-full h-full object-cover" />
+                 <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" alt="Lead Architect" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                </div>
                <div>
                  <p className="font-medium text-white text-sm">Rheinard N.</p>
@@ -81,7 +81,7 @@ export function InsightArticle() {
              transition={{ delay: 0.3 }}
              className="w-full h-[400px] md:h-[500px] rounded-3xl overflow-hidden mb-16 relative glass-panel p-2"
            >
-             <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070" className="w-full h-full object-cover rounded-2xl" alt={title} />
+             <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070" className="w-full h-full object-cover rounded-2xl" loading="lazy" decoding="async" alt={title} />
            </motion.div>
 
            {/* Article Content - Typography Optimization for SEO/Accessibility */}

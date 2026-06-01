@@ -36,13 +36,13 @@ export function SEO({
   
   // High-value global and local keywords
   const finalKeywords = [keywords, 
-    "Top Software Agency worldwide", 
-    "Best Custom Web Application Developer in the United States", 
-    "Premium SaaS Development Firm in Dubai", 
-    "Elite Software Architects in London",
-    "Digital Transformation US",
-    "Enterprise Software Solutions UK",
-    "Premium Web Agency UAE"
+    "Software Development Agency", 
+    "Custom Web Application Developer", 
+    "Premium SaaS Development Firm", 
+    "Elite Software Architects",
+    "Digital Transformation Strategy",
+    "Enterprise Software Solutions",
+    "Premium Web Development"
   ].filter(Boolean).join(", ");
 
   const baseSchema = {
@@ -59,26 +59,13 @@ export function SEO({
           "width": 512,
           "height": 512
         },
-        "description": "World-class digital agency engineering enterprise web applications for clients in Dubai, London, New York, and worldwide.",
+        "description": "World-class digital agency engineering enterprise web applications and software solutions globally.",
         "image": image,
         "priceRange": "$$$$",
-        "address": [
-           {
-             "@type": "PostalAddress",
-             "addressLocality": "New York",
-             "addressCountry": "US"
-           },
-           {
-             "@type": "PostalAddress",
-             "addressLocality": "London",
-             "addressCountry": "UK"
-           },
-           {
-             "@type": "PostalAddress",
-             "addressLocality": "Dubai",
-             "addressCountry": "AE"
-           }
-        ],
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "Global Presence"
+        },
         "sameAs": [
           "https://twitter.com/einortsolutions",
           "https://linkedin.com/company/einort"

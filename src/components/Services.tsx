@@ -146,6 +146,7 @@ export function Services() {
 
   return (
     <section className="min-h-screen bg-dark text-white relative pt-32 pb-24 border-b border-light/5">
+      <SEO title="Services & Architectures | EINORT SOLUTIONS" description="Explore our tailored enterprise-grade architectures and software development services." />
       <div className="absolute inset-0 bg-dark z-0" />
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-premium-gold/5 blur-[150px] pointer-events-none z-0" />
       
@@ -156,7 +157,7 @@ export function Services() {
              <Activity className="w-4 h-4 text-premium-gold animate-pulse" />
              <span className="text-[10px] uppercase font-mono tracking-widest">Intelligent Consultation Engine</span>
            </div>
-           <h2 className="text-4xl md:text-5xl font-display font-medium tracking-tight mb-4 text-white">System <span className="text-premium-gold italic">Architect</span></h2>
+           <h1 className="text-4xl md:text-5xl font-display font-medium tracking-tight mb-4 text-white">System <span className="text-premium-gold italic">Architect</span></h1>
            <p className="text-white/60 font-light text-sm">We don't sell generic services. Provide your specific operational parameters, and our diagnostic engine will recommend a tailored enterprise-grade architecture.</p>
         </div>
 
