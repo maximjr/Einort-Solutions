@@ -31,6 +31,13 @@ export interface Lead {
   contractSent?: boolean;
   proposalSent?: boolean;
   activities?: ActivityLog[];
+  
+  // Scoped CRM attributes (Phase 7D)
+  maturity?: string;
+  priorityIndex?: string;
+  complexityScale?: string;
+  intention?: string;
+  nextActionPlan?: string;
 }
 
 interface CRMState {
@@ -60,31 +67,38 @@ export const useCRMStore = create<CRMState>((set) => ({
     listenerCount++;
     if (!activeCRMListener) {
       const q = query(collection(db, 'leads'));
-      activeCRMListener = onSnapshot(q, (snapshot) => {
-        const leadsData: Lead[] = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          leadsData.push({
-            id: doc.id,
-            name: data.name,
-            contact: data.contact,
-            email: data.email,
-            value: data.value,
-            stage: data.stage as LeadStage,
-            date: data.date,
-            status: data.status,
-            score: data.score,
-            aiNote: data.aiNote,
-            lastContact: data.lastContact,
-            nextFollowUp: data.nextFollowUp,
-            forecast: data.forecast,
-            company: data.company,
-            health: data.health || (data.score > 80 ? 'Accelerated' : data.score < 40 ? 'At Risk' : 'On Track'),
-            contractSent: !!data.contractSent,
-            proposalSent: !!data.proposalSent,
-            activities: data.activities || []
+        activeCRMListener = onSnapshot(q, (snapshot) => {
+          const leadsData: Lead[] = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            leadsData.push({
+              id: doc.id,
+              name: data.name,
+              contact: data.contact,
+              email: data.email,
+              value: data.value,
+              stage: data.stage as LeadStage,
+              date: data.date,
+              status: data.status,
+              score: data.score,
+              aiNote: data.aiNote,
+              lastContact: data.lastContact,
+              nextFollowUp: data.nextFollowUp,
+              forecast: data.forecast,
+              company: data.company,
+              health: data.health || (data.score > 80 ? 'Accelerated' : data.score < 40 ? 'At Risk' : 'On Track'),
+              contractSent: !!data.contractSent,
+              proposalSent: !!data.proposalSent,
+              activities: data.activities || [],
+              
+              // Load the newly introduced properties
+              maturity: data.maturity || "Growth Venture",
+              priorityIndex: data.priorityIndex || "Standard Priority",
+              complexityScale: data.complexityScale || "Standard MVP Scope",
+              intention: data.intention || "",
+              nextActionPlan: data.nextActionPlan || ""
+            });
           });
-        });
         set({ leads: leadsData });
       }, (error) => console.error("Error fetching leads:", error));
     }

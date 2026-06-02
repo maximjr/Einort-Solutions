@@ -16,6 +16,7 @@ interface UserData {
 export function AdminUsers() {
   const [users, setUsers] = useState<UserData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const q = query(collection(db, 'users')); // Note: requires proper rules indexing if adding orderBy
@@ -30,6 +31,15 @@ export function AdminUsers() {
     
     return () => unsubscribe();
   }, []);
+
+  const filteredUsers = users.filter(u => {
+    const term = searchTerm.toLowerCase();
+    return (
+      (u.displayName || "").toLowerCase().includes(term) ||
+      (u.email || "").toLowerCase().includes(term) ||
+      (u.id || "").toLowerCase().includes(term)
+    );
+  });
 
   return (
     <motion.div
@@ -53,6 +63,8 @@ export function AdminUsers() {
              <input 
                type="text" 
                placeholder="Search identifiers..." 
+               value={searchTerm}
+               onChange={(e) => setSearchTerm(e.target.value)}
                className="w-full bg-dark border border-white/10 rounded-lg py-2 pl-10 pr-4 text-sm font-mono text-white focus:outline-none focus:border-premium-gold transition-colors"
              />
            </div>
@@ -73,7 +85,7 @@ export function AdminUsers() {
                 <Cpu className="w-8 h-8 text-premium-gold animate-pulse" />
                 <p className="font-mono text-xs uppercase tracking-widest text-silver-metallic">Syncing Data...</p>
              </div>
-          ) : users.length === 0 ? (
+          ) : filteredUsers.length === 0 ? (
              <div className="flex flex-col items-center justify-center h-64 gap-4">
                 <ShieldAlert className="w-8 h-8 text-silver-metallic" />
                 <p className="font-mono text-xs uppercase tracking-widest text-silver-metallic">No Identities Found</p>
@@ -90,7 +102,7 @@ export function AdminUsers() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((u, i) => (
+                {filteredUsers.map((u, i) => (
                   <tr key={u.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
                     <td className="p-4">
                       <div className="flex items-center gap-4">

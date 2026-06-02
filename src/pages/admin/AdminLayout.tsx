@@ -53,10 +53,15 @@ export function AdminLayout() {
   }, []);
 
   useEffect(() => {
-    if ((!loading || forceLoad) && !user) {
-      navigate("/dashboard"); // or a specific admin login page
+    if (!loading || forceLoad) {
+      if (!user) {
+        navigate("/dashboard");
+      } else if (!userRole || !["super_admin", "admin", "manager", "developer", "designer"].includes(userRole)) {
+        console.warn(`[AdminLayout Security] Access denied for role: "${userRole}". Redirecting to Home page.`);
+        navigate("/", { replace: true });
+      }
     }
-  }, [user, loading, navigate, forceLoad]);
+  }, [user, loading, userRole, navigate, forceLoad]);
 
   if ((loading && !forceLoad) || !user) {
     return (

@@ -17,26 +17,36 @@ export function AnalyticsRouteTracker() {
     // Ignore studio since it already logs
     if (p.startsWith('/studio')) return;
 
-    let type: any = 'custom_action';
-    let details = `Opened page: ${p}`;
+    let type: any = 'page_visit';
+    let details = `Visited page: ${p}`;
 
     if (p.startsWith('/services')) {
       type = 'opened_services';
       details = `Explored services: ${p}`;
     } else if (p === '/pricing') {
-      type = 'custom_action';
-      details = 'Explored pricing';
+      type = 'viewed_pricing';
+      details = 'Explored pricing plans & tier parameters';
     } else if (p === '/book') {
-      type = 'custom_action';
-      details = 'Opened booking page';
+      type = 'page_visit';
+      details = 'Opened scheduling manager';
     } else if (p === '/client') {
-      type = 'custom_action';
-      details = 'Opened client portal';
+      type = 'page_visit';
+      details = 'Opened Client Portal dashboard';
     } else if (p === '/work') {
-      type = 'custom_action';
-      details = 'Explored portfolio';
+      type = 'page_visit';
+      details = 'Explored architectural portfolio';
+    } else if (p === '/about') {
+      type = 'page_visit';
+      details = 'Explored agency info and manifesto';
+    } else if (p === '/process') {
+      type = 'page_visit';
+      details = 'Viewed standard engineering process';
+    } else if (p === '/audit') {
+      type = 'page_visit';
+      details = 'Opened interactive automated AI audit scanner';
     } else if (p === '/') {
-      return; // Handled by standard impressions optionally
+      type = 'page_visit';
+      details = 'Landed on home landing dashboard';
     }
 
     if (type) {

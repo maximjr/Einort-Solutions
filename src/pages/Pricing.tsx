@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 import { Check, ArrowRight } from 'lucide-react';
 import { CinematicTransition } from '../components/CinematicTransition';
 import { Footer } from '../components/Footer';
@@ -50,6 +51,7 @@ const plans = [
 ];
 
 export function Pricing() {
+  const navigate = useNavigate();
   return (
     <CinematicTransition>
       <SEO title="Plans & Pricing | EINORT SOLUTIONS" description="Choose the architecture that aligns with your scale. Transparent pricing for premium enterprise custom software solutions." />
@@ -114,7 +116,10 @@ export function Pricing() {
                   ))}
                 </div>
 
-                <button className={`w-full py-4 rounded-full font-semibold text-sm transition-all flex items-center justify-center gap-2 group ${plan.popular ? 'bg-premium-gold text-dark hover:brightness-110 shadow-lg shadow-premium-gold/20' : 'bg-white/5 text-white hover:bg-white/10 border border-white/10'}`}>
+                <button 
+                  onClick={() => navigate('/custom-project')}
+                  className={`w-full py-4 rounded-full font-semibold text-sm transition-all flex items-center justify-center gap-2 group ${plan.popular ? 'bg-premium-gold text-dark hover:brightness-110 shadow-lg shadow-premium-gold/20' : 'bg-white/5 text-white hover:bg-white/10 border border-white/10'}`}
+                >
                   Initiate Project <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </motion.div>

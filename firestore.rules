@@ -9,51 +9,80 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
+    // Helper to determine if user is the hardcoded super admin
+    function isHardcodedSuperAdmin() {
+      return request.auth != null && (
+        request.auth.uid == 'UeKYfLdwQ7OtTITmIPTMZhkW0hu2' ||
+        (request.auth.token != null && 'email' in request.auth.token && request.auth.token.email == 'njeirheinard@gmail.com')
+      );
+    }
+
+    // Helper to get role from the admin document OR user document, with fallback
     function getRole() {
-      return (request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid)))
-             ? get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role 
-             : 'client';
+      return isHardcodedSuperAdmin()
+        ? 'super_admin'
+        : (request.auth != null
+            ? (exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+                ? ('role' in get(/databases/$(database)/documents/admins/$(request.auth.uid)).data ? get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role : 'client')
+                : (exists(/databases/$(database)/documents/users/$(request.auth.uid))
+                    ? ('accountType' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.accountType : 'client')
+                    : 'client'))
+            : 'client');
     }
 
     function isAdmin() {
-      return request.auth != null && getRole() in ['super_admin', 'admin', 'manager', 'developer', 'designer'];
+      return request.auth != null && (
+        isHardcodedSuperAdmin() ||
+        getRole() == 'super_admin' ||
+        getRole() == 'admin' ||
+        getRole() == 'manager' ||
+        getRole() == 'developer' ||
+        getRole() == 'designer'
+      );
     }
 
     function isSuperAdmin() {
-      return request.auth != null && getRole() == 'super_admin';
-    }
-
-    // Global bypass for super_admin
-    match /{document=**} {
-      allow read, write: if isSuperAdmin();
+      return request.auth != null && (
+        isHardcodedSuperAdmin() ||
+        getRole() == 'super_admin'
+      );
     }
 
     match /admins/{adminId} {
-      allow get: if isSignedIn() && request.auth.uid == adminId;
-      allow read: if isAdmin();
+      allow read: if isSignedIn();
+      allow write: if isHardcodedSuperAdmin() || isSuperAdmin();
     }
 
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      allow read, write: if isAdmin();
+      allow read, write: if isHardcodedSuperAdmin() || isOwner(userId) || isAdmin();
     }
 
     match /projectSubmissions/{submissionId} {
-      allow read, write: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow read, write: if isAdmin();
     }
 
     match /customProjects/{projectId} {
-      allow read, write: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow read, write: if isAdmin();
     }
 
     match /leads/{leadId} {
-      allow create: if isSignedIn();
+      allow create: if true;
       allow read, write: if isAdmin();
     }
 
     match /clientActivity/{activityId} {
-      allow create: if isSignedIn();
+      allow create: if true;
       allow read: if isAdmin();
+    }
+
+    match /prototypeDrafts/{draftId} {
+      allow create, update: if true;
+      allow read: if resource == null || resource.data.userId == 'anonymous' || (isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin()));
+      allow delete: if isAdmin();
     }
 
     match /notifications/{notificationId} {

@@ -158,9 +158,7 @@ export default function App() {
                   <Route path="/insights/:slug" element={<InsightArticle />} />
                   <Route path="/privacy" element={<Legal />} />
                   <Route path="/terms" element={<Legal />} />
-                  <Route path="/dashboard" element={
-                    <AuthRedirector />
-                  } />
+                  <Route path="/dashboard" element={<AuthRedirector />} />
                   
                   {/* 404 Catch-All */}
                   <Route path="*" element={<NotFound />} />
