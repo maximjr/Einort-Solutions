@@ -134,22 +134,16 @@ export function AuthModal({
       });
     } catch (error: any) {
       setIsLoading(false);
+      console.error(`[Firebase Login Error] Code: ${error.code}, Message: ${error.message}`, error);
+      
       if (
         error.code === "auth/invalid-credential" ||
         error.code === "auth/user-not-found" ||
         error.code === "auth/wrong-password"
       ) {
         setErrorStatus("Password or Email Incorrect");
-      } else if (error.code === "auth/network-request-failed") {
-        setErrorStatus(
-          "Network issue detected. Please verify your internet connection.",
-        );
-      } else if (error.code === "auth/too-many-requests") {
-        setErrorStatus("Too many failed attempts. Please try again later.");
       } else {
-        setErrorStatus(
-          "Authentication failed. Please attempt again later or contact support.",
-        );
+        setErrorStatus(error.message || "Authentication failed. Please attempt again later.");
       }
     }
   };
@@ -197,30 +191,12 @@ export function AuthModal({
       });
     } catch (error: any) {
       setIsLoading(false);
-
+      console.error(`[Firebase Signup Error] Code: ${error.code}, Message: ${error.message}`, error);
+      
       if (error.code === "auth/email-already-in-use") {
         setErrorStatus("User already exists. Sign in?");
-      } else if (
-        error.code === "permission-denied" ||
-        error.message?.includes("Missing or insufficient permissions")
-      ) {
-        setErrorStatus(
-          "Permission configuration issue. Profile access blocked by secure rules.",
-        );
-      } else if (error.code === "auth/invalid-email") {
-        setErrorStatus("The email address is improperly formatted.");
-      } else if (error.code === "auth/weak-password") {
-        setErrorStatus(
-          "Password too weak. Please use a stronger, specialized password.",
-        );
-      } else if (error.code === "auth/network-request-failed") {
-        setErrorStatus(
-          "Network issue detected. Please verify your internet connection.",
-        );
       } else {
-        setErrorStatus(
-          "Registration failed. Please attempt again later or contact support.",
-        );
+        setErrorStatus(error.message || "Registration failed. Please attempt again later.");
       }
     }
   };

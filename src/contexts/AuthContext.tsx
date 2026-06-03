@@ -50,8 +50,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const activeDb = db;
 
     let unsubscribeDoc: (() => void) | null = null;
+    let isMounted = true;
 
     const unsubscribeAuth = onAuthStateChanged(activeAuth, async (currentUser) => {
+      if (!isMounted) return;
+      
       setUser(currentUser);
 
       if (currentUser) {
@@ -59,22 +62,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           const docRef = doc(activeDb, "users", currentUser.uid);
 
-          // First, update lastLogin using a direct get/set to avoid snapshot loop if we write
+          // Update lastLogin safely 
           getDoc(docRef)
             .then((docSnap) => {
-              if (docSnap.exists()) {
+              if (docSnap.exists() && isMounted) {
                 setDoc(
                   docRef,
                   { lastLogin: serverTimestamp() },
                   { merge: true },
-                ).catch(() => {});
+                ).catch((err) => console.warn("Failed to update last login", err));
               }
             })
-            .catch(() => {});
+            .catch((err) => console.warn("Failed to get profile doc", err));
 
           unsubscribeDoc = onSnapshot(
             docRef,
             (docSnap) => {
+              if (!isMounted) return;
               if (docSnap.exists()) {
                 setUserData({ uid: docSnap.id, ...docSnap.data() } as UserData);
               } else {
@@ -82,25 +86,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               }
               setLoading(false);
             },
-            () => {
-              setUserData(null);
-              setLoading(false);
+            (error) => {
+              console.error("Firestore snapshot error:", error);
+              if (isMounted) {
+                setUserData(null);
+                setLoading(false);
+              }
             },
           );
         } catch (error) {
+          console.error("Auth context setup error:", error);
+          if (isMounted) {
+            setUserData(null);
+            setLoading(false);
+          }
+        }
+      } else {
+        if (isMounted) {
           setUserData(null);
           setLoading(false);
         }
-      } else {
-        setUserData(null);
         if (unsubscribeDoc) {
           unsubscribeDoc();
+          unsubscribeDoc = null;
         }
-        setLoading(false);
       }
     });
 
     return () => {
+      isMounted = false;
       unsubscribeAuth();
       if (unsubscribeDoc) {
         unsubscribeDoc();
