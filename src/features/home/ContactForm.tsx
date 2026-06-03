@@ -17,12 +17,7 @@ import {
   LayoutTemplate,
   Briefcase,
 } from "lucide-react";
-import {
-  collection,
-  serverTimestamp,
-  setDoc,
-  doc,
-} from "firebase/firestore";
+import { collection, serverTimestamp, setDoc, doc } from "firebase/firestore";
 import { db, isFirebaseConfigured } from "../../lib/firebase";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "../../lib/utils";
@@ -126,7 +121,7 @@ export function ContactForm() {
       const projectData = {
         id: docRef.id,
         projectId: docRef.id,
-        userId: user?.uid || "unauthenticated",
+        userId: user!.uid,
         email: data.email,
         clientName: data.clientName,
         company: data.company,
@@ -586,18 +581,34 @@ export function ContactForm() {
                             >
                               <ArrowLeft size={16} /> Back
                             </Button>
-                            <Button
-                              type="button"
-                              onClick={handleSubmit(onSubmit)}
-                              disabled={isSubmitting}
-                              className="tracking-[0.1em] font-bold gap-2"
-                            >
-                              {isSubmitting ? (
-                                <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
-                              ) : (
-                                "Initiate Alliance"
-                              )}
-                            </Button>
+                            {!user ? (
+                              <Button
+                                type="button"
+                                onClick={() =>
+                                  window.dispatchEvent(
+                                    new CustomEvent("open-auth", {
+                                      detail: { mode: "register" },
+                                    }),
+                                  )
+                                }
+                                className="tracking-[0.1em] font-bold gap-2"
+                              >
+                                Login to Submit
+                              </Button>
+                            ) : (
+                              <Button
+                                type="button"
+                                onClick={handleSubmit(onSubmit)}
+                                disabled={isSubmitting}
+                                className="tracking-[0.1em] font-bold gap-2"
+                              >
+                                {isSubmitting ? (
+                                  <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+                                ) : (
+                                  "Initiate Alliance"
+                                )}
+                              </Button>
+                            )}
                           </div>
                         </motion.div>
                       )}

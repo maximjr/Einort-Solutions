@@ -8,21 +8,23 @@ import { Globe, ArrowRight, ShieldCheck, Zap } from "lucide-react";
 
 export function LocationPage() {
   const { region } = useParams<{ region: string }>();
-  const formattedRegion = region ? region.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase()) : "Global";
+  const formattedRegion = region
+    ? region.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+    : "Global";
 
   const schema = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Service",
-    "serviceType": `${formattedRegion} Web Development`,
-    "provider": {
+    serviceType: `${formattedRegion} Web Development`,
+    provider: {
       "@type": "Organization",
-      "name": "Einort Solutions"
+      name: "Einort Solutions",
     },
-    "areaServed": {
+    areaServed: {
       "@type": "Place",
-      "name": formattedRegion
+      name: formattedRegion,
     },
-    "description": `Premium enterprise software engineering, AI automation, and custom web development services for businesses in ${formattedRegion}.`
+    description: `Premium enterprise software engineering, AI automation, and custom web development services for businesses in ${formattedRegion}.`,
   });
 
   return (
@@ -35,7 +37,7 @@ export function LocationPage() {
         <Container>
           <div className="max-w-4xl mx-auto border-l-2 border-primary/20 pl-6 md:pl-10 relative">
             <div className="absolute -left-[2px] top-0 w-[2px] h-32 bg-gradient-to-b from-primary to-transparent"></div>
-            
+
             <FadeUp>
               <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full bg-primary/10 border border-primary/20 shadow-sm">
                 <Globe size={14} className="text-primary" />
@@ -44,23 +46,34 @@ export function LocationPage() {
                 </span>
               </div>
               <h1 className="text-5xl md:text-7xl font-display font-medium text-white tracking-tight mb-8 leading-tight">
-                Premium Software Engineering for 
+                Premium Software Engineering for
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400 block mt-2">
                   {formattedRegion} Businesses
                 </span>
               </h1>
               <p className="text-xl text-slate-400 font-light max-w-2xl leading-relaxed mb-10">
-                Einort Solutions partners with industry leaders in {formattedRegion} to design, architect, and deploy world-class digital platforms. From highly scalable SaaS systems to custom ERP platforms, we engineer tomorrow's digital reality.
+                Einort Solutions partners with industry leaders in{" "}
+                {formattedRegion} to design, architect, and deploy world-class
+                digital platforms. From highly scalable SaaS systems to custom
+                ERP platforms, we engineer tomorrow's digital reality.
               </p>
-              
+
               <div className="flex flex-wrap gap-4">
                 <Link to="/#contact">
-                  <Button variant="primary" size="lg" className="gap-2 uppercase text-xs tracking-widest font-bold">
+                  <Button
+                    variant="primary"
+                    size="lg"
+                    className="gap-2 uppercase text-xs tracking-widest font-bold"
+                  >
                     Schedule Discovery <ArrowRight size={16} />
                   </Button>
                 </Link>
                 <Link to="/">
-                  <Button variant="outline" size="lg" className="uppercase text-xs tracking-widest font-bold text-slate-300">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="uppercase text-xs tracking-widest font-bold text-slate-300"
+                  >
                     Explore Global Services
                   </Button>
                 </Link>
@@ -73,26 +86,30 @@ export function LocationPage() {
               {
                 icon: <Zap size={24} />,
                 title: "Scalable Architecture",
-                desc: `We build cloud-native systems designed to handle enterprise traffic for ${formattedRegion} markets.`
+                desc: `We build cloud-native systems designed to handle enterprise traffic for ${formattedRegion} markets.`,
               },
               {
                 icon: <ShieldCheck size={24} />,
                 title: "Secure & Compliant",
-                desc: `Meeting the strict data security and compliance requirements standard in ${formattedRegion}.`
+                desc: `Meeting the strict data security and compliance requirements standard in ${formattedRegion}.`,
               },
               {
                 icon: <Globe size={24} />,
                 title: "Local Market Expertise",
-                desc: `Deep understanding of buyer intent and user experience optimization for ${formattedRegion} audiences.`
-              }
+                desc: `Deep understanding of buyer intent and user experience optimization for ${formattedRegion} audiences.`,
+              },
             ].map((feature, i) => (
-              <FadeUp key={i} delay={0.2 + (i * 0.1)}>
+              <FadeUp key={i} delay={0.2 + i * 0.1}>
                 <Card className="p-8 h-full bg-background/50 border-white/5 hover:border-white/10 transition-colors">
                   <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6">
                     {feature.icon}
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-3">{feature.title}</h3>
-                  <p className="text-slate-400 font-light text-sm leading-relaxed">{feature.desc}</p>
+                  <h3 className="text-lg font-bold text-white mb-3">
+                    {feature.title}
+                  </h3>
+                  <p className="text-slate-400 font-light text-sm leading-relaxed">
+                    {feature.desc}
+                  </p>
                 </Card>
               </FadeUp>
             ))}

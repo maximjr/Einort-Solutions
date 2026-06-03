@@ -2,7 +2,10 @@ import { cn } from "../../lib/utils";
 import React from "react";
 import { motion, HTMLMotionProps } from "motion/react";
 
-export interface ButtonProps extends Omit<HTMLMotionProps<"button">, "ref" | "children"> {
+export interface ButtonProps extends Omit<
+  HTMLMotionProps<"button">,
+  "ref" | "children"
+> {
   variant?: "primary" | "secondary" | "outline" | "ghost";
   size?: "sm" | "md" | "lg";
   children?: React.ReactNode;

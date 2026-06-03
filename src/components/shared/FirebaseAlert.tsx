@@ -31,20 +31,29 @@ VITE_FIREBASE_APP_ID=your-app-id`;
             {feature} is temporarily unavailable
           </h3>
           <p className="text-sm text-slate-300 font-light mb-4">
-            This module requires a secure connection to the database. Missing environment variables detected.
-            Please configure your Vercel deployment <code className="text-primary bg-primary/10 px-1 py-0.5 rounded text-xs tracking-wider">.env</code> variables.
+            This module requires a secure connection to the database. Missing
+            environment variables detected. Please configure your Vercel
+            deployment{" "}
+            <code className="text-primary bg-primary/10 px-1 py-0.5 rounded text-xs tracking-wider">
+              .env
+            </code>{" "}
+            variables.
           </p>
-          
+
           <div className="bg-background/80 rounded-xl p-4 overflow-x-auto border border-white/5 relative group">
             <button
               onClick={copyToClipboard}
               className="absolute top-3 right-3 p-2 bg-white/5 hover:bg-white/10 rounded-lg text-slate-300 transition-colors"
               title="Copy environment template"
             >
-              {copied ? <CheckCircle2 size={16} className="text-green-400" /> : <Copy size={16} />}
+              {copied ? (
+                <CheckCircle2 size={16} className="text-green-400" />
+              ) : (
+                <Copy size={16} />
+              )}
             </button>
             <pre className="text-slate-400 text-xs font-mono leading-relaxed">
-{envs}
+              {envs}
             </pre>
           </div>
         </div>

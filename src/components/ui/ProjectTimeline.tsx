@@ -14,11 +14,13 @@ const STEPS = [
 
 export function ProjectTimeline({ status }: ProjectTimelineProps) {
   const currentStatus = (status || "new").toLowerCase();
-  
+
   let currentIndex = 0;
   if (["review", "consultation"].includes(currentStatus)) {
     currentIndex = 1;
-  } else if (["development", "in-progress", "building", "active"].includes(currentStatus)) {
+  } else if (
+    ["development", "in-progress", "building", "active"].includes(currentStatus)
+  ) {
     currentIndex = 2;
   } else if (["completed", "delivered", "done"].includes(currentStatus)) {
     currentIndex = 3;
@@ -29,9 +31,9 @@ export function ProjectTimeline({ status }: ProjectTimelineProps) {
       <div className="relative flex items-center justify-between">
         {/* Connecting Line Backdrop */}
         <div className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 w-full bg-white/5" />
-        
+
         {/* Active Connecting Line */}
-        <motion.div 
+        <motion.div
           className="absolute left-0 top-1/2 -translate-y-1/2 h-0.5 bg-primary"
           initial={{ width: "0%" }}
           animate={{ width: `${(currentIndex / (STEPS.length - 1)) * 100}%` }}
@@ -50,8 +52,8 @@ export function ProjectTimeline({ status }: ProjectTimelineProps) {
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.4, delay: index * 0.15 }}
                 className={`w-10 h-10 rounded-full flex items-center justify-center z-10 border-2 transition-colors duration-500 bg-background ${
-                  isCompleted 
-                    ? "border-primary text-primary" 
+                  isCompleted
+                    ? "border-primary text-primary"
                     : "border-white/10 text-slate-500"
                 } ${isActive ? "shadow-[0_0_15px_rgba(59,130,246,0.3)] ring-2 ring-primary/20 ring-offset-2 ring-offset-background" : ""}`}
               >
@@ -63,9 +65,15 @@ export function ProjectTimeline({ status }: ProjectTimelineProps) {
                 transition={{ duration: 0.4, delay: index * 0.15 + 0.2 }}
                 className="absolute top-12 whitespace-nowrap"
               >
-                <span className={`text-[10px] uppercase font-bold tracking-wider ${
-                  isActive ? "text-primary" : (isCompleted ? "text-slate-300" : "text-slate-600")
-                }`}>
+                <span
+                  className={`text-[10px] uppercase font-bold tracking-wider ${
+                    isActive
+                      ? "text-primary"
+                      : isCompleted
+                        ? "text-slate-300"
+                        : "text-slate-600"
+                  }`}
+                >
                   {step.label}
                 </span>
               </motion.div>

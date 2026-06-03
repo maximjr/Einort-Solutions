@@ -28,7 +28,13 @@ export function Logo({ className = "w-10 h-10" }: { className?: string }) {
         </linearGradient>
 
         <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-          <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="#000" floodOpacity="0.5" />
+          <feDropShadow
+            dx="0"
+            dy="2"
+            stdDeviation="4"
+            floodColor="#000"
+            floodOpacity="0.5"
+          />
         </filter>
         <filter id="keyholeGlow" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="1.5" result="blur" />
@@ -37,42 +43,57 @@ export function Logo({ className = "w-10 h-10" }: { className?: string }) {
       </defs>
 
       {/* Background Outer Base */}
-      <polygon
-        points="50,10 85,30 85,70 50,90 15,70 15,30"
-        fill="#020617"
-      />
+      <polygon points="50,10 85,30 85,70 50,90 15,70 15,30" fill="#020617" />
 
       {/* Top Left Facet */}
       <path d="M15,30 L50,10 L50,25 L15,45 Z" fill="url(#blueMain)" />
-      
+
       {/* Top Right Facet */}
       <path d="M50,10 L85,30 L50,50 L50,25 Z" fill="url(#blueMain)" />
-      
+
       {/* Structural Connecting Ribbon Center - Top half */}
-      <path d="M15,45 L50,65 L85,45 L85,30 L50,50 L15,30 Z" fill="url(#purpleMain)" opacity="0.8" />
-      
+      <path
+        d="M15,45 L50,65 L85,45 L85,30 L50,50 L15,30 Z"
+        fill="url(#purpleMain)"
+        opacity="0.8"
+      />
+
       {/* Bottom Right Facet */}
       <path d="M85,70 L50,90 L50,75 L85,55 Z" fill="url(#purpleMain)" />
-      
+
       {/* Bottom Left Facet */}
       <path d="M50,90 L15,70 L50,50 L50,75 Z" fill="url(#purpleMain)" />
 
       {/* Structural Connecting Ribbon Center - Bottom half overlapping */}
-      <path d="M85,55 L50,35 L15,55 L15,70 L50,50 L85,70 Z" fill="url(#blueMain)" opacity="0.9" />
+      <path
+        d="M85,55 L50,35 L15,55 L15,70 L50,50 L85,70 Z"
+        fill="url(#blueMain)"
+        opacity="0.9"
+      />
 
       {/* 3D Bevel Highlights - Light edges */}
       <path d="M15,30 L50,10 L50,13 L17,31 Z" fill="rgba(255,255,255,0.4)" />
       <path d="M50,10 L85,30 L83,31 L50,13 Z" fill="rgba(255,255,255,0.2)" />
       <path d="M15,45 L15,30 L18,31 L18,44 Z" fill="rgba(255,255,255,0.2)" />
-      
+
       {/* 3D Bevel Shadows - Dark edges */}
       <path d="M85,70 L50,90 L50,87 L83,69 Z" fill="rgba(0,0,0,0.4)" />
       <path d="M50,90 L15,70 L17,69 L50,87 Z" fill="rgba(0,0,0,0.2)" />
       <path d="M85,55 L85,70 L82,69 L82,56 Z" fill="rgba(0,0,0,0.3)" />
 
       {/* Intersection Shadows (where ribbons cross) */}
-      <path d="M25,48 L50,62 L50,50 L35,42 Z" fill="#000" opacity="0.4" filter="url(#shadow)" />
-      <path d="M75,52 L50,38 L50,50 L65,58 Z" fill="#000" opacity="0.3" filter="url(#shadow)" />
+      <path
+        d="M25,48 L50,62 L50,50 L35,42 Z"
+        fill="#000"
+        opacity="0.4"
+        filter="url(#shadow)"
+      />
+      <path
+        d="M75,52 L50,38 L50,50 L65,58 Z"
+        fill="#000"
+        opacity="0.3"
+        filter="url(#shadow)"
+      />
 
       {/* Central Keyhole Cutout */}
       <g filter="url(#keyholeGlow)">

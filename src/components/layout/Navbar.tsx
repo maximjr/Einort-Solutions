@@ -52,6 +52,14 @@ export function Navbar() {
     }
   }, [location.pathname, location.hash]);
 
+  useEffect(() => {
+    const handleOpenAuth = (e: any) => {
+      openAuth(e.detail?.mode || "login");
+    };
+    window.addEventListener("open-auth", handleOpenAuth);
+    return () => window.removeEventListener("open-auth", handleOpenAuth);
+  }, []);
+
   const openAuth = (mode: "login" | "register") => {
     setAuthMode(mode);
     setIsAuthOpen(true);

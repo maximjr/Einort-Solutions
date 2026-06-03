@@ -1,13 +1,30 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Clock, Activity, FileText, History, Box } from "lucide-react";
+import {
+  Clock,
+  Activity,
+  FileText,
+  CheckCircle,
+  Circle,
+  Box,
+  ArrowRight,
+  ShieldCheck,
+  Mail,
+  Calendar,
+} from "lucide-react";
 import { Container } from "../../components/layout/Container";
-import { Card } from "../../components/ui/Card";
+import { Card, CardContent } from "../../components/ui/Card";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Button } from "../../components/ui/Button";
 import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
 import { useAuth } from "../../hooks/useAuth";
-import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+} from "firebase/firestore";
 import { db } from "../../lib/firebase";
 
 export function ClientPortal() {
@@ -17,204 +34,405 @@ export function ClientPortal() {
 
   useEffect(() => {
     if (!user) {
-       setLoading(false);
-       return;
+      setLoading(false);
+      return;
     }
 
     const q = query(
       collection(db, "projects"),
       where("userId", "==", user.uid),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "desc"),
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const p = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setProjects(p);
-      setLoading(false);
-    }, (error: any) => {
-       // Handle the rule error gracefully on the UI
-       if (error.code === 'permission-denied') {
-          setProjects([{
-             id: 'permission-error',
-             company: 'Permission Denied',
-             projectType: 'System Alert',
-             industry: 'Infrastructure',
-             status: 'Rule Error',
-             budget: 'N/A',
-             timeline: 'N/A',
-             createdAt: { toDate: () => new Date() },
-             isError: true
-          }]);
-       }
-       setLoading(false);
-    });
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const p = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setProjects(p);
+        setLoading(false);
+      },
+      (error: any) => {
+        if (error.code === "permission-denied") {
+          setProjects([
+            {
+              id: "permission-error",
+              company: "Access Restricted",
+              projectType: "System Notification",
+              industry: "Security",
+              status: "degraded",
+              budget: "N/A",
+              timeline: "N/A",
+              createdAt: { toDate: () => new Date() },
+              isError: true,
+            },
+          ]);
+        }
+        setLoading(false);
+      },
+    );
 
     return () => unsubscribe();
-  }, [user]);
+  }, [user?.uid]);
+
+  const stages = [
+    { key: "new", label: "Discovery" },
+    { key: "analysis", label: "Planning" },
+    { key: "design", label: "UI/UX Architecture" },
+    { key: "development", label: "Engineering" },
+    { key: "testing", label: "QA & Review" },
+    { key: "completed", label: "Deployed" },
+  ];
+
+  const getStageIndex = (status: string) => {
+    if (!status) return 0;
+    const s = status.toLowerCase();
+    const index = stages.findIndex(
+      (st) =>
+        s.includes(st.key) || s.includes(st.label.toLowerCase().split(" ")[0]),
+    );
+    return index === -1 ? 0 : index;
+  };
 
   return (
-    <section className="py-24 bg-surface min-h-[80vh] relative pt-32">
-      <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-primary/5 blur-[150px] pointer-events-none rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-      <Container>
+    <section className="py-24 bg-[#030712] min-h-screen relative pt-32 overflow-hidden">
+      {/* Premium Background Ambience */}
+      <div className="absolute top-0 left-1/2 w-[800px] h-[600px] bg-primary/5 blur-[150px] pointer-events-none rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+
+      <Container className="relative z-10">
         <Breadcrumbs
-          items={[{ label: "Home", href: "/" }, { label: "Client Portal" }]}
+          items={[
+            { label: "Global Workspace", href: "/" },
+            { label: "Client Workspace" },
+          ]}
         />
 
         <FadeUp>
-          <div className="mb-12">
-            <h1 className="text-3xl md:text-5xl font-display font-medium text-white mb-4">
-              Client Portal
-            </h1>
-            <p className="text-text-muted font-light text-lg">
-              Welcome back, <span className="text-white font-medium">{userData?.fullName || "Valued Client"}</span>. View your active projects and
-              billing.
-            </p>
+          <div className="mb-14 flex items-end justify-between border-b border-white/[0.05] pb-8">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-display font-medium text-white tracking-tight mb-2">
+                Executive Workspace
+              </h1>
+              <p className="text-slate-400 font-light text-lg">
+                Welcome back,{" "}
+                <span className="text-white font-medium">
+                  {userData?.fullName || "Valued Partner"}
+                </span>
+                .
+              </p>
+            </div>
+            <div className="hidden md:flex items-center gap-4 text-[11px] uppercase tracking-widest font-bold text-slate-500 bg-white/[0.02] border border-white/[0.05] px-4 py-2 rounded-full">
+              <ShieldCheck size={14} className="text-primary" /> SECURE TUNNEL
+              ACTIVE
+            </div>
           </div>
         </FadeUp>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          <div className="md:col-span-8 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-8 space-y-8">
             <FadeUp delay={0.1}>
-              <h2 className="text-xl font-display text-white mb-4 flex items-center gap-2">
-                <FileText size={20} className="text-primary" /> My Projects
-              </h2>
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+                  Active Engagements
+                </h2>
+                {projects.length > 0 && !projects[0].isError && (
+                  <Link to="/#contact">
+                    <span className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+                      Request New Build <ArrowRight size={12} />
+                    </span>
+                  </Link>
+                )}
+              </div>
             </FadeUp>
 
             {loading ? (
-              <div className="animate-pulse space-y-4">
+              <div className="w-full animate-pulse space-y-6">
                 {[1, 2].map((i) => (
                   <div
                     key={i}
-                    className="h-40 bg-white/5 rounded-xl w-full"
+                    className="h-64 bg-white/[0.02] border border-white/[0.05] rounded-3xl w-full"
                   ></div>
                 ))}
               </div>
             ) : projects.length === 0 ? (
               <FadeUp delay={0.2}>
-                <Card className="bg-background/50 border-white/5 p-12 text-center flex flex-col items-center justify-center">
-                   <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-6">
-                     <Box className="w-8 h-8 text-primary" />
-                   </div>
-                  <h3 className="text-xl font-display text-white mb-4">
-                    No Active Projects
+                <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-3xl p-16 text-center flex flex-col items-center justify-center relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+                  <div className="w-20 h-20 rounded-2xl bg-white/[0.03] border border-white/[0.05] shadow-inner flex items-center justify-center mb-6 relative z-10 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
+                    <Box className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-display text-white mb-4 relative z-10 tracking-tight">
+                    You're ready to build something exceptional.
                   </h3>
-                  <p className="text-text-muted font-light mb-8 max-w-sm">
-                    You currently don't have any enterprise projects deployed.
-                    Submit a discovery brief to begin.
+                  <p className="text-slate-400 font-light mb-10 max-w-md relative z-10 leading-relaxed">
+                    Initiate a private consultation to discuss architecture,
+                    timelines, and resourcing for your next enterprise
+                    application.
                   </p>
-                  <Link to="/#contact">
+                  <Link to="/#contact" className="relative z-10">
                     <Button
                       variant="primary"
-                      className="uppercase tracking-widest text-[11px] font-bold h-12 shadow-lg hover:shadow-primary/20 hover:-translate-y-1 transition-all duration-300"
+                      className="uppercase tracking-widest text-[11px] font-bold h-12 px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all duration-300"
                     >
-                      Start New Project
+                      Initiate Discovery
                     </Button>
                   </Link>
                 </Card>
               </FadeUp>
             ) : (
-              <div className="space-y-4">
-                {projects.map((proj, i) => (
-                   <FadeUp key={proj.id} delay={0.1 + (i * 0.1)}>
-                      <Card className={`bg-background/50 border-white/5 p-8 transition-colors group ${proj.isError ? 'border-red-500/20 hover:border-red-500/40 bg-red-500/5' : 'hover:border-white/10'}`}>
-                        <div className="flex justify-between items-start mb-6">
-                           <div>
-                              <h3 className={`text-xl font-display transition-colors ${proj.isError ? 'text-red-400 group-hover:text-red-300' : 'text-white group-hover:text-primary'}`}>{proj.company || "Project Initialized"}</h3>
-                              <p className="text-sm text-text-muted mt-1 capitalize">{proj.projectType} • {proj.industry}</p>
-                           </div>
-                           <span className={`px-3 py-1.5 border text-[10px] uppercase font-bold tracking-wider rounded-md ${proj.isError ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-white/5 border-white/10 text-slate-300'}`}>
-                             {proj.status || "In Review"}
-                           </span>
+              <div className="space-y-6">
+                {projects.map((proj, i) => {
+                  const currentStageIndex = getStageIndex(proj.status);
+
+                  return (
+                    <FadeUp key={proj.id} delay={0.1 + i * 0.1}>
+                      <Card
+                        className={`bg-white/[0.015] border-white/[0.05] shadow-none rounded-3xl overflow-hidden transition-all duration-500 relative group ${proj.isError ? "border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.05)]" : "hover:border-white/10 hover:shadow-[0_0_40px_rgba(59,130,246,0.03)]"}`}
+                      >
+                        {/* Premium Top Highlight */}
+                        <div
+                          className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${proj.isError ? "from-red-500/50 to-transparent" : "from-primary/50 to-transparent"} opacity-50`}
+                        ></div>
+
+                        <div className="p-8 md:p-10">
+                          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-10">
+                            <div>
+                              <h3
+                                className={`text-2xl md:text-3xl font-display tracking-tight transition-colors mb-2 ${proj.isError ? "text-red-400 font-mono" : "text-white"}`}
+                              >
+                                {proj.company || "Classified Build"}
+                              </h3>
+                              <div className="flex items-center gap-3">
+                                <span className="text-[11px] uppercase font-bold tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
+                                  {proj.projectType || "Enterprise Platform"}
+                                </span>
+                                <span className="text-[11px] uppercase font-bold tracking-widest text-slate-500">
+                                  {proj.industry || "N/A"}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Live Status indicator */}
+                            <div
+                              className={`flex items-center gap-2 text-[10px] uppercase font-bold tracking-widest px-3 py-1.5 rounded-full border shadow-sm ${proj.isError ? "bg-red-500/10 border-red-500/20 text-red-400" : "bg-white/[0.03] border-white/10 text-white"}`}
+                            >
+                              {!proj.isError && (
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] pulse-glow block"></span>
+                              )}
+                              {proj.status || "In Review"}
+                            </div>
+                          </div>
+
+                          {proj.isError ? (
+                            <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-6 text-sm text-red-200 leading-relaxed font-mono">
+                              <p className="mb-2">
+                                SYSTEM ALERT: Authentication payload rejected by
+                                upstream data ingress.
+                              </p>
+                              <p className="opacity-70 text-xs">
+                                Missing valid IAM roles or strict Firestore
+                                security evaluation denied access to the project
+                                subspace. Verify the rules topology to clear the
+                                disruption state.
+                              </p>
+                            </div>
+                          ) : (
+                            <>
+                              {/* Linear Progress Tracking */}
+                              <div className="mb-10 block">
+                                <div className="flex justify-between items-end mb-3">
+                                  <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500">
+                                    Delivery Velocity
+                                  </p>
+                                  <p className="text-[11px] font-mono text-primary">
+                                    {Math.round(
+                                      ((currentStageIndex + 1) /
+                                        stages.length) *
+                                        100,
+                                    )}
+                                    % CLR
+                                  </p>
+                                </div>
+                                <div className="relative">
+                                  {/* Track Line */}
+                                  <div className="absolute top-1/2 left-0 w-full h-[2px] bg-white/[0.05] -translate-y-1/2"></div>
+                                  {/* Active Track Line */}
+                                  <div
+                                    className="absolute top-1/2 left-0 h-[2px] bg-primary -translate-y-1/2 shadow-[0_0_10px_rgba(59,130,246,0.5)] transition-all duration-1000 ease-out"
+                                    style={{
+                                      width: `${(currentStageIndex / (stages.length - 1)) * 100}%`,
+                                    }}
+                                  ></div>
+                                  {/* Nodes */}
+                                  <div className="relative flex justify-between">
+                                    {stages.map((stage, idx) => {
+                                      const isCompleted =
+                                        idx < currentStageIndex;
+                                      const isCurrent =
+                                        idx === currentStageIndex;
+                                      return (
+                                        <div
+                                          key={stage.key}
+                                          className="flex flex-col items-center group/node relative"
+                                        >
+                                          <div
+                                            className={`w-3 h-3 rounded-full flex items-center justify-center z-10 transition-colors duration-500 ${isCompleted ? "bg-primary shadow-[0_0_10px_rgba(59,130,246,0.5)]" : isCurrent ? "bg-[#030712] border-[3px] border-primary scale-125" : "bg-[#030712] border-2 border-white/20"}`}
+                                          >
+                                            {isCompleted && (
+                                              <CheckCircle className="w-2 h-2 text-white" />
+                                            )}
+                                          </div>
+                                          {/* Tooltip purely CSS based */}
+                                          <div className="absolute -top-10 bg-white text-black text-[9px] uppercase tracking-widest font-bold py-1 px-3 rounded shadow-xl opacity-0 group-hover/node:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap">
+                                            {stage.label}
+                                          </div>
+                                          <span
+                                            className={`text-[9px] uppercase tracking-widest font-bold mt-4 absolute top-2 transition-colors ${isCurrent ? "text-white" : "text-slate-600"}`}
+                                          >
+                                            {isCurrent ? stage.label : ""}
+                                          </span>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Project Metadata Grid */}
+                              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-8 border-t border-white/5">
+                                <div>
+                                  <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-2">
+                                    Estimated Budget
+                                  </p>
+                                  <p className="text-sm text-white font-mono object-contain">
+                                    {proj.budget || "TBD"}
+                                  </p>
+                                </div>
+                                <div>
+                                  <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-2">
+                                    Delivery Scope
+                                  </p>
+                                  <p className="text-sm text-white font-mono">
+                                    {proj.timeline || "TBD"}
+                                  </p>
+                                </div>
+                                <div className="lg:col-span-2">
+                                  <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-2">
+                                    Commencement Date
+                                  </p>
+                                  <p className="text-sm text-slate-400 font-mono">
+                                    {proj.createdAt
+                                      ? proj.createdAt
+                                          .toDate()
+                                          .toLocaleDateString("en-US", {
+                                            year: "numeric",
+                                            month: "long",
+                                            day: "numeric",
+                                          })
+                                      : "Just now"}
+                                  </p>
+                                </div>
+                              </div>
+                            </>
+                          )}
                         </div>
-                        {proj.isError ? (
-                           <div className="pt-6 border-t border-red-500/10 text-sm text-red-200">
-                             Firestore Security Rules have denied access to the collection. Please deploy the updated <span className="font-mono text-xs bg-red-500/20 px-1 rounded">firestore.rules</span> to your Firebase project to restore access.
-                           </div>
-                        ) : (
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-white/5">
-                           <div>
-                             <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Budget</p>
-                             <p className="text-sm text-white">{proj.budget || "TBD"}</p>
-                           </div>
-                           <div>
-                             <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Timeline</p>
-                             <p className="text-sm text-white">{proj.timeline || "TBD"}</p>
-                           </div>
-                           <div className="col-span-2">
-                             <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Submitted</p>
-                             <p className="text-sm text-slate-400">{proj.createdAt ? proj.createdAt.toDate().toLocaleDateString() : "Just now"}</p>
-                           </div>
-                        </div>
-                        )}
                       </Card>
-                   </FadeUp>
-                ))}
+                    </FadeUp>
+                  );
+                })}
               </div>
             )}
           </div>
 
-          <div className="md:col-span-4 space-y-6">
+          <div className="lg:col-span-4 space-y-6">
             <FadeUp delay={0.3}>
-              <Card className="bg-background/50 border-white/5 p-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <History size={64} className="text-primary" />
-                </div>
-                <h3 className="text-lg font-display text-white mb-6 relative z-10 flex items-center gap-2">
-                  <Activity size={18} className="text-primary" /> Project Latest Activity
+              <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-3xl p-8 relative overflow-hidden group">
+                <div className="absolute -right-10 -top-10 w-40 h-40 bg-primary/5 rounded-full blur-[40px] group-hover:bg-primary/10 transition-colors duration-700"></div>
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-8 flex items-center border-b border-white/[0.05] pb-4">
+                  <Activity size={14} className="text-primary mr-2" /> Live
+                  Intelligence
                 </h3>
-                {projects.length > 0 ? (
-                  <div className="space-y-4 relative z-10">
-                    <div className="flex gap-4">
-                      <div className="w-1.5 h-1.5 mt-2 rounded-full bg-primary flex-shrink-0 relative before:content-[''] before:absolute before:w-px before:h-12 before:bg-white/10 before:left-1/2 before:-translate-x-1/2 before:top-4"></div>
-                      <div>
-                        <p className="text-sm text-white">Project Submitted</p>
-                        <p className="text-xs text-primary mt-1">
-                          In Review Phase
-                        </p>
-                      </div>
+
+                {projects.length > 0 && !projects[0].isError ? (
+                  <div className="space-y-6 relative z-10 pl-2">
+                    <div className="relative">
+                      <div className="absolute left-[-16px] top-1.5 w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] pulse-glow"></div>
+                      <div className="absolute left-[-13px] top-3 bottom-[-24px] w-[1px] bg-white/[0.05]"></div>
+                      <p className="text-sm text-white font-medium mb-1 tracking-wide">
+                        Project Synchronized
+                      </p>
+                      <p className="text-[11px] font-mono text-emerald-400">
+                        System Nominal • Live
+                      </p>
                     </div>
-                    <div className="flex gap-4">
-                      <div className="w-1.5 h-1.5 mt-2 rounded-full bg-white/20 flex-shrink-0 relative before:content-[''] before:absolute before:w-px before:h-12 before:bg-white/10 before:left-1/2 before:-translate-x-1/2 before:top-4"></div>
-                      <div>
-                        <p className="text-sm text-slate-400">
-                          Architect Review
-                        </p>
-                        <p className="text-xs text-slate-600 mt-1">Pending Assignment</p>
-                      </div>
+                    <div className="relative">
+                      <div className="absolute left-[-16px] top-1.5 w-1.5 h-1.5 rounded-full bg-white/20"></div>
+                      <div className="absolute left-[-13px] top-3 bottom-[-24px] w-[1px] bg-white/[0.05]"></div>
+                      <p className="text-sm text-slate-300 font-medium mb-1 tracking-wide">
+                        Engineering Review
+                      </p>
+                      <p className="text-[11px] font-mono text-slate-500">
+                        Pending Assignment
+                      </p>
                     </div>
-                    <div className="flex gap-4">
-                      <div className="w-1.5 h-1.5 mt-2 rounded-full bg-white/20 flex-shrink-0"></div>
-                      <div>
-                        <p className="text-sm text-slate-400">
-                          Kickoff Call
-                        </p>
-                        <p className="text-xs text-slate-600 mt-1">Pending Approval</p>
-                      </div>
+                    <div className="relative">
+                      <div className="absolute left-[-16px] top-1.5 w-1.5 h-1.5 rounded-full bg-white/20"></div>
+                      <p className="text-sm text-slate-400 font-medium mb-1 tracking-wide">
+                        Executive Discovery Call
+                      </p>
+                      <p className="text-[11px] font-mono text-slate-600">
+                        Locked
+                      </p>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-text-muted text-sm italic relative z-10">
-                    Submit a project to view its lifecycle history.
-                  </p>
+                  <div className="flex flex-col items-center justify-center py-6 text-center">
+                    <p className="text-slate-500 text-sm font-light leading-relaxed">
+                      Intelligence stream offline until a project is initiated.
+                    </p>
+                  </div>
                 )}
               </Card>
             </FadeUp>
 
             <FadeUp delay={0.4}>
-              <Card className="bg-background/50 border-white/5 p-6 block hover:bg-white/[0.02] transition-colors cursor-pointer group">
-                <h3 className="text-lg font-display text-white mb-4 flex items-center justify-between">
-                   <div className="flex items-center gap-2">
-                    <Clock size={18} className="text-primary" /> Meetings
-                   </div>
-                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                     <span className="text-primary text-xs font-bold font-mono">0</span>
-                   </div>
+              <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-3xl p-8 hover:border-white/10 transition-colors group">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-8 border-b border-white/[0.05] pb-4">
+                  Dedicated Support
                 </h3>
-                <div className="space-y-4">
-                  <p className="text-text-muted text-sm font-light">
-                    Kickoff meetings and deadlines will appear here once your project
-                    is initiated by our engineering team.
-                  </p>
+                <div className="space-y-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center shrink-0">
+                      <Mail className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-white font-medium tracking-wide mb-1">
+                        Priority Channel
+                      </p>
+                      <p className="text-xs text-slate-500 leading-relaxed font-light mb-3">
+                        Direct access to your assigned engineering lead.
+                      </p>
+                      <a
+                        href="mailto:einortsolutions237@gmail.com"
+                        className="text-[10px] uppercase font-bold tracking-widest text-primary hover:text-white transition-colors flex items-center gap-1"
+                      >
+                        Contact Architect <ArrowRight size={10} />
+                      </a>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center shrink-0">
+                      <Calendar className="w-4 h-4 text-emerald-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-white font-medium tracking-wide mb-1">
+                        Agile Syncs
+                      </p>
+                      <p className="text-xs text-slate-500 leading-relaxed font-light">
+                        Scheduled alignment meetings will populate here
+                        post-kickoff.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </Card>
             </FadeUp>

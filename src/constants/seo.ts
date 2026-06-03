@@ -1,5 +1,6 @@
 export const SEO_CONFIG = {
-  title: "Einort Solutions | Elite Custom Software & Enterprise Web Architecture",
+  title:
+    "Einort Solutions | Elite Custom Software & Enterprise Web Architecture",
   description:
     "Einort Solutions is a global enterprise software engineering agency. We specialize in custom web development, ERP systems, AI automation, and premium UI/UX design across the USA, Canada, and Europe.",
   openGraph: {
@@ -14,20 +15,44 @@ export const SEO_CONFIG = {
   twitter: {
     cardType: "summary_large_image",
     title: "Einort Solutions | Enterprise Software Agency",
-    description: "Premium enterprise software engineering and architecture for global businesses.",
+    description:
+      "Premium enterprise software engineering and architecture for global businesses.",
   },
   organizationSchema: {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "Einort Solutions",
-    "url": "https://einort.com",
-    "logo": "https://einort.com/icon.svg",
-    "description": "Premium software engineering, custom CRM & ERP solutions, and full-stack enterprise web development.",
-    "sameAs": [
+    name: "Einort Solutions",
+    url: "https://einort.com",
+    logo: "https://einort.com/icon.svg",
+    description:
+      "Premium software engineering, custom CRM & ERP solutions, and full-stack enterprise web development.",
+    sameAs: [
       "https://twitter.com/einortsolutions",
-      "https://linkedin.com/company/einortsolutions"
+      "https://linkedin.com/company/einortsolutions",
     ],
-    "areaServed": ["US", "CA", "GB", "DE", "FR", "NL", "BE", "CH", "IE", "AT", "DK", "SE", "NO", "LU"],
-    "knowsAbout": ["Enterprise Software Architecture", "React Development", "ERP Development", "AI Automation", "Web Design", "UI/UX"]
-  }
+    areaServed: [
+      "US",
+      "CA",
+      "GB",
+      "DE",
+      "FR",
+      "NL",
+      "BE",
+      "CH",
+      "IE",
+      "AT",
+      "DK",
+      "SE",
+      "NO",
+      "LU",
+    ],
+    knowsAbout: [
+      "Enterprise Software Architecture",
+      "React Development",
+      "ERP Development",
+      "AI Automation",
+      "Web Design",
+      "UI/UX",
+    ],
+  },
 };

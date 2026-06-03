@@ -71,9 +71,15 @@ export function Hero() {
           </FadeUp>
 
           <FadeUp delay={0.4}>
-            <h2 className="sr-only">Custom Web Development & Enterprise Software Engineering in USA, Canada, and Europe</h2>
+            <h2 className="sr-only">
+              Custom Web Development & Enterprise Software Engineering in USA,
+              Canada, and Europe
+            </h2>
             <p className="text-lg md:text-2xl text-text-muted mb-12 max-w-3xl mx-auto leading-relaxed font-light tracking-wide">
-              Partner with Einort Solutions for premium custom software architecture. We engineer highly scalable SaaS platforms, enterprise web applications, and world-class AI automation systems for industry leaders across the US, Canada, and Europe.
+              Partner with Einort Solutions for premium custom software
+              architecture. We engineer highly scalable SaaS platforms,
+              enterprise web applications, and world-class AI automation systems
+              for industry leaders across the US, Canada, and Europe.
             </p>
           </FadeUp>
 

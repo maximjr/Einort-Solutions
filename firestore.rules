@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Auth Helpers
+    // Core Auth Helpers
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -11,35 +11,31 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
     
-    // Secure Profile Role Checking
-    function getRole() {
-      return isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) 
-        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role 
-        : 'none';
-    }
-
-    function getIsAdminFlag() {
-       return isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) 
-        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin 
-        : false;
-    }
-
-    function hasValidRole() {
-      // Allow if token has custom claim OR if profile has valid role
-      return (request.auth.token.role in ['client', 'admin', 'super_admin']) || 
-             (getRole() in ['client', 'admin', 'super_admin']) ||
-             getIsAdminFlag() == true;
-    }
-    
-    // Role Checks
+    // Secure Profile Role Checking - Eager evaluation safe
     function isAdmin() {
-      return (request.auth.token.role in ['admin', 'super_admin']) || 
-             getRole() in ['admin', 'super_admin'] || 
-             getIsAdminFlag() == true;
+      return isAuthenticated() && (
+        ('role' in request.auth.token && request.auth.token.role in ['admin', 'super_admin']) || 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'none') in ['admin', 'super_admin']) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('isAdmin', false) == true)
+      );
     }
     
     function isSuperAdmin() {
-      return request.auth.token.role == 'super_admin' || getRole() == 'super_admin';
+      return isAuthenticated() && (
+        ('role' in request.auth.token && request.auth.token.role == 'super_admin') || 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'none') == 'super_admin')
+      );
+    }
+
+    function isRole(targetRole) {
+      return isAuthenticated() && (
+        ('role' in request.auth.token && request.auth.token.role == targetRole) || 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'none') == targetRole)
+      );
     }
 
     // Inquiries Collection: Public submit, admin read/write
@@ -51,28 +47,29 @@ service cloud.firestore {
     // Users Collection (RBAC Source of Truth)
     match /users/{userId} {
       allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
-      // Users can securely create their profile upon signup
       allow create: if isAuthenticated() && (isOwner(userId) || isAdmin());
-      // Users can update their own non-privileged fields, Admins can update all
       allow update: if isAuthenticated() && (isAdmin() || (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'isAdmin', 'permissions', 'accountType'])));
       allow delete: if isSuperAdmin();
     }
 
     // Projects / CRM / general protected collections
     match /projects/{projectId} {
-      allow read: if isAuthenticated() && hasValidRole() && (
-                     resource.data.userId == request.auth.uid ||
-                     (request.auth.token.email != null && resource.data.email == request.auth.token.email) ||
-                     isAdmin()
-                   );
-      allow create: if isAuthenticated() && hasValidRole() && (request.resource.data.userId == request.auth.uid || isAdmin());
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid || 
+        isAdmin() ||
+        (request.auth.token.get('email', null) != null && resource.data.get('email', '') == request.auth.token.email)
+      );
+      allow create: if request.auth != null && (
+        request.resource.data.userId == request.auth.uid ||
+        isAdmin()
+      );
       allow update, delete: if isAdmin();
     }
     
     // Activity / Analytics
     match /activity/{activityId} {
-      allow read: if isAuthenticated() && hasValidRole() && (resource.data.userId == request.auth.uid || isAdmin());
-      allow write: if isAuthenticated() && hasValidRole() && (isAdmin() || request.resource.data.userId == request.auth.uid);
+      allow read: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow write: if isAuthenticated() && (isAdmin() || request.resource.data.userId == request.auth.uid);
     }
 
     match /ledger/{documentId} {
@@ -88,32 +85,32 @@ service cloud.firestore {
       allow create: if isAdmin();
     }
     match /notifications/{documentId} {
-      allow read, update, delete: if isAuthenticated() && hasValidRole() && (isAdmin() || resource.data.userId == request.auth.uid);
-      allow create: if isAuthenticated() && hasValidRole() && (isAdmin() || request.resource.data.userId == request.auth.uid);
+      allow read, update, delete: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && (isAdmin() || request.resource.data.userId == request.auth.uid);
     }
     match /clientActivity/{documentId} {
-      allow read, update, delete: if isAuthenticated() && hasValidRole() && (isAdmin() || resource.data.userId == request.auth.uid);
-      allow create: if isAuthenticated() && hasValidRole() && (isAdmin() || request.resource.data.userId == request.auth.uid);
+      allow read, update, delete: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && (isAdmin() || request.resource.data.userId == request.auth.uid);
     }
     match /consultDossiers/{documentId} {
-      allow read, update, delete: if isAuthenticated() && hasValidRole() && (isAdmin() || resource.data.userId == request.auth.uid);
-      allow create: if isAuthenticated() && hasValidRole() && (isAdmin() || request.resource.data.userId == request.auth.uid);
+      allow read, update, delete: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && (isAdmin() || request.resource.data.userId == request.auth.uid);
     }
     match /projectOrders/{documentId} {
-      allow read, update, delete: if isAuthenticated() && hasValidRole() && (isAdmin() || resource.data.userId == request.auth.uid);
-      allow create: if isAuthenticated() && hasValidRole() && (isAdmin() || request.resource.data.userId == request.auth.uid);
+      allow read, update, delete: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && (isAdmin() || request.resource.data.userId == request.auth.uid);
     }
     match /projectSubmissions/{documentId} {
-      allow read, update, delete: if isAuthenticated() && hasValidRole() && (isAdmin() || resource.data.userId == request.auth.uid);
-      allow create: if isAuthenticated() && hasValidRole() && (isAdmin() || request.resource.data.userId == request.auth.uid);
+      allow read, update, delete: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && (isAdmin() || request.resource.data.userId == request.auth.uid);
     }
     match /customProjects/{documentId} {
-      allow read, update, delete: if isAuthenticated() && hasValidRole() && (isAdmin() || resource.data.userId == request.auth.uid);
-      allow create: if isAuthenticated() && hasValidRole() && (isAdmin() || request.resource.data.userId == request.auth.uid);
+      allow read, update, delete: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && (isAdmin() || request.resource.data.userId == request.auth.uid);
     }
     match /submissions/{documentId} {
-      allow read, update, delete: if isAuthenticated() && hasValidRole() && (isAdmin() || resource.data.userId == request.auth.uid);
-      allow create: if isAuthenticated() && hasValidRole() && (isAdmin() || request.resource.data.userId == request.auth.uid);
+      allow read, update, delete: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && (isAdmin() || request.resource.data.userId == request.auth.uid);
     }
 
     // Default deny

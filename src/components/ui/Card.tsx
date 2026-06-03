@@ -2,7 +2,10 @@ import { cn } from "../../lib/utils";
 import React, { useRef, useState, useEffect } from "react";
 import { motion, HTMLMotionProps } from "motion/react";
 
-export interface CardProps extends Omit<HTMLMotionProps<"div">, "ref" | "children"> {
+export interface CardProps extends Omit<
+  HTMLMotionProps<"div">,
+  "ref" | "children"
+> {
   spotlight?: boolean;
   children?: React.ReactNode;
 }

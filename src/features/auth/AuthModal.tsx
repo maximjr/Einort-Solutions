@@ -72,7 +72,12 @@ export function AuthModal({
 
   const redirectUser = async (
     uid: string,
-    fallbackData?: { email: string; fullName: string; phone: string, emailVerified?: boolean },
+    fallbackData?: {
+      email: string;
+      fullName: string;
+      phone: string;
+      emailVerified?: boolean;
+    },
   ) => {
     try {
       const docRef = doc(db, "users", uid);
@@ -128,14 +133,22 @@ export function AuthModal({
       });
     } catch (error: any) {
       setIsLoading(false);
-      if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
-        setErrorStatus("Invalid email or password. Please verify your credentials.");
+      if (
+        error.code === "auth/invalid-credential" ||
+        error.code === "auth/user-not-found" ||
+        error.code === "auth/wrong-password"
+      ) {
+        setErrorStatus("Password or Email Incorrect");
       } else if (error.code === "auth/network-request-failed") {
-        setErrorStatus("Network issue detected. Please verify your internet connection.");
+        setErrorStatus(
+          "Network issue detected. Please verify your internet connection.",
+        );
       } else if (error.code === "auth/too-many-requests") {
         setErrorStatus("Too many failed attempts. Please try again later.");
       } else {
-        setErrorStatus("Authentication failed. Please attempt again later or contact support.");
+        setErrorStatus(
+          "Authentication failed. Please attempt again later or contact support.",
+        );
       }
     }
   };
@@ -151,10 +164,10 @@ export function AuthModal({
         data.email,
         data.password,
       );
-      
+
       const user = userCredential.user;
       await updateProfile(user, { displayName: data.name });
-      
+
       // Force token refresh to avoid permission denied race condition in Firestore
       await user.getIdToken(true);
 
@@ -176,16 +189,16 @@ export function AuthModal({
         "Account created successfully. Redirecting automatically...",
       );
       await redirectUser(user.uid, {
-         email: data.email,
-         fullName: data.name,
-         phone: data.phone,
-         emailVerified: user.emailVerified
+        email: data.email,
+        fullName: data.name,
+        phone: data.phone,
+        emailVerified: user.emailVerified,
       });
     } catch (error: any) {
       setIsLoading(false);
 
       if (error.code === "auth/email-already-in-use") {
-        setErrorStatus("This email already exists.");
+        setErrorStatus("User already exists. Sign in?");
       } else if (
         error.code === "permission-denied" ||
         error.message?.includes("Missing or insufficient permissions")

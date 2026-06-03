@@ -88,10 +88,13 @@ export function Services() {
                 <CardHeader className="pb-4">
                   <div className="w-14 h-14 rounded-2xl bg-surface/50 border border-white/5 flex items-center justify-center mb-6 group-hover:scale-[1.05] group-hover:border-primary/30 group-hover:bg-primary/5 transition-all duration-500 shadow-xl relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    {React.cloneElement(service.icon as React.ReactElement<any>, {
-                      className:
-                        "w-6 h-6 text-primary group-hover:text-primary transition-colors duration-500",
-                    })}
+                    {React.cloneElement(
+                      service.icon as React.ReactElement<any>,
+                      {
+                        className:
+                          "w-6 h-6 text-primary group-hover:text-primary transition-colors duration-500",
+                      },
+                    )}
                   </div>
                   <CardTitle className="text-2xl font-display font-medium text-white tracking-wide">
                     {service.title}

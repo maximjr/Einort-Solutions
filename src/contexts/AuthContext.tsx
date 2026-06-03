@@ -69,14 +69,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             })
             .catch(() => {});
 
-          unsubscribeDoc = onSnapshot(docRef, (docSnap) => {
-            if (docSnap.exists()) {
-              setUserData({ uid: docSnap.id, ...docSnap.data() } as UserData);
-            } else {
+          unsubscribeDoc = onSnapshot(
+            docRef,
+            (docSnap) => {
+              if (docSnap.exists()) {
+                setUserData({ uid: docSnap.id, ...docSnap.data() } as UserData);
+              } else {
+                setUserData(null);
+              }
+              setLoading(false);
+            },
+            () => {
               setUserData(null);
-            }
-            setLoading(false);
-          });
+              setLoading(false);
+            },
+          );
         } catch (error) {
           setUserData(null);
           setLoading(false);

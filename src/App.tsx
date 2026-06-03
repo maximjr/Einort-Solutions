@@ -1,11 +1,6 @@
 import { Suspense, lazy, useEffect } from "react";
 import { HelmetProvider } from "react-helmet-async";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Outlet
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import Lenis from "lenis";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
@@ -84,7 +79,6 @@ function HomePage() {
 }
 
 function Layout() {
-
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,
@@ -136,66 +130,9 @@ export default function App() {
         <BrowserRouter>
           <SEO />
           <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route
-              index
-              element={
-                <Suspense
-                  fallback={
-                    <div className="min-h-screen bg-background flex items-center justify-center">
-                      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                  }
-                >
-                  <HomePage />
-                </Suspense>
-              }
-            />
-            <Route
-              path="services/:serviceId"
-              element={
-                <Suspense
-                  fallback={
-                    <div className="min-h-screen bg-background flex items-center justify-center">
-                      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                  }
-                >
-                  <ServicesPage />
-                </Suspense>
-              }
-            />
-            <Route
-              path="locations/:region"
-              element={
-                <Suspense
-                  fallback={
-                    <div className="min-h-screen bg-background flex items-center justify-center">
-                      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                  }
-                >
-                  <LocationPage />
-                </Suspense>
-              }
-            />
-            <Route
-              path="industries/:industry"
-              element={
-                <Suspense
-                  fallback={
-                    <div className="min-h-screen bg-background flex items-center justify-center">
-                      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                  }
-                >
-                  <IndustryPage />
-                </Suspense>
-              }
-            />
-            <Route element={<ProtectedRoute requireAdmin={true} />}>
+            <Route path="/" element={<Layout />}>
               <Route
-                path="admin"
+                index
                 element={
                   <Suspense
                     fallback={
@@ -204,14 +141,12 @@ export default function App() {
                       </div>
                     }
                   >
-                    <AdminDashboard />
+                    <HomePage />
                   </Suspense>
                 }
               />
-            </Route>
-            <Route element={<ProtectedRoute />}>
               <Route
-                path="client-portal"
+                path="services/:serviceId"
                 element={
                   <Suspense
                     fallback={
@@ -220,14 +155,73 @@ export default function App() {
                       </div>
                     }
                   >
-                    <ClientPortal />
+                    <ServicesPage />
                   </Suspense>
                 }
               />
+              <Route
+                path="locations/:region"
+                element={
+                  <Suspense
+                    fallback={
+                      <div className="min-h-screen bg-background flex items-center justify-center">
+                        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    }
+                  >
+                    <LocationPage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="industries/:industry"
+                element={
+                  <Suspense
+                    fallback={
+                      <div className="min-h-screen bg-background flex items-center justify-center">
+                        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    }
+                  >
+                    <IndustryPage />
+                  </Suspense>
+                }
+              />
+              <Route element={<ProtectedRoute requireAdmin={true} />}>
+                <Route
+                  path="admin"
+                  element={
+                    <Suspense
+                      fallback={
+                        <div className="min-h-screen bg-background flex items-center justify-center">
+                          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      }
+                    >
+                      <AdminDashboard />
+                    </Suspense>
+                  }
+                />
+              </Route>
+              <Route element={<ProtectedRoute />}>
+                <Route
+                  path="client-portal"
+                  element={
+                    <Suspense
+                      fallback={
+                        <div className="min-h-screen bg-background flex items-center justify-center">
+                          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      }
+                    >
+                      <ClientPortal />
+                    </Suspense>
+                  }
+                />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
-      </BrowserRouter>
+          </Routes>
+        </BrowserRouter>
       </AuthProvider>
     </HelmetProvider>
   );
