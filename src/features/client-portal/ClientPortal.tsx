@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
-  Clock,
   Activity,
-  FileText,
   CheckCircle,
-  Circle,
   Box,
   ArrowRight,
   ShieldCheck,
@@ -13,7 +10,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { Container } from "../../components/layout/Container";
-import { Card, CardContent } from "../../components/ui/Card";
+import { Card } from "../../components/ui/Card";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Button } from "../../components/ui/Button";
 import { Breadcrumbs } from "../../components/ui/Breadcrumbs";

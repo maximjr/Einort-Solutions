@@ -8,13 +8,13 @@ let db: ReturnType<typeof getFirestore>;
 let isFirebaseConfigured = false;
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBgZkkDSUz-_bPpCA7t2UAd3Qrw1TeY6js",
-  authDomain: "new-einort-web.firebaseapp.com",
-  projectId: "new-einort-web",
-  storageBucket: "new-einort-web.firebasestorage.app",
-  messagingSenderId: "80255620883",
-  appId: "1:80255620883:web:b422bd14ad45842eedace6",
-  measurementId: "G-SCP4L95TFC",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 try {

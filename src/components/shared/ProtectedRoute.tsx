@@ -14,7 +14,7 @@ export function ProtectedRoute({ requireAdmin = false }) {
   }
 
   if (!isFirebaseConfigured) {
-    return <Outlet />;
+    return <Navigate to="/" replace />;
   }
 
   if (!user) {
