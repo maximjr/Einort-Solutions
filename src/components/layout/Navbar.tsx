@@ -6,7 +6,7 @@ import { Button } from "../ui/Button";
 import { AuthModal } from "../../features/auth/AuthModal";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "../../hooks/useAuth";
-import { auth } from "../../lib/firebase";
+import { auth, isFirebaseConfigured } from "../../lib/firebase";
 import { signOut } from "firebase/auth";
 import { Logo } from "../ui/Logo";
 
@@ -26,7 +26,9 @@ export function Navbar() {
   const { user, userData } = useAuth();
 
   const handleSignOut = async () => {
-    await signOut(auth);
+    if (isFirebaseConfigured) {
+      await signOut(auth);
+    }
   };
 
   useEffect(() => {

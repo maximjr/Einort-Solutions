@@ -263,223 +263,223 @@ export function AuthModal({
                 </p>
               </div>
 
-              {!isFirebaseConfigured && (
+              {!isFirebaseConfigured ? (
                 <div className="mb-4">
                   <FirebaseAlert feature="Authentication" />
                 </div>
-              )}
-
-              {errorStatus && (
-                <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-md flex items-start gap-3 relative z-10 transition-all">
-                  <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-                  <div className="text-sm text-red-200">
-                    {errorStatus}
-                    {errorStatus === "User already exists. Sign in?" && (
-                      <button
-                        onClick={() => switchMode("login")}
-                        className="ml-2 underline font-bold hover:text-white"
-                      >
-                        Switch to Login
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {successStatus && (
-                <div className="mb-6 p-3 bg-green-500/10 border border-green-500/20 rounded-md flex items-start gap-3 relative z-10 transition-all">
-                  <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
-                  <div className="text-sm text-green-200">{successStatus}</div>
-                </div>
-              )}
-
-              <div className="relative z-10">
-                {mode === "login" ? (
-                  <form
-                    onSubmit={loginForm.handleSubmit(onLogin)}
-                    className="space-y-4"
-                  >
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-                        Email
-                      </label>
-                      <Input
-                        placeholder="name@company.com"
-                        {...loginForm.register("email")}
-                        className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] h-12 ${loginForm.formState.errors.email ? "border-red-500/50" : ""}`}
-                      />
-                      {loginForm.formState.errors.email && (
-                        <p className="text-red-400 text-xs">
-                          {loginForm.formState.errors.email.message}
-                        </p>
-                      )}
+              ) : (
+                <div className="relative z-10">
+                  {errorStatus && (
+                    <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-md flex items-start gap-3 relative z-10 transition-all">
+                      <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                      <div className="text-sm text-red-200">
+                        {errorStatus}
+                        {errorStatus === "User already exists. Sign in?" && (
+                          <button
+                            onClick={() => switchMode("login")}
+                            className="ml-2 underline font-bold hover:text-white"
+                          >
+                            Switch to Login
+                          </button>
+                        )}
+                      </div>
                     </div>
+                  )}
 
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
+                  {successStatus && (
+                    <div className="mb-6 p-3 bg-green-500/10 border border-green-500/20 rounded-md flex items-start gap-3 relative z-10 transition-all">
+                      <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
+                      <div className="text-sm text-green-200">{successStatus}</div>
+                    </div>
+                  )}
+
+                  {mode === "login" ? (
+                    <form
+                      onSubmit={loginForm.handleSubmit(onLogin)}
+                      className="space-y-4"
+                    >
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
+                          Email
+                        </label>
+                        <Input
+                          placeholder="name@company.com"
+                          {...loginForm.register("email")}
+                          className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] h-12 ${loginForm.formState.errors.email ? "border-red-500/50" : ""}`}
+                        />
+                        {loginForm.formState.errors.email && (
+                          <p className="text-red-400 text-xs">
+                            {loginForm.formState.errors.email.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
+                            Password
+                          </label>
+                        </div>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            {...loginForm.register("password")}
+                            className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] pr-10 h-12 ${loginForm.formState.errors.password ? "border-red-500/50" : ""}`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white focus:outline-none"
+                          >
+                            {showPassword ? (
+                              <EyeOff size={18} />
+                            ) : (
+                              <Eye size={18} />
+                            )}
+                          </button>
+                        </div>
+                        {loginForm.formState.errors.password && (
+                          <p className="text-red-400 text-xs">
+                            {loginForm.formState.errors.password.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <Button
+                        type="submit"
+                        className="w-full uppercase tracking-[0.15em] font-bold mt-2 h-14 text-[11px]"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Authenticating..." : "Sign In"}
+                      </Button>
+                    </form>
+                  ) : (
+                    <form
+                      onSubmit={registerForm.handleSubmit(onRegister)}
+                      className="space-y-4"
+                    >
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
+                          Full Name
+                        </label>
+                        <Input
+                          placeholder="John Doe"
+                          {...registerForm.register("name")}
+                          className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] h-12 ${registerForm.formState.errors.name ? "border-red-500/50" : ""}`}
+                        />
+                        {registerForm.formState.errors.name && (
+                          <p className="text-red-400 text-xs">
+                            {registerForm.formState.errors.name.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
+                          Email
+                        </label>
+                        <Input
+                          placeholder="name@company.com"
+                          {...registerForm.register("email")}
+                          className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] h-12 ${registerForm.formState.errors.email ? "border-red-500/50" : ""}`}
+                        />
+                        {registerForm.formState.errors.email && (
+                          <p className="text-red-400 text-xs">
+                            {registerForm.formState.errors.email.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
+                          Phone Number
+                        </label>
+                        <Input
+                          placeholder="+1 (555) 000-0000"
+                          {...registerForm.register("phone")}
+                          className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] h-12 ${registerForm.formState.errors.phone ? "border-red-500/50" : ""}`}
+                        />
+                        {registerForm.formState.errors.phone && (
+                          <p className="text-red-400 text-xs">
+                            {registerForm.formState.errors.phone.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
                         <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
                           Password
                         </label>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            {...registerForm.register("password")}
+                            className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] pr-10 h-12 ${registerForm.formState.errors.password ? "border-red-500/50" : ""}`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white focus:outline-none"
+                          >
+                            {showPassword ? (
+                              <EyeOff size={18} />
+                            ) : (
+                              <Eye size={18} />
+                            )}
+                          </button>
+                        </div>
+                        {registerForm.formState.errors.password && (
+                          <p className="text-red-400 text-xs">
+                            {registerForm.formState.errors.password.message}
+                          </p>
+                        )}
                       </div>
-                      <div className="relative">
-                        <Input
-                          type={showPassword ? "text" : "password"}
-                          placeholder="••••••••"
-                          {...loginForm.register("password")}
-                          className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] pr-10 h-12 ${loginForm.formState.errors.password ? "border-red-500/50" : ""}`}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white focus:outline-none"
-                        >
-                          {showPassword ? (
-                            <EyeOff size={18} />
-                          ) : (
-                            <Eye size={18} />
-                          )}
-                        </button>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
+                          Repeat Password
+                        </label>
+                        <div className="relative">
+                          <Input
+                            type={showRepeatPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            {...registerForm.register("repeatPassword")}
+                            className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] pr-10 h-12 ${registerForm.formState.errors.repeatPassword ? "border-red-500/50" : ""}`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setShowRepeatPassword(!showRepeatPassword)
+                            }
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white focus:outline-none"
+                          >
+                            {showRepeatPassword ? (
+                              <EyeOff size={18} />
+                            ) : (
+                              <Eye size={18} />
+                            )}
+                          </button>
+                        </div>
+                        {registerForm.formState.errors.repeatPassword && (
+                          <p className="text-red-400 text-xs">
+                            {registerForm.formState.errors.repeatPassword.message}
+                          </p>
+                        )}
                       </div>
-                      {loginForm.formState.errors.password && (
-                        <p className="text-red-400 text-xs">
-                          {loginForm.formState.errors.password.message}
-                        </p>
-                      )}
-                    </div>
 
-                    <Button
-                      type="submit"
-                      className="w-full uppercase tracking-[0.15em] font-bold mt-2 h-14 text-[11px]"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Authenticating..." : "Sign In"}
-                    </Button>
-                  </form>
-                ) : (
-                  <form
-                    onSubmit={registerForm.handleSubmit(onRegister)}
-                    className="space-y-4"
-                  >
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-                        Full Name
-                      </label>
-                      <Input
-                        placeholder="John Doe"
-                        {...registerForm.register("name")}
-                        className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] h-12 ${registerForm.formState.errors.name ? "border-red-500/50" : ""}`}
-                      />
-                      {registerForm.formState.errors.name && (
-                        <p className="text-red-400 text-xs">
-                          {registerForm.formState.errors.name.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-                        Email
-                      </label>
-                      <Input
-                        placeholder="name@company.com"
-                        {...registerForm.register("email")}
-                        className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] h-12 ${registerForm.formState.errors.email ? "border-red-500/50" : ""}`}
-                      />
-                      {registerForm.formState.errors.email && (
-                        <p className="text-red-400 text-xs">
-                          {registerForm.formState.errors.email.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-                        Phone Number
-                      </label>
-                      <Input
-                        placeholder="+1 (555) 000-0000"
-                        {...registerForm.register("phone")}
-                        className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] h-12 ${registerForm.formState.errors.phone ? "border-red-500/50" : ""}`}
-                      />
-                      {registerForm.formState.errors.phone && (
-                        <p className="text-red-400 text-xs">
-                          {registerForm.formState.errors.phone.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-                        Password
-                      </label>
-                      <div className="relative">
-                        <Input
-                          type={showPassword ? "text" : "password"}
-                          placeholder="••••••••"
-                          {...registerForm.register("password")}
-                          className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] pr-10 h-12 ${registerForm.formState.errors.password ? "border-red-500/50" : ""}`}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white focus:outline-none"
-                        >
-                          {showPassword ? (
-                            <EyeOff size={18} />
-                          ) : (
-                            <Eye size={18} />
-                          )}
-                        </button>
-                      </div>
-                      {registerForm.formState.errors.password && (
-                        <p className="text-red-400 text-xs">
-                          {registerForm.formState.errors.password.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-                        Repeat Password
-                      </label>
-                      <div className="relative">
-                        <Input
-                          type={showRepeatPassword ? "text" : "password"}
-                          placeholder="••••••••"
-                          {...registerForm.register("repeatPassword")}
-                          className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] pr-10 h-12 ${registerForm.formState.errors.repeatPassword ? "border-red-500/50" : ""}`}
-                        />
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setShowRepeatPassword(!showRepeatPassword)
-                          }
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white focus:outline-none"
-                        >
-                          {showRepeatPassword ? (
-                            <EyeOff size={18} />
-                          ) : (
-                            <Eye size={18} />
-                          )}
-                        </button>
-                      </div>
-                      {registerForm.formState.errors.repeatPassword && (
-                        <p className="text-red-400 text-xs">
-                          {registerForm.formState.errors.repeatPassword.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <Button
-                      type="submit"
-                      className="w-full uppercase tracking-[0.15em] font-bold mt-2 h-14 text-[11px]"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Creating Account..." : "Register"}
-                    </Button>
-                  </form>
-                )}
-              </div>
+                      <Button
+                        type="submit"
+                        className="w-full uppercase tracking-[0.15em] font-bold mt-2 h-14 text-[11px]"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Creating Account..." : "Register"}
+                      </Button>
+                    </form>
+                  )}
+                </div>
+              )}
 
               <div className="mt-6 pt-6 border-t border-white/5 text-center relative z-10">
                 <p className="text-xs text-slate-400 uppercase tracking-widest">
