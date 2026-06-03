@@ -114,6 +114,10 @@ export function ContactForm() {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
+      if (!db || !isFirebaseConfigured) {
+        throw new Error("Database not configured");
+      }
+      
       const leadScore = Math.floor(Math.random() * 40) + 60; // Mock score 60-100
       const complexityScore = Math.floor(Math.random() * 5) + 5; // Mock score 5-10
 

@@ -22,7 +22,7 @@ import {
   orderBy,
   onSnapshot,
 } from "firebase/firestore";
-import { db } from "../../lib/firebase";
+import { db, isFirebaseConfigured } from "../../lib/firebase";
 
 export function ClientPortal() {
   const { userData, user } = useAuth();
@@ -30,13 +30,15 @@ export function ClientPortal() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !db || !isFirebaseConfigured) {
       setLoading(false);
       return;
     }
 
+    const activeDb = db;
+
     const q = query(
-      collection(db, "projects"),
+      collection(activeDb, "projects"),
       where("userId", "==", user.uid),
       orderBy("createdAt", "desc"),
     );

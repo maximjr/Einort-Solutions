@@ -80,6 +80,7 @@ export function AuthModal({
     },
   ) => {
     try {
+      if (!db) throw new Error("DB not configured");
       const docRef = doc(db, "users", uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
@@ -115,7 +116,7 @@ export function AuthModal({
   };
 
   const onLogin = async (data: LoginData) => {
-    if (!isFirebaseConfigured) return;
+    if (!isFirebaseConfigured || !auth) return;
     setIsLoading(true);
     setErrorStatus(null);
     setSuccessStatus(null);
@@ -154,7 +155,7 @@ export function AuthModal({
   };
 
   const onRegister = async (data: RegisterData) => {
-    if (!isFirebaseConfigured) return;
+    if (!isFirebaseConfigured || !auth || !db) return;
     setIsLoading(true);
     setErrorStatus(null);
     setSuccessStatus(null);

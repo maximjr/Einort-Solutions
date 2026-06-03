@@ -64,11 +64,13 @@ export function AdminDashboard() {
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isFirebaseConfigured) {
+    if (!isFirebaseConfigured || !db) {
       setLoading(false);
       setLoadingUsers(false);
       return;
     }
+
+    const activeDb = db;
 
     let unsubscribeProjects = () => {};
     let unsubscribeUsers = () => {};
@@ -77,7 +79,7 @@ export function AdminDashboard() {
     const setupSubscriptions = async () => {
       try {
         const projectsQuery = query(
-          collection(db, "projects"),
+          collection(activeDb, "projects"),
           orderBy("createdAt", "desc"),
           limit(100),
         );
@@ -121,7 +123,7 @@ export function AdminDashboard() {
         );
 
         const usersQuery = query(
-          collection(db, "users"),
+          collection(activeDb, "users"),
           orderBy("createdAt", "desc"),
           limit(100),
         );
@@ -160,7 +162,7 @@ export function AdminDashboard() {
         );
 
         const activityQuery = query(
-          collection(db, "clientActivity"),
+          collection(activeDb, "clientActivity"),
           orderBy("timestamp", "desc"),
           limit(50),
         );

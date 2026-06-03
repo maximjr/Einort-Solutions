@@ -26,7 +26,7 @@ export function Navbar() {
   const { user, userData } = useAuth();
 
   const handleSignOut = async () => {
-    if (isFirebaseConfigured) {
+    if (isFirebaseConfigured && auth) {
       await signOut(auth);
     }
   };

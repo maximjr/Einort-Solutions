@@ -46,15 +46,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    const activeAuth = auth;
+    const activeDb = db;
+
     let unsubscribeDoc: (() => void) | null = null;
 
-    const unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
+    const unsubscribeAuth = onAuthStateChanged(activeAuth, async (currentUser) => {
       setUser(currentUser);
 
       if (currentUser) {
         // Fetch custom user data from firestore
         try {
-          const docRef = doc(db, "users", currentUser.uid);
+          const docRef = doc(activeDb, "users", currentUser.uid);
 
           // First, update lastLogin using a direct get/set to avoid snapshot loop if we write
           getDoc(docRef)

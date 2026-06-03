@@ -12,9 +12,9 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-let app: FirebaseApp = {} as FirebaseApp;
-let auth: Auth = {} as Auth;
-let db: Firestore = {} as Firestore;
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let db: Firestore | null = null;
 let isFirebaseConfigured = false;
 
 try {
