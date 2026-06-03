@@ -1,61 +1,56 @@
-import { useEffect, useState } from "react";
-import {
-  collection,
-  query,
-  where,
-  onSnapshot,
-} from "firebase/firestore";
-import { db } from "../../lib/firebase";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Clock, Activity, FileText, History } from "lucide-react";
+import { Clock, Activity, FileText, History, Box } from "lucide-react";
 import { Container } from "../../components/layout/Container";
 import { Card } from "../../components/ui/Card";
 import { FadeUp } from "../../components/animations/FadeUp";
-import { useAuth } from "../../hooks/useAuth";
 import { Button } from "../../components/ui/Button";
 import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
-
-import { ProjectTimeline } from "../../components/ui/ProjectTimeline";
+import { useAuth } from "../../hooks/useAuth";
+import { collection, query, where, orderBy, onSnapshot } from "firebase/firestore";
+import { db } from "../../lib/firebase";
 
 export function ClientPortal() {
-  const { user } = useAuth();
+  const { userData, user } = useAuth();
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [syncError, setSyncError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user?.uid || !user?.email) return;
+    if (!user) {
+       setLoading(false);
+       return;
+    }
 
     const q = query(
       collection(db, "projects"),
-      where("userId", "==", user.uid)
+      where("userId", "==", user.uid),
+      orderBy("createdAt", "desc")
     );
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })).sort((a: any, b: any) => {
-          const timeA = a.createdAt?.toMillis?.() || 0;
-          const timeB = b.createdAt?.toMillis?.() || 0;
-          return timeB - timeA;
-        });
-        setProjects(data);
-        setLoading(false);
-        setSyncError(null);
-      },
-      () => {
-        setSyncError(
-          "Unable to sync projects. The datastore rules require manual deployment.",
-        );
-        setLoading(false);
-      },
-    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const p = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setProjects(p);
+      setLoading(false);
+    }, (error: any) => {
+       // Handle the rule error gracefully on the UI
+       if (error.code === 'permission-denied') {
+          setProjects([{
+             id: 'permission-error',
+             company: 'Permission Denied',
+             projectType: 'System Alert',
+             industry: 'Infrastructure',
+             status: 'Rule Error',
+             budget: 'N/A',
+             timeline: 'N/A',
+             createdAt: { toDate: () => new Date() },
+             isError: true
+          }]);
+       }
+       setLoading(false);
+    });
 
     return () => unsubscribe();
-  }, [user?.uid, user?.email]);
+  }, [user]);
 
   return (
     <section className="py-24 bg-surface min-h-[80vh] relative pt-32">
@@ -64,13 +59,14 @@ export function ClientPortal() {
         <Breadcrumbs
           items={[{ label: "Home", href: "/" }, { label: "Client Portal" }]}
         />
+
         <FadeUp>
           <div className="mb-12">
             <h1 className="text-3xl md:text-5xl font-display font-medium text-white mb-4">
               Client Portal
             </h1>
             <p className="text-text-muted font-light text-lg">
-              Welcome back, {user?.email}. View your active projects and
+              Welcome back, <span className="text-white font-medium">{userData?.fullName || "Valued Client"}</span>. View your active projects and
               billing.
             </p>
           </div>
@@ -84,21 +80,6 @@ export function ClientPortal() {
               </h2>
             </FadeUp>
 
-            {syncError && (
-              <FadeUp delay={0.15}>
-                <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-lg text-red-400 text-sm mb-6 flex flex-col gap-2">
-                  <p className="font-bold">
-                    Missing or insufficient permissions.
-                  </p>
-                  <p>
-                    {syncError} Please run{" "}
-                    <code>npx firebase deploy --only firestore:rules</code> on
-                    your backend to apply the new enterprise security models.
-                  </p>
-                </div>
-              </FadeUp>
-            )}
-
             {loading ? (
               <div className="animate-pulse space-y-4">
                 {[1, 2].map((i) => (
@@ -111,17 +92,20 @@ export function ClientPortal() {
             ) : projects.length === 0 ? (
               <FadeUp delay={0.2}>
                 <Card className="bg-background/50 border-white/5 p-12 text-center flex flex-col items-center justify-center">
+                   <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-6">
+                     <Box className="w-8 h-8 text-primary" />
+                   </div>
                   <h3 className="text-xl font-display text-white mb-4">
                     No Active Projects
                   </h3>
                   <p className="text-text-muted font-light mb-8 max-w-sm">
-                    You currently don't have any active enterprise projects.
+                    You currently don't have any enterprise projects deployed.
                     Submit a discovery brief to begin.
                   </p>
                   <Link to="/#contact">
                     <Button
                       variant="primary"
-                      className="uppercase tracking-widest text-[11px] font-bold"
+                      className="uppercase tracking-widest text-[11px] font-bold h-12 shadow-lg hover:shadow-primary/20 hover:-translate-y-1 transition-all duration-300"
                     >
                       Start New Project
                     </Button>
@@ -129,80 +113,41 @@ export function ClientPortal() {
                 </Card>
               </FadeUp>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {projects.map((proj, i) => (
-                  <FadeUp key={proj.id} delay={0.1 + i * 0.1}>
-                    <Card className="bg-background/50 border-white/5 p-6 hover:border-white/10 transition-colors">
-                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-6">
-                        <div>
-                          <h3 className="text-2xl font-display text-white capitalize">
-                            {proj.projectType} Platform
-                          </h3>
-                          <p className="text-sm text-text-muted mt-1 font-mono">
-                            ID: {proj.id?.slice(0, 8).toUpperCase()}
-                          </p>
+                   <FadeUp key={proj.id} delay={0.1 + (i * 0.1)}>
+                      <Card className={`bg-background/50 border-white/5 p-8 transition-colors group ${proj.isError ? 'border-red-500/20 hover:border-red-500/40 bg-red-500/5' : 'hover:border-white/10'}`}>
+                        <div className="flex justify-between items-start mb-6">
+                           <div>
+                              <h3 className={`text-xl font-display transition-colors ${proj.isError ? 'text-red-400 group-hover:text-red-300' : 'text-white group-hover:text-primary'}`}>{proj.company || "Project Initialized"}</h3>
+                              <p className="text-sm text-text-muted mt-1 capitalize">{proj.projectType} • {proj.industry}</p>
+                           </div>
+                           <span className={`px-3 py-1.5 border text-[10px] uppercase font-bold tracking-wider rounded-md ${proj.isError ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-white/5 border-white/10 text-slate-300'}`}>
+                             {proj.status || "In Review"}
+                           </span>
                         </div>
-                        <div className="flex gap-4 items-center">
-                          <div className="text-right">
-                            <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">
-                              Status
-                            </p>
-                            <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] uppercase font-bold tracking-wider rounded-md border border-primary/20">
-                              {proj.status || "Under Review"}
-                            </span>
-                          </div>
+                        {proj.isError ? (
+                           <div className="pt-6 border-t border-red-500/10 text-sm text-red-200">
+                             Firestore Security Rules have denied access to the collection. Please deploy the updated <span className="font-mono text-xs bg-red-500/20 px-1 rounded">firestore.rules</span> to your Firebase project to restore access.
+                           </div>
+                        ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-white/5">
+                           <div>
+                             <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Budget</p>
+                             <p className="text-sm text-white">{proj.budget || "TBD"}</p>
+                           </div>
+                           <div>
+                             <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Timeline</p>
+                             <p className="text-sm text-white">{proj.timeline || "TBD"}</p>
+                           </div>
+                           <div className="col-span-2">
+                             <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Submitted</p>
+                             <p className="text-sm text-slate-400">{proj.createdAt ? proj.createdAt.toDate().toLocaleDateString() : "Just now"}</p>
+                           </div>
                         </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-white/[0.02] rounded-lg mb-6">
-                        <div>
-                          <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">
-                            Timeline
-                          </p>
-                          <p className="text-sm text-white capitalize">
-                            {proj.timeline}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">
-                            Budget
-                          </p>
-                          <p className="text-sm text-white capitalize">
-                            {proj.budget}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">
-                            Urgency
-                          </p>
-                          <p className="text-sm text-white capitalize">
-                            {proj.urgency}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">
-                            Submitted
-                          </p>
-                          <p className="text-sm text-white">
-                            {proj.createdAt?.toDate?.()?.toLocaleDateString() || "Just now"}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="mb-6 border-y border-white/5 bg-background">
-                        <ProjectTimeline status={proj.status} />
-                      </div>
-
-                      <div>
-                        <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-2">
-                          Requirements
-                        </p>
-                        <p className="text-sm text-text-muted font-light leading-relaxed line-clamp-2">
-                          {proj.requirements}
-                        </p>
-                      </div>
-                    </Card>
-                  </FadeUp>
+                        )}
+                      </Card>
+                   </FadeUp>
                 ))}
               </div>
             )}
@@ -215,8 +160,7 @@ export function ClientPortal() {
                   <History size={64} className="text-primary" />
                 </div>
                 <h3 className="text-lg font-display text-white mb-6 relative z-10 flex items-center gap-2">
-                  <Activity size={18} className="text-primary" /> Project
-                  History
+                  <Activity size={18} className="text-primary" /> Project Latest Activity
                 </h3>
                 {projects.length > 0 ? (
                   <div className="space-y-4 relative z-10">
@@ -224,37 +168,51 @@ export function ClientPortal() {
                       <div className="w-1.5 h-1.5 mt-2 rounded-full bg-primary flex-shrink-0 relative before:content-[''] before:absolute before:w-px before:h-12 before:bg-white/10 before:left-1/2 before:-translate-x-1/2 before:top-4"></div>
                       <div>
                         <p className="text-sm text-white">Project Submitted</p>
-                        <p className="text-xs text-text-muted mt-1">
-                          {projects[0]?.createdAt?.toDate?.()?.toLocaleDateString() || "Today"}
+                        <p className="text-xs text-primary mt-1">
+                          In Review Phase
                         </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-4">
+                      <div className="w-1.5 h-1.5 mt-2 rounded-full bg-white/20 flex-shrink-0 relative before:content-[''] before:absolute before:w-px before:h-12 before:bg-white/10 before:left-1/2 before:-translate-x-1/2 before:top-4"></div>
+                      <div>
+                        <p className="text-sm text-slate-400">
+                          Architect Review
+                        </p>
+                        <p className="text-xs text-slate-600 mt-1">Pending Assignment</p>
                       </div>
                     </div>
                     <div className="flex gap-4">
                       <div className="w-1.5 h-1.5 mt-2 rounded-full bg-white/20 flex-shrink-0"></div>
                       <div>
                         <p className="text-sm text-slate-400">
-                          Architect Review
+                          Kickoff Call
                         </p>
-                        <p className="text-xs text-slate-600 mt-1">Pending</p>
+                        <p className="text-xs text-slate-600 mt-1">Pending Approval</p>
                       </div>
                     </div>
                   </div>
                 ) : (
                   <p className="text-text-muted text-sm italic relative z-10">
-                    No history available yet.
+                    Submit a project to view its lifecycle history.
                   </p>
                 )}
               </Card>
             </FadeUp>
 
             <FadeUp delay={0.4}>
-              <Card className="bg-background/50 border-white/5 p-6">
-                <h3 className="text-lg font-display text-white mb-4 flex items-center gap-2">
-                  <Clock size={18} className="text-primary" /> Timeline
+              <Card className="bg-background/50 border-white/5 p-6 block hover:bg-white/[0.02] transition-colors cursor-pointer group">
+                <h3 className="text-lg font-display text-white mb-4 flex items-center justify-between">
+                   <div className="flex items-center gap-2">
+                    <Clock size={18} className="text-primary" /> Meetings
+                   </div>
+                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                     <span className="text-primary text-xs font-bold font-mono">0</span>
+                   </div>
                 </h3>
                 <div className="space-y-4">
                   <p className="text-text-muted text-sm font-light">
-                    Milestones and deadlines will appear here once your project
+                    Kickoff meetings and deadlines will appear here once your project
                     is initiated by our engineering team.
                   </p>
                 </div>

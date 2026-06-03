@@ -10,9 +10,8 @@ import Lenis from "lenis";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
 import { SEO } from "./components/seo/SEO";
-import { ProtectedRoute } from "./components/shared/ProtectedRoute";
 
-import { isFirebaseConfigured } from "./lib/firebase";
+import { ProtectedRoute } from "./components/shared/ProtectedRoute";
 
 // Immediately load Hero to optimize LCP
 import { Hero } from "./features/home/Hero";
@@ -128,40 +127,15 @@ function Layout() {
   );
 }
 
-export default function App() {
-  if (!isFirebaseConfigured) {
-    return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
-        <div className="max-w-md w-full bg-surface border border-border rounded-xl p-6 text-center">
-          <div className="w-16 h-16 bg-red-500/10 text-red-500 flex items-center justify-center rounded-full mx-auto mb-4">
-            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold mb-2">System Configuration Missing</h2>
-          <p className="text-text-muted mb-6">
-            The enterprise application requires Firebase environment variables to securely boot. Please add them to your <code className="text-primary bg-primary/10 px-1 py-0.5 rounded">.env</code> file.
-          </p>
-          <div className="bg-background text-left p-4 rounded-lg overflow-x-auto text-sm border border-border">
-            <pre className="text-text-muted">
-{`VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=`}
-            </pre>
-          </div>
-        </div>
-      </div>
-    );
-  }
+import { AuthProvider } from "./contexts/AuthContext";
 
+export default function App() {
   return (
     <HelmetProvider>
-      <BrowserRouter>
-        <SEO />
-        <Routes>
+      <AuthProvider>
+        <BrowserRouter>
+          <SEO />
+          <Routes>
           <Route path="/" element={<Layout />}>
             <Route
               index
@@ -254,6 +228,7 @@ VITE_FIREBASE_APP_ID=`}
           </Route>
         </Routes>
       </BrowserRouter>
+      </AuthProvider>
     </HelmetProvider>
   );
 }

@@ -30,13 +30,7 @@ export function reportWebVitals(onPerfEntry?: (metric: Metric) => void) {
         fetch(VITALS_ENDPOINT, { body, method: "POST", keepalive: true });
       }
     } catch (error) {
-      console.error("Failed to send web vitals", error);
-    }
-
-    if (import.meta.env.DEV) {
-      console.log(
-        `[Web Vitals] ${metric.name}: ${metric.value} (${metric.rating})`,
-      );
+      // Failed to send web vitals silently
     }
   };
 

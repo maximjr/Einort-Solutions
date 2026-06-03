@@ -1,19 +1,21 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { X, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { X, Eye, EyeOff, AlertCircle } from "lucide-react";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "../../lib/firebase";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db, isFirebaseConfigured } from "../../lib/firebase";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Logo } from "../../components/ui/Logo";
-import { motion, AnimatePresence } from "motion/react";
+import { FirebaseAlert } from "../../components/shared/FirebaseAlert";
+import { useNavigate } from "react-router-dom";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -22,11 +24,11 @@ const loginSchema = z.object({
 
 const registerSchema = z
   .object({
-    name: z.string().min(2, "Name is required"),
+    name: z.string().min(2, "Full name is required"),
     email: z.string().email("Please enter a valid email address"),
-    phone: z.string().min(6, "Phone number is required"),
+    phone: z.string().min(5, "Phone number is required"),
     password: z.string().min(6, "Password must be at least 6 characters"),
-    repeatPassword: z.string(),
+    repeatPassword: z.string().min(6, "Password must be at least 6 characters"),
   })
   .refine((data) => data.password === data.repeatPassword, {
     message: "Passwords don't match",
@@ -51,66 +53,162 @@ export function AuthModal({
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [errorStatus, setErrorStatus] = useState<string | null>(null);
+  const [successStatus, setSuccessStatus] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const loginForm = useForm<LoginData>({ resolver: zodResolver(loginSchema) });
   const registerForm = useForm<RegisterData>({
     resolver: zodResolver(registerSchema),
   });
 
+  const switchMode = (newMode: "login" | "register") => {
+    setMode(newMode);
+    setErrorStatus(null);
+    setSuccessStatus(null);
+    loginForm.reset();
+    registerForm.reset();
+  };
+
+  const redirectUser = async (
+    uid: string,
+    fallbackData?: { email: string; fullName: string; phone: string, emailVerified?: boolean },
+  ) => {
+    try {
+      const docRef = doc(db, "users", uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.role === "admin" || data.role === "super_admin") {
+          navigate("/admin");
+        } else {
+          navigate("/client-portal");
+        }
+      } else {
+        // Orphaned account recovery - recreate profile if missing
+        if (fallbackData) {
+          await setDoc(docRef, {
+            uid: uid,
+            email: fallbackData.email,
+            fullName: fallbackData.fullName,
+            role: "client",
+            accountType: "enterprise",
+            permissions: ["read_own_profile", "read_own_projects"],
+            createdAt: serverTimestamp(),
+            lastLogin: serverTimestamp(),
+            emailVerified: fallbackData.emailVerified || false,
+            profileCompleted: true,
+          });
+        }
+        navigate("/client-portal");
+      }
+      onClose();
+    } catch (e) {
+      navigate("/client-portal");
+      onClose();
+    }
+  };
+
   const onLogin = async (data: LoginData) => {
+    if (!isFirebaseConfigured) return;
     setIsLoading(true);
     setErrorStatus(null);
+    setSuccessStatus(null);
     try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-      onClose();
+      const cred = await signInWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password,
+      );
+      setSuccessStatus("Secure connection established. Redirecting...");
+      await redirectUser(cred.user.uid, {
+        email: data.email,
+        fullName: "User",
+        phone: "",
+      });
     } catch (error: any) {
-      setErrorStatus("Password or Email Incorrect");
-    } finally {
       setIsLoading(false);
+      if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+        setErrorStatus("Invalid email or password. Please verify your credentials.");
+      } else if (error.code === "auth/network-request-failed") {
+        setErrorStatus("Network issue detected. Please verify your internet connection.");
+      } else if (error.code === "auth/too-many-requests") {
+        setErrorStatus("Too many failed attempts. Please try again later.");
+      } else {
+        setErrorStatus("Authentication failed. Please attempt again later or contact support.");
+      }
     }
   };
 
   const onRegister = async (data: RegisterData) => {
+    if (!isFirebaseConfigured) return;
     setIsLoading(true);
     setErrorStatus(null);
+    setSuccessStatus(null);
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         data.email,
         data.password,
       );
-      await updateProfile(userCredential.user, { displayName: data.name });
+      
+      const user = userCredential.user;
+      await updateProfile(user, { displayName: data.name });
+      
+      // Force token refresh to avoid permission denied race condition in Firestore
+      await user.getIdToken(true);
 
-      // Create single source of truth RBAC profile
-      await setDoc(doc(db, "users", userCredential.user.uid), {
+      // Create single source of truth RBAC profile securely
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
         email: data.email,
-        name: data.name,
-        phone: data.phone,
+        fullName: data.name,
         role: "client",
         accountType: "enterprise",
         permissions: ["read_own_profile", "read_own_projects"],
-        isAdmin: false,
         createdAt: serverTimestamp(),
+        lastLogin: serverTimestamp(),
+        emailVerified: user.emailVerified,
+        profileCompleted: true,
       });
 
-      onClose();
+      setSuccessStatus(
+        "Account created successfully. Redirecting automatically...",
+      );
+      await redirectUser(user.uid, {
+         email: data.email,
+         fullName: data.name,
+         phone: data.phone,
+         emailVerified: user.emailVerified
+      });
     } catch (error: any) {
-      if (error.code === "auth/email-already-in-use") {
-        setErrorStatus("User already exists. Sign in?");
-      } else {
-        setErrorStatus(error.message);
-      }
-    } finally {
       setIsLoading(false);
-    }
-  };
 
-  const switchMode = (newMode: "login" | "register") => {
-    setMode(newMode);
-    setErrorStatus(null);
-    loginForm.reset();
-    registerForm.reset();
+      if (error.code === "auth/email-already-in-use") {
+        setErrorStatus("This email already exists.");
+      } else if (
+        error.code === "permission-denied" ||
+        error.message?.includes("Missing or insufficient permissions")
+      ) {
+        setErrorStatus(
+          "Permission configuration issue. Profile access blocked by secure rules.",
+        );
+      } else if (error.code === "auth/invalid-email") {
+        setErrorStatus("The email address is improperly formatted.");
+      } else if (error.code === "auth/weak-password") {
+        setErrorStatus(
+          "Password too weak. Please use a stronger, specialized password.",
+        );
+      } else if (error.code === "auth/network-request-failed") {
+        setErrorStatus(
+          "Network issue detected. Please verify your internet connection.",
+        );
+      } else {
+        setErrorStatus(
+          "Registration failed. Please attempt again later or contact support.",
+        );
+      }
+    }
   };
 
   return (
@@ -120,49 +218,46 @@ export function AuthModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="w-full max-w-md relative"
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.95, opacity: 0 }}
+            className="w-full max-w-md bg-surface border border-white/5 rounded-2xl shadow-2xl overflow-hidden relative"
           >
-            <div className="bg-surface border border-white/10 rounded-2xl shadow-2xl p-6 sm:p-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/10 blur-[100px] pointer-events-none rounded-full translate-x-1/2 -translate-y-1/2"></div>
-
+            <div className="absolute top-4 right-4 z-10">
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors z-10"
+                className="p-2 text-slate-400 hover:text-white transition-colors focus:outline-none"
               >
-                <X size={24} />
+                <X size={20} />
               </button>
+            </div>
 
-              <div className="text-center mb-8 relative z-10">
-                <div className="flex items-center justify-center gap-3 mb-4">
-                  <Logo className="w-10 h-10 drop-shadow-[0_0_15px_rgba(59,130,246,0.4)]" />
-                  <div className="flex flex-col text-left">
-                    <span className="text-xl font-display font-bold uppercase tracking-widest text-white leading-none">
-                      Einort
-                    </span>
-                    <span className="text-[9px] font-display font-bold uppercase tracking-[0.3em] text-primary mt-1">
-                      Solutions
-                    </span>
-                  </div>
+            <div className="p-8">
+              <div className="mb-8 text-center relative z-10">
+                <div className="flex justify-center mb-6">
+                  <Logo />
                 </div>
-                <h2 className="text-2xl font-display font-medium text-white uppercase tracking-tight">
-                  {mode === "login" ? "Access Portal" : "Create Account"}
+                <h2 className="text-2xl font-display text-white mb-2">
+                  {mode === "login" ? "Welcome Back" : "Create Account"}
                 </h2>
-                <p className="text-text-muted text-sm mt-2 font-light">
+                <p className="text-text-muted text-sm">
                   {mode === "login"
-                    ? "Sign in to access your enterprise dashboard."
+                    ? "Sign in to access your client portal."
                     : "Register to start your architectural journey."}
                 </p>
               </div>
 
+              {!isFirebaseConfigured && (
+                <div className="mb-4">
+                  <FirebaseAlert feature="Authentication" />
+                </div>
+              )}
+
               {errorStatus && (
-                <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-md flex items-start gap-3 relative z-10">
+                <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-md flex items-start gap-3 relative z-10 transition-all">
                   <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
                   <div className="text-sm text-red-200">
                     {errorStatus}
@@ -175,6 +270,13 @@ export function AuthModal({
                       </button>
                     )}
                   </div>
+                </div>
+              )}
+
+              {successStatus && (
+                <div className="mb-6 p-3 bg-green-500/10 border border-green-500/20 rounded-md flex items-start gap-3 relative z-10 transition-all">
+                  <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
+                  <div className="text-sm text-green-200">{successStatus}</div>
                 </div>
               )}
 

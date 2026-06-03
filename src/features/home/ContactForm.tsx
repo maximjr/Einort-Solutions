@@ -23,9 +23,10 @@ import {
   setDoc,
   doc,
 } from "firebase/firestore";
-import { db, auth } from "../../lib/firebase";
+import { db, isFirebaseConfigured } from "../../lib/firebase";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "../../lib/utils";
+import { FirebaseAlert } from "../../components/shared/FirebaseAlert";
 
 const formSchema = z.object({
   projectType: z.string().min(1, "Please select a project type"),
@@ -65,11 +66,14 @@ const timelines = [
   { id: "flexible", label: "Flexible" },
 ];
 
+import { useAuth } from "../../hooks/useAuth";
+
 export function ContactForm() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const {
     register,
@@ -115,14 +119,14 @@ export function ContactForm() {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      const user = auth.currentUser;
       const leadScore = Math.floor(Math.random() * 40) + 60; // Mock score 60-100
       const complexityScore = Math.floor(Math.random() * 5) + 5; // Mock score 5-10
 
       const docRef = doc(collection(db, "projects"));
       const projectData = {
+        id: docRef.id,
         projectId: docRef.id,
-        userId: user ? user.uid : "unauthenticated",
+        userId: user?.uid || "unauthenticated",
         email: data.email,
         clientName: data.clientName,
         company: data.company,
@@ -208,7 +212,9 @@ export function ContactForm() {
           </FadeUp>
 
           <FadeUp delay={0.2} className="lg:col-span-7 relative min-h-[500px]">
-            {isSuccess ? (
+            {!isFirebaseConfigured ? (
+              <FirebaseAlert feature="Lead Generation" />
+            ) : isSuccess ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}

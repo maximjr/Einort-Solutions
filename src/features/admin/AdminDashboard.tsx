@@ -6,7 +6,6 @@ import {
   CardContent,
 } from "../../components/ui/Card";
 import { FadeUp } from "../../components/animations/FadeUp";
-import { useAuth } from "../../hooks/useAuth";
 import React, { useEffect, useState } from "react";
 import {
   collection,
@@ -46,9 +45,9 @@ import { ProjectTimeline } from "../../components/ui/ProjectTimeline";
 
 const COLORS = ["#3b82f6", "#8b5cf6", "#ec4899", "#f43f5e", "#f59e0b", "#10b981", "#64748b"];
 
+import { isFirebaseConfigured } from "../../lib/firebase";
 
 export function AdminDashboard() {
-  const { userData } = useAuth();
   const [projects, setProjects] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +56,9 @@ export function AdminDashboard() {
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!userData || (userData.role !== "admin" && userData.role !== "super_admin")) {
+    if (!isFirebaseConfigured) {
+      setLoading(false);
+      setLoadingUsers(false);
       return;
     }
 
@@ -83,10 +84,14 @@ export function AdminDashboard() {
             setLoading(false);
             setSyncError(null);
           },
-          () => {
-            setSyncError(
-              "Realtime ledger sync interrupted. Using secure static fallback.",
-            );
+          (error: any) => {
+            if (error.code === 'permission-denied') {
+               setSyncError("Firestore Security Rules denied access. Please deploy your customized firestore.rules to your Firebase project.");
+            } else {
+               setSyncError(
+                 "Realtime ledger sync interrupted. Using secure static fallback.",
+               );
+            }
             try {
               // Graceful fallback to static fetch
               getDocs(projectsQuery).then((snapshot) => {
@@ -119,7 +124,10 @@ export function AdminDashboard() {
             setUsers(data);
             setLoadingUsers(false);
           },
-          () => {
+          (error: any) => {
+            if (error.code === 'permission-denied') {
+                setSyncError("Firestore Security Rules denied access. Please deploy your customized firestore.rules to your Firebase project.");
+            }
             try {
               // Graceful fallback to static fetch
               getDocs(usersQuery).then((snapshot) => {
@@ -146,7 +154,7 @@ export function AdminDashboard() {
       unsubscribeProjects();
       unsubscribeUsers();
     };
-  }, [userData]);
+  }, []);
 
   const activeClientsCount = users.filter(
     (u) => u.role === "client" || !u.role,
@@ -217,6 +225,7 @@ export function AdminDashboard() {
             { label: "Admin Intelligence" },
           ]}
         />
+        
         <FadeUp>
           <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
