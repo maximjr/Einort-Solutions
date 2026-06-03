@@ -1,177 +1,259 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
+import { Suspense, lazy, useEffect } from "react";
+import { HelmetProvider } from "react-helmet-async";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Outlet
+} from "react-router-dom";
+import Lenis from "lenis";
+import { Navbar } from "./components/layout/Navbar";
+import { Footer } from "./components/layout/Footer";
+import { SEO } from "./components/seo/SEO";
+import { ProtectedRoute } from "./components/shared/ProtectedRoute";
 
-import { lazy, Suspense } from 'react';
-import { Navbar } from './components/Navbar';
-import { Footer } from './components/Footer';
-import { DevSetupGuard } from './components/DevSetupGuard';
-import { Routes, Route, useLocation } from 'react-router-dom';
-import { AnimatePresence } from 'motion/react';
-import { CinematicTransition } from './components/CinematicTransition';
-import { SEO } from './components/SEO';
-import { AnalyticsRouteTracker } from './AnalyticsRouteTracker';
+import { isFirebaseConfigured } from "./lib/firebase";
 
-import { AuthRedirector } from './components/AuthRedirector';
+// Immediately load Hero to optimize LCP
+import { Hero } from "./features/home/Hero";
 
-// Eagerly loaded components for fast first contentful paint
-import { Hero } from './components/Hero';
-import { HomeSummary } from './components/HomeSummary';
-import { Testimonials } from './components/Testimonials';
-import { Contact } from './components/Contact';
-
-// Lazy loading components for performance
-const Services = lazy(() => import('./components/Services').then(m => ({ default: m.Services })));
-const Portfolio = lazy(() => import('./components/Portfolio').then(m => ({ default: m.Portfolio })));
-const About = lazy(() => import('./components/About').then(m => ({ default: m.About })));
-const Process = lazy(() => import('./components/Process').then(m => ({ default: m.Process })));
-const Pricing = lazy(() => import('./pages/Pricing').then(m => ({ default: m.Pricing })));
-const FAQ = lazy(() => import('./pages/FAQ').then(m => ({ default: m.FAQ })));
-const Booking = lazy(() => import('./pages/Booking').then(m => ({ default: m.Booking })));
-const AIAudit = lazy(() => import('./pages/AIAudit').then(m => ({ default: m.AIAudit })));
-const ClientPortal = lazy(() => import('./pages/client/ClientPortal').then(m => ({ default: m.ClientPortal })));
-const Onboarding = lazy(() => import('./pages/Onboarding').then(m => ({ default: m.Onboarding })));
-const LocalizedService = lazy(() => import('./pages/LocalizedService').then(m => ({ default: m.LocalizedService })));
-const InsightHub = lazy(() => import('./pages/InsightHub').then(m => ({ default: m.InsightHub })));
-const InsightArticle = lazy(() => import('./pages/InsightArticle').then(m => ({ default: m.InsightArticle })));
-const ServiceExperience = lazy(() => import('./components/ServiceExperience').then(m => ({ default: m.ServiceExperience })));
-const CustomizationStudio = lazy(() => import('./components/CustomizationStudio').then(m => ({ default: m.CustomizationStudio })));
-const CustomProjectRequest = lazy(() => import('./pages/CustomProjectRequest').then(m => ({ default: m.CustomProjectRequest })));
-const Legal = lazy(() => import('./pages/Legal').then(m => ({ default: m.Legal })));
-const NotFound = lazy(() => import('./pages/NotFound').then(m => ({ default: m.NotFound })));
-
-// Admin Layout and Pages
-const AdminLayout = lazy(() => import('./pages/admin/AdminLayout').then(m => ({ default: m.AdminLayout })));
-const Overview = lazy(() => import('./pages/admin/Overview').then(m => ({ default: m.Overview })));
-const AdminUsers = lazy(() => import('./pages/admin/Users').then(m => ({ default: m.AdminUsers })));
-const AdminProjects = lazy(() => import('./pages/admin/Projects').then(m => ({ default: m.AdminProjects })));
-const AdminAnalytics = lazy(() => import('./pages/admin/Analytics').then(m => ({ default: m.AdminAnalytics })));
-const AdminCRM = lazy(() => import('./pages/admin/CRM').then(m => ({ default: m.AdminCRM })));
-
-const LoadingFallback = () => (
-  <div className="min-h-[100dvh] flex items-center justify-center bg-dark">
-    <div className="w-12 h-12 border-2 border-premium-gold/20 border-t-premium-gold rounded-full animate-spin"></div>
-  </div>
+// Lazy loaded features
+const Services = lazy(() =>
+  import("./features/home/Services").then((module) => ({
+    default: module.Services,
+  })),
+);
+const ERP = lazy(() =>
+  import("./features/home/ERP").then((module) => ({ default: module.ERP })),
+);
+const WhyChooseUs = lazy(() =>
+  import("./features/home/WhyChooseUs").then((module) => ({
+    default: module.WhyChooseUs,
+  })),
+);
+const Testimonials = lazy(() =>
+  import("./features/home/Testimonials").then((module) => ({
+    default: module.Testimonials,
+  })),
+);
+const ContactForm = lazy(() =>
+  import("./features/home/ContactForm").then((module) => ({
+    default: module.ContactForm,
+  })),
+);
+const AdminDashboard = lazy(() =>
+  import("./features/admin/AdminDashboard").then((module) => ({
+    default: module.AdminDashboard,
+  })),
+);
+const ClientPortal = lazy(() =>
+  import("./features/client-portal/ClientPortal").then((module) => ({
+    default: module.ClientPortal,
+  })),
+);
+const ServicesPage = lazy(() =>
+  import("./features/services/ServicesPage").then((module) => ({
+    default: module.ServicesPage,
+  })),
 );
 
-export default function App() {
-  const location = useLocation();
+// SEO Pages
+const LocationPage = lazy(() =>
+  import("./features/seo/LocationPage").then((module) => ({
+    default: module.LocationPage,
+  })),
+);
+const IndustryPage = lazy(() =>
+  import("./features/seo/IndustryPage").then((module) => ({
+    default: module.IndustryPage,
+  })),
+);
 
-  // Do not wrap CustomizationStudio in CinematicTransition with padding to allow full bleed sidebar
-  const isStudioRoute = location.pathname.startsWith('/studio');
-  const isAdminRoute = location.pathname.startsWith('/admin');
-  const isCustomProjectRoute = location.pathname.startsWith('/custom-project');
-  const hideGlobalLayout = isStudioRoute || isAdminRoute || isCustomProjectRoute;
+function HomePage() {
+  return (
+    <>
+      <Hero />
+      <Suspense fallback={<div className="h-40"></div>}>
+        <Services />
+        <ERP />
+        <WhyChooseUs />
+        <Testimonials />
+        <ContactForm />
+      </Suspense>
+    </>
+  );
+}
+
+function Layout() {
+
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: "vertical",
+      gestureOrientation: "vertical",
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 2,
+    });
+
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
 
   return (
-    <div className="bg-dark min-h-screen text-white selection:bg-premium-gold selection:text-white font-sans relative overflow-x-hidden">
-      <SEO />
-      <AnalyticsRouteTracker />
-      {!hideGlobalLayout && (
-        <>
-          <div className="fixed inset-0 z-0 opacity-20 pointer-events-none mix-blend-screen" style={{ backgroundImage: "radial-gradient(circle at 2px 2px, #1A73E8 1px, transparent 0)", backgroundSize: "32px 32px" }}></div>
-          <div className="fixed -top-[100px] -right-[100px] w-[500px] h-[500px] bg-premium-gold opacity-10 rounded-full blur-[120px] pointer-events-none"></div>
-          <div className="fixed -bottom-[200px] -left-[100px] w-[600px] h-[600px] bg-dark-blue opacity-30 rounded-full blur-[150px] pointer-events-none"></div>
-        </>
-      )}
-      
-      <div className="relative z-10 flex flex-col min-h-screen">
-        {!hideGlobalLayout && <Navbar />}
-        <main className="flex-grow">
-          <AnimatePresence mode="wait">
-            <div key={location.pathname}>
-              <Suspense fallback={<LoadingFallback />}>
-                <Routes location={location}>
-                  <Route path="/" element={
-                    <CinematicTransition>
-                      <Hero />
-                      <Testimonials />
-                      <HomeSummary />
-                      <Contact />
-                    </CinematicTransition>
-                  } />
-                  <Route path="/services" element={
-                    <CinematicTransition>
-                      <div className="pt-24 min-h-screen">
-                        <Services />
-                        <Contact />
-                      </div>
-                    </CinematicTransition>
-                  } />
-                  <Route path="/services/:serviceId" element={
-                    <CinematicTransition>
-                       <ServiceExperience />
-                    </CinematicTransition>
-                  } />
-                  <Route path="/studio/:projectId" element={
-                    <CustomizationStudio />
-                  } />
-                  <Route path="/custom-project" element={
-                    <CustomProjectRequest />
-                  } />
-                  
-                  {/* Admin Routes */}
-                  <Route path="/admin" element={<AdminLayout />}>
-                    <Route index element={<Overview />} />
-                    <Route path="crm" element={<AdminCRM />} />
-                    <Route path="users" element={<AdminUsers />} />
-                    <Route path="projects" element={<AdminProjects />} />
-                    <Route path="analytics" element={<AdminAnalytics />} />
-                    <Route path="operations" element={<Overview />} /> {/* Fallback for operations link */}
-                  </Route>
-
-                  <Route path="/work" element={
-                    <CinematicTransition>
-                      <div className="pt-24">
-                        <Portfolio />
-                        <Contact />
-                      </div>
-                    </CinematicTransition>
-                  } />
-                  <Route path="/about" element={
-                    <CinematicTransition>
-                      <div className="pt-24 min-h-screen">
-                        <About />
-                        <Contact />
-                      </div>
-                    </CinematicTransition>
-                  } />
-                  <Route path="/process" element={
-                    <CinematicTransition>
-                      <div className="pt-24 min-h-screen"><Process /></div>
-                    </CinematicTransition>
-                  } />
-                  <Route path="/contact" element={
-                    <CinematicTransition>
-                      <div className="pt-24 min-h-screen"><Contact /></div>
-                    </CinematicTransition>
-                  } />
-                  <Route path="/pricing" element={<Pricing />} />
-                  <Route path="/faq" element={<FAQ />} />
-                  <Route path="/book" element={<Booking />} />
-                  <Route path="/onboarding" element={<Onboarding />} />
-                  <Route path="/client" element={<ClientPortal />} />
-                  <Route path="/agency/:slug" element={<LocalizedService />} />
-                  <Route path="/audit" element={<AIAudit />} />
-                  <Route path="/insights" element={<InsightHub />} />
-                  <Route path="/insights/:slug" element={<InsightArticle />} />
-                  <Route path="/privacy" element={<Legal />} />
-                  <Route path="/terms" element={<Legal />} />
-                  <Route path="/dashboard" element={<AuthRedirector />} />
-                  
-                  {/* 404 Catch-All */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
+    <div className="bg-background min-h-screen text-text-main font-sans selection:bg-primary selection:text-white flex flex-col">
+      <Navbar />
+      <main className="flex-grow">
+        <Suspense
+          fallback={
+            <div className="min-h-screen bg-background flex items-center justify-center">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
-          </AnimatePresence>
-        </main>
-        {/* Hide footer on studio or admin routes for seamless experience */}
-        {!hideGlobalLayout && <Footer />}
-        <DevSetupGuard />
-      </div>
+          }
+        >
+          <Outlet />
+        </Suspense>
+      </main>
+      <Footer />
     </div>
   );
 }
 
+export default function App() {
+  if (!isFirebaseConfigured) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
+        <div className="max-w-md w-full bg-surface border border-border rounded-xl p-6 text-center">
+          <div className="w-16 h-16 bg-red-500/10 text-red-500 flex items-center justify-center rounded-full mx-auto mb-4">
+            <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold mb-2">System Configuration Missing</h2>
+          <p className="text-text-muted mb-6">
+            The enterprise application requires Firebase environment variables to securely boot. Please add them to your <code className="text-primary bg-primary/10 px-1 py-0.5 rounded">.env</code> file.
+          </p>
+          <div className="bg-background text-left p-4 rounded-lg overflow-x-auto text-sm border border-border">
+            <pre className="text-text-muted">
+{`VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=`}
+            </pre>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <HelmetProvider>
+      <BrowserRouter>
+        <SEO />
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route
+              index
+              element={
+                <Suspense
+                  fallback={
+                    <div className="min-h-screen bg-background flex items-center justify-center">
+                      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  }
+                >
+                  <HomePage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="services/:serviceId"
+              element={
+                <Suspense
+                  fallback={
+                    <div className="min-h-screen bg-background flex items-center justify-center">
+                      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  }
+                >
+                  <ServicesPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="locations/:region"
+              element={
+                <Suspense
+                  fallback={
+                    <div className="min-h-screen bg-background flex items-center justify-center">
+                      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  }
+                >
+                  <LocationPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="industries/:industry"
+              element={
+                <Suspense
+                  fallback={
+                    <div className="min-h-screen bg-background flex items-center justify-center">
+                      <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  }
+                >
+                  <IndustryPage />
+                </Suspense>
+              }
+            />
+            <Route element={<ProtectedRoute requireAdmin={true} />}>
+              <Route
+                path="admin"
+                element={
+                  <Suspense
+                    fallback={
+                      <div className="min-h-screen bg-background flex items-center justify-center">
+                        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    }
+                  >
+                    <AdminDashboard />
+                  </Suspense>
+                }
+              />
+            </Route>
+            <Route element={<ProtectedRoute />}>
+              <Route
+                path="client-portal"
+                element={
+                  <Suspense
+                    fallback={
+                      <div className="min-h-screen bg-background flex items-center justify-center">
+                        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                      </div>
+                    }
+                  >
+                    <ClientPortal />
+                  </Suspense>
+                }
+              />
+            </Route>
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </HelmetProvider>
+  );
+}

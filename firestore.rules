@@ -1,112 +1,113 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function isSignedIn() {
+    
+    // Auth Helpers
+    function isAuthenticated() {
       return request.auth != null;
     }
-
+    
     function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+      return isAuthenticated() && request.auth.uid == userId;
     }
-
-    // Helper to determine if user is the hardcoded super admin
-    function isHardcodedSuperAdmin() {
-      return request.auth != null && (
-        request.auth.uid == 'UeKYfLdwQ7OtTITmIPTMZhkW0hu2' ||
-        (request.auth.token != null && 'email' in request.auth.token && request.auth.token.email == 'njeirheinard@gmail.com')
-      );
+    
+    // Fetch User Role
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
-
-    // Helper to get role from the admin document OR user document, with fallback
-    function getRole() {
-      return isHardcodedSuperAdmin()
-        ? 'super_admin'
-        : (request.auth != null
-            ? (exists(/databases/$(database)/documents/admins/$(request.auth.uid))
-                ? ('role' in get(/databases/$(database)/documents/admins/$(request.auth.uid)).data ? get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role : 'client')
-                : (exists(/databases/$(database)/documents/users/$(request.auth.uid))
-                    ? ('accountType' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.accountType : 'client')
-                    : 'client'))
-            : 'client');
-    }
-
+    
+    // Role Checks
     function isAdmin() {
-      return request.auth != null && (
-        isHardcodedSuperAdmin() ||
-        getRole() == 'super_admin' ||
-        getRole() == 'admin' ||
-        getRole() == 'manager' ||
-        getRole() == 'developer' ||
-        getRole() == 'designer'
-      );
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'user') in ['admin', 'super_admin'] ||
+              get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('isAdmin', false) == true);
     }
-
+    
     function isSuperAdmin() {
-      return request.auth != null && (
-        isHardcodedSuperAdmin() ||
-        getRole() == 'super_admin'
-      );
+      return isAuthenticated() && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'user') == 'super_admin';
     }
 
-    match /admins/{adminId} {
-      allow read: if isSignedIn();
-      allow write: if isHardcodedSuperAdmin() || isSuperAdmin();
+    // Inquiries Collection: Public submit, admin read/write
+    match /inquiries/{inquiryId} {
+      allow create: if request.resource.data.keys().hasAll(['fullName', 'email', 'company']);
+      allow read, update, delete: if isAdmin();
     }
 
+    // Users Collection (RBAC Source of Truth)
     match /users/{userId} {
-      allow read, write: if isHardcodedSuperAdmin() || isOwner(userId) || isAdmin();
+      // User can read their own profile, Admins can read all
+      allow read: if isOwner(userId) || isAdmin();
+      
+      // Users can securely create their profile upon signup (requires auth, but document must not exist yet)
+      // or Admins can create users
+      allow create: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      
+      // Only admins can modify roles, users can only update their own safe details
+      allow update: if isAdmin() || (isOwner(userId) && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'isAdmin', 'permissions', 'accountType']));
+      
+      allow delete: if isSuperAdmin();
     }
 
-    match /projectSubmissions/{submissionId} {
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow read, write: if isAdmin();
-    }
-
-    match /customProjects/{projectId} {
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow read, write: if isAdmin();
-    }
-
-    match /leads/{leadId} {
-      allow create: if true;
-      allow read, write: if isAdmin();
-    }
-
-    match /clientActivity/{activityId} {
-      allow create: if true;
-      allow read: if isAdmin();
-    }
-
-    match /prototypeDrafts/{draftId} {
-      allow create, update: if true;
-      allow read: if resource == null || resource.data.userId == 'anonymous' || (isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin()));
-      allow delete: if isAdmin();
-    }
-
-    match /notifications/{notificationId} {
-      allow create: if isAdmin();
-      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow read, write: if isAdmin();
-    }
-
-    match /messages/{messageId} {
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow read, write: if isAdmin();
-    }
-
-    match /bookings/{bookingId} {
-      allow create: if isSignedIn();
-      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow read, write: if isAdmin();
-    }
-
+    // Projects / CRM / general protected collections
     match /projects/{projectId} {
+      allow read: if isOwner(resource.data.get('userId', '')) || (isAuthenticated() && request.auth.token.email != null && resource.data.get('email', '') == request.auth.token.email) || isAdmin();
+      allow create: if request.resource.data.get('userId', '') == 'unauthenticated' || isOwner(request.resource.data.get('userId', '')) || isAdmin();
+      allow update, delete: if isAdmin();
+    }
+    
+    // Activity / Analytics
+    match /activity/{activityId} {
+      allow read: if isOwner(resource.data.get('userId', '')) || isAdmin();
+      allow write: if isAdmin() || isOwner(request.resource.data.get('userId', ''));
+    }
+
+    match /ledger/{documentId} {
+      allow read, update, delete: if isAdmin();
       allow create: if isAdmin();
-      allow read, update: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow read, write: if isAdmin();
+    }
+    match /crm/{documentId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if isAdmin();
+    }
+    match /analytics/{documentId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if isAdmin();
+    }
+    match /notifications/{documentId} {
+      allow read, update, delete: if isAdmin() || isOwner(resource.data.get('userId', ''));
+      allow create: if isAdmin() || isOwner(request.resource.data.get('userId', ''));
+    }
+    match /clientActivity/{documentId} {
+      allow read, update, delete: if isAdmin() || isOwner(resource.data.get('userId', ''));
+      allow create: if isAdmin() || isOwner(request.resource.data.get('userId', ''));
+    }
+    match /consultDossiers/{documentId} {
+      allow read, update, delete: if isAdmin() || isOwner(resource.data.get('userId', ''));
+      allow create: if isAdmin() || isOwner(request.resource.data.get('userId', ''));
+    }
+    match /projectOrders/{documentId} {
+      allow read, update, delete: if isAdmin() || isOwner(resource.data.get('userId', ''));
+      allow create: if isAdmin() || isOwner(request.resource.data.get('userId', ''));
+    }
+    match /projectSubmissions/{documentId} {
+      allow read, update, delete: if isAdmin() || isOwner(resource.data.get('userId', ''));
+      allow create: if isAdmin() || isOwner(request.resource.data.get('userId', ''));
+    }
+    match /customProjects/{documentId} {
+      allow read, update, delete: if isAdmin() || isOwner(resource.data.get('userId', ''));
+      allow create: if isAdmin() || isOwner(request.resource.data.get('userId', ''));
+    }
+    match /submissions/{documentId} {
+      allow read, update, delete: if isAdmin() || isOwner(resource.data.get('userId', ''));
+      allow create: if isAdmin() || isOwner(request.resource.data.get('userId', ''));
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
