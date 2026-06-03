@@ -122,6 +122,7 @@ function Layout() {
 }
 
 import { AuthProvider } from "./contexts/AuthContext";
+import { ErrorBoundary } from "./components/shared/ErrorBoundary";
 
 export default function App() {
   return (
@@ -129,7 +130,8 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <SEO />
-          <Routes>
+          <ErrorBoundary>
+            <Routes>
             <Route path="/" element={<Layout />}>
               <Route
                 index
@@ -221,6 +223,7 @@ export default function App() {
               </Route>
             </Route>
           </Routes>
+          </ErrorBoundary>
         </BrowserRouter>
       </AuthProvider>
     </HelmetProvider>

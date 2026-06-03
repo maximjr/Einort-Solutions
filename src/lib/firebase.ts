@@ -1,7 +1,7 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { getAuth, Auth } from "firebase/auth";
 import { getFirestore, Firestore } from "firebase/firestore";
-import { getAnalytics, Analytics } from "firebase/analytics";
+import { getAnalytics, Analytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBgZkkDSUz-_bPpCA7t2UAd3Qrw1TeY6js",
@@ -23,8 +23,15 @@ try {
   app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
   auth = getAuth(app);
   db = getFirestore(app);
-  analytics = getAnalytics(app);
   isFirebaseConfigured = true;
+  
+  isSupported().then(yes => {
+    if (yes && app) {
+      analytics = getAnalytics(app);
+    }
+  }).catch(() => {
+    console.warn("Firebase Analytics not supported in this environment");
+  });
 } catch (error) {
   console.error("Firebase initialization failed:", error);
 }
