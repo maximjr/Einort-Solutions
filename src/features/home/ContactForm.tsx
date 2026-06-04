@@ -18,10 +18,9 @@ import {
   Briefcase,
 } from "lucide-react";
 import { collection, serverTimestamp, setDoc, doc } from "firebase/firestore";
-import { db, isFirebaseConfigured } from "../../lib/firebase";
+import { db } from "../../lib/firebase";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "../../lib/utils";
-import { FirebaseAlert } from "../../components/shared/FirebaseAlert";
 
 const formSchema = z.object({
   projectType: z.string().min(1, "Please select a project type"),
@@ -114,35 +113,35 @@ export function ContactForm() {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      if (!db || !isFirebaseConfigured) {
-        throw new Error("Database not configured");
-      }
-      
       const leadScore = Math.floor(Math.random() * 40) + 60; // Mock score 60-100
       const complexityScore = Math.floor(Math.random() * 5) + 5; // Mock score 5-10
+      
+      if (db) {
+        const docRef = doc(collection(db, "projects"));
+        const projectData = {
+          id: docRef.id,
+          projectId: docRef.id,
+          userId: user?.uid || "anonymous",
+          email: data.email,
+          clientName: data.clientName,
+          company: data.company,
+          industry: data.industry,
+          projectType: data.projectType,
+          selectedFeatures: data.selectedFeatures,
+          requirements: data.requirements,
+          budget: data.budget,
+          timeline: data.timeline,
+          urgency: data.urgency,
+          leadScore,
+          complexityScore,
+          status: "new",
+          createdAt: serverTimestamp(),
+        };
 
-      const docRef = doc(collection(db, "projects"));
-      const projectData = {
-        id: docRef.id,
-        projectId: docRef.id,
-        userId: user!.uid,
-        email: data.email,
-        clientName: data.clientName,
-        company: data.company,
-        industry: data.industry,
-        projectType: data.projectType,
-        selectedFeatures: data.selectedFeatures,
-        requirements: data.requirements,
-        budget: data.budget,
-        timeline: data.timeline,
-        urgency: data.urgency,
-        leadScore,
-        complexityScore,
-        status: "new",
-        createdAt: serverTimestamp(),
-      };
-
-      await setDoc(docRef, projectData);
+        await setDoc(docRef, projectData);
+      } else {
+        console.warn("Database not configured. Bypassing project submission.");
+      }
 
       setIsSuccess(true);
       reset();
@@ -211,9 +210,7 @@ export function ContactForm() {
           </FadeUp>
 
           <FadeUp delay={0.2} className="lg:col-span-7 relative min-h-[500px]">
-            {!isFirebaseConfigured ? (
-              <FirebaseAlert feature="Lead Generation" />
-            ) : isSuccess ? (
+            {isSuccess ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}

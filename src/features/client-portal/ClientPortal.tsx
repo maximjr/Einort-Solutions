@@ -22,7 +22,7 @@ import {
   orderBy,
   onSnapshot,
 } from "firebase/firestore";
-import { db, isFirebaseConfigured } from "../../lib/firebase";
+import { db } from "../../lib/firebase";
 
 export function ClientPortal() {
   const { userData, user } = useAuth();
@@ -30,7 +30,7 @@ export function ClientPortal() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user || !db || !isFirebaseConfigured) {
+    if (!user || !db) {
       setLoading(false);
       return;
     }

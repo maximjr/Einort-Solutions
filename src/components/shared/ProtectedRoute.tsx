@@ -1,6 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { isFirebaseConfigured } from "../../lib/firebase";
 
 export function ProtectedRoute({ requireAdmin = false }) {
   const { user, userData, loading } = useAuth();
@@ -11,10 +10,6 @@ export function ProtectedRoute({ requireAdmin = false }) {
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
-  }
-
-  if (!isFirebaseConfigured) {
-    return <Navigate to="/" replace />;
   }
 
   if (!user) {

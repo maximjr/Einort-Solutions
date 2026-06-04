@@ -6,7 +6,7 @@ import { Button } from "../ui/Button";
 import { AuthModal } from "../../features/auth/AuthModal";
 import { motion, AnimatePresence } from "motion/react";
 import { useAuth } from "../../hooks/useAuth";
-import { auth, isFirebaseConfigured } from "../../lib/firebase";
+import { auth } from "../../lib/firebase";
 import { signOut } from "firebase/auth";
 import { Logo } from "../ui/Logo";
 
@@ -26,7 +26,7 @@ export function Navbar() {
   const { user, userData } = useAuth();
 
   const handleSignOut = async () => {
-    if (isFirebaseConfigured && auth) {
+    if (auth) {
       await signOut(auth);
     }
   };

@@ -52,7 +52,6 @@ const COLORS = [
   "#64748b",
 ];
 
-import { isFirebaseConfigured } from "../../lib/firebase";
 
 export function AdminDashboard() {
   const [projects, setProjects] = useState<any[]>([]);
@@ -64,7 +63,7 @@ export function AdminDashboard() {
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isFirebaseConfigured || !db) {
+    if (!db) {
       setLoading(false);
       setLoadingUsers(false);
       return;

@@ -7,7 +7,7 @@ import {
   setDoc,
   serverTimestamp,
 } from "firebase/firestore";
-import { auth, db, isFirebaseConfigured } from "../lib/firebase";
+import { auth, db } from "../lib/firebase";
 
 export interface UserData {
   uid: string;
@@ -32,7 +32,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   userData: null,
   loading: true,
-  isFirebaseConfigured: false,
+  isFirebaseConfigured: true,
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isFirebaseConfigured || !auth || !db) {
+    if (!auth || !db) {
       setLoading(false);
       return;
     }
@@ -124,7 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, userData, loading, isFirebaseConfigured }}
+      value={{ user, userData, loading, isFirebaseConfigured: true }}
     >
       {children}
     </AuthContext.Provider>

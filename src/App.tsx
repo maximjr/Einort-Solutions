@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import Lenis from "lenis";
@@ -8,60 +8,20 @@ import { SEO } from "./components/seo/SEO";
 
 import { ProtectedRoute } from "./components/shared/ProtectedRoute";
 
-// Immediately load Hero to optimize LCP
+// Statically loaded features to prevent chunk-loading deadlocks and maximize render performance
 import { Hero } from "./features/home/Hero";
-
-// Lazy loaded features
-const Services = lazy(() =>
-  import("./features/home/Services").then((module) => ({
-    default: module.Services,
-  })),
-);
-const ERP = lazy(() =>
-  import("./features/home/ERP").then((module) => ({ default: module.ERP })),
-);
-const WhyChooseUs = lazy(() =>
-  import("./features/home/WhyChooseUs").then((module) => ({
-    default: module.WhyChooseUs,
-  })),
-);
-const Testimonials = lazy(() =>
-  import("./features/home/Testimonials").then((module) => ({
-    default: module.Testimonials,
-  })),
-);
-const ContactForm = lazy(() =>
-  import("./features/home/ContactForm").then((module) => ({
-    default: module.ContactForm,
-  })),
-);
-const AdminDashboard = lazy(() =>
-  import("./features/admin/AdminDashboard").then((module) => ({
-    default: module.AdminDashboard,
-  })),
-);
-const ClientPortal = lazy(() =>
-  import("./features/client-portal/ClientPortal").then((module) => ({
-    default: module.ClientPortal,
-  })),
-);
-const ServicesPage = lazy(() =>
-  import("./features/services/ServicesPage").then((module) => ({
-    default: module.ServicesPage,
-  })),
-);
+import { Services } from "./features/home/Services";
+import { ERP } from "./features/home/ERP";
+import { WhyChooseUs } from "./features/home/WhyChooseUs";
+import { Testimonials } from "./features/home/Testimonials";
+import { ContactForm } from "./features/home/ContactForm";
+import { AdminDashboard } from "./features/admin/AdminDashboard";
+import { ClientPortal } from "./features/client-portal/ClientPortal";
+import { ServicesPage } from "./features/services/ServicesPage";
 
 // SEO Pages
-const LocationPage = lazy(() =>
-  import("./features/seo/LocationPage").then((module) => ({
-    default: module.LocationPage,
-  })),
-);
-const IndustryPage = lazy(() =>
-  import("./features/seo/IndustryPage").then((module) => ({
-    default: module.IndustryPage,
-  })),
-);
+import { LocationPage } from "./features/seo/LocationPage";
+import { IndustryPage } from "./features/seo/IndustryPage";
 
 function HomePage() {
   return (

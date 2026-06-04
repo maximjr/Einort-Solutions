@@ -10,11 +10,10 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db, isFirebaseConfigured } from "../../lib/firebase";
+import { auth, db } from "../../lib/firebase";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { Logo } from "../../components/ui/Logo";
-import { FirebaseAlert } from "../../components/shared/FirebaseAlert";
 import { useNavigate } from "react-router-dom";
 
 const loginSchema = z.object({
@@ -80,7 +79,11 @@ export function AuthModal({
     },
   ) => {
     try {
-      if (!db) throw new Error("DB not configured");
+      if (!db) {
+        navigate("/client-portal");
+        onClose();
+        return;
+      }
       const docRef = doc(db, "users", uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
@@ -116,7 +119,10 @@ export function AuthModal({
   };
 
   const onLogin = async (data: LoginData) => {
-    if (!isFirebaseConfigured || !auth) return;
+    if (!auth) {
+      setErrorStatus("Auth service not available");
+      return;
+    }
     setIsLoading(true);
     setErrorStatus(null);
     setSuccessStatus(null);
@@ -149,7 +155,7 @@ export function AuthModal({
   };
 
   const onRegister = async (data: RegisterData) => {
-    if (!isFirebaseConfigured || !auth || !db) return;
+    if (!auth || !db) return;
     setIsLoading(true);
     setErrorStatus(null);
     setSuccessStatus(null);
@@ -240,12 +246,7 @@ export function AuthModal({
                 </p>
               </div>
 
-              {!isFirebaseConfigured ? (
-                <div className="mb-4">
-                  <FirebaseAlert feature="Authentication" />
-                </div>
-              ) : (
-                <div className="relative z-10">
+              <div className="relative z-10">
                   {errorStatus && (
                     <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-md flex items-start gap-3 relative z-10 transition-all">
                       <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
@@ -455,8 +456,7 @@ export function AuthModal({
                       </Button>
                     </form>
                   )}
-                </div>
-              )}
+              </div>
 
               <div className="mt-6 pt-6 border-t border-white/5 text-center relative z-10">
                 <p className="text-xs text-slate-400 uppercase tracking-widest">

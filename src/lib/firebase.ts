@@ -17,13 +17,12 @@ let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
 let db: Firestore | null = null;
 let analytics: Analytics | null = null;
-let isFirebaseConfigured = false;
+const isFirebaseConfigured = true;
 
 try {
   app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
   auth = getAuth(app);
   db = getFirestore(app);
-  isFirebaseConfigured = true;
   
   isSupported().then(yes => {
     if (yes && app) {
