@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Card } from "../../components/ui/Card";
@@ -56,7 +57,57 @@ const servicesData: Record<string, any> = {
 
 export function ServicesPage() {
   const { serviceId } = useParams();
-  const service = serviceId ? servicesData[serviceId] : null;
+  const [service, setService] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!serviceId) {
+      setLoading(false);
+      return;
+    }
+
+    const cacheKey = `einort_service_${serviceId}`;
+    const cachedData = localStorage.getItem(cacheKey);
+
+    if (cachedData) {
+      try {
+        const parsed = JSON.parse(cachedData);
+        // Re-attach the React element icon since it cannot be serialized
+        const staticData = servicesData[serviceId];
+        setService({ ...parsed, icon: staticData?.icon });
+        setLoading(false);
+        return;
+      } catch (err) {
+        console.warn("Failed to parse cached service data", err);
+      }
+    }
+
+    // Simulate network delay to demonstrate caching benefit
+    setLoading(true);
+    const timer = setTimeout(() => {
+      const data = servicesData[serviceId];
+      if (data) {
+        // Strip out non-serializable JSX elements before caching
+        const { icon, ...serializableData } = data;
+        localStorage.setItem(cacheKey, JSON.stringify(serializableData));
+        setService(data);
+      } else {
+        setService(null);
+      }
+      setLoading(false);
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [serviceId]);
+
+  if (loading) {
+    return (
+      <Container className="py-32 text-center h-[70vh] flex flex-col justify-center items-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-text-muted text-sm tracking-wider uppercase font-mono">Loading Service...</p>
+      </Container>
+    );
+  }
 
   if (!service) {
     return (

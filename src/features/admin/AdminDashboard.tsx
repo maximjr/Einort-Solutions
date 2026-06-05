@@ -7,15 +7,7 @@ import {
 } from "../../components/ui/Card";
 import { FadeUp } from "../../components/animations/FadeUp";
 import React, { useEffect, useState, useMemo } from "react";
-import {
-  collection,
-  query,
-  orderBy,
-  limit,
-  onSnapshot,
-  getDocs,
-} from "firebase/firestore";
-import { db } from "../../lib/firebase";
+import { ProjectStatus } from "../../types";
 import {
   Users,
   Briefcase,
@@ -25,6 +17,9 @@ import {
   Zap,
   Target,
   DollarSign,
+  Loader2,
+  Trash2,
+  MessageSquare,
 } from "lucide-react";
 import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
 import {
@@ -42,6 +37,16 @@ import {
 
 import { ProjectTimeline } from "../../components/ui/ProjectTimeline";
 
+// Enterprise Service Layer Upgrades
+import { projectService } from "../../services/admin/projectService";
+import { clientService } from "../../services/admin/clientService";
+import { activityService } from "../../services/admin/activityService";
+import { analyticsService } from "../../services/admin/analyticsService";
+import { notificationService } from "../../services/admin/notificationService";
+import { messageService } from "../../services/admin/messageService";
+import { AdminMessenger } from "./AdminMessenger";
+import { useMessaging } from "../../hooks/useMessaging";
+
 const COLORS = [
   "#3b82f6",
   "#8b5cf6",
@@ -52,6 +57,42 @@ const COLORS = [
   "#64748b",
 ];
 
+const getDetailedStatusPill = (status: string) => {
+  const currentStatus = (status || "pending").toLowerCase();
+  
+  if (currentStatus === "cancelled") {
+    return {
+      label: "Cancelled",
+      bgClass: "bg-red-500/10 text-red-400 border-red-500/20",
+      dotClass: "bg-red-400 shadow-[0_0_8px_rgba(239,68,68,0.8)]",
+    };
+  }
+  
+  const pendingStages = ["pending", "new", "discovery"];
+  const completedStages = ["completed", "launched", "deployment"];
+  
+  if (pendingStages.includes(currentStatus)) {
+    return {
+      label: "Pending Review",
+      bgClass: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+      dotClass: "bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse",
+    };
+  }
+  
+  if (completedStages.includes(currentStatus)) {
+    return {
+      label: "Completed",
+      bgClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+      dotClass: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]",
+    };
+  }
+  
+  return {
+    label: "In Progress",
+    bgClass: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    dotClass: "bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse",
+  };
+};
 
 export function AdminDashboard() {
   const [projects, setProjects] = useState<any[]>([]);
@@ -61,133 +102,75 @@ export function AdminDashboard() {
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [expandedProject, setExpandedProject] = useState<string | null>(null);
+  const [syncingProjects, setSyncingProjects] = useState<Record<string, boolean>>({});
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [activeView, setActiveView] = useState<"analytics" | "messaging">("analytics");
+  const [unreadTotalCount, setUnreadTotalCount] = useState(0);
+
+  const { conversations } = useMessaging();
+  const [resolvedAdminId, setResolvedAdminId] = useState<string>("super_admin");
 
   useEffect(() => {
-    if (!db) {
-      setLoading(false);
-      setLoadingUsers(false);
-      return;
-    }
-
-    const activeDb = db;
-
-    let unsubscribeProjects = () => {};
-    let unsubscribeUsers = () => {};
-    let unsubscribeActivities = () => {};
-
-    const setupSubscriptions = async () => {
+    async function initAdmin() {
       try {
-        const projectsQuery = query(
-          collection(activeDb, "projects"),
-          orderBy("createdAt", "desc"),
-          limit(100),
-        );
-
-        unsubscribeProjects = onSnapshot(
-          projectsQuery,
-          (snapshot) => {
-            const data = snapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-            setProjects(data);
-            setLoading(false);
-            setSyncError(null);
-          },
-          (error: any) => {
-            if (error.code === "permission-denied") {
-              setSyncError(
-                "Firestore Security Rules denied access. Please deploy your customized firestore.rules to your Firebase project.",
-              );
-            } else {
-              setSyncError(
-                "Realtime ledger sync interrupted. Using secure static fallback.",
-              );
-            }
-            try {
-              getDocs(projectsQuery)
-                .then((snapshot) => {
-                  const data = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                  }));
-                  setProjects(data);
-                  setLoading(false);
-                })
-                .catch(() => setLoading(false));
-            } catch {
-              setLoading(false);
-            }
-          },
-        );
-
-        const usersQuery = query(
-          collection(activeDb, "users"),
-          orderBy("createdAt", "desc"),
-          limit(100),
-        );
-
-        unsubscribeUsers = onSnapshot(
-          usersQuery,
-          (snapshot) => {
-            const data = snapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-            setUsers(data);
-            setLoadingUsers(false);
-          },
-          (error: any) => {
-            if (error.code === "permission-denied") {
-              setSyncError(
-                "Firestore Security Rules denied access. Please deploy your customized firestore.rules to your Firebase project.",
-              );
-            }
-            try {
-              getDocs(usersQuery)
-                .then((snapshot) => {
-                  const data = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                  }));
-                  setUsers(data);
-                  setLoadingUsers(false);
-                })
-                .catch(() => setLoadingUsers(false));
-            } catch {
-              setLoadingUsers(false);
-            }
-          },
-        );
-
-        const activityQuery = query(
-          collection(activeDb, "clientActivity"),
-          orderBy("timestamp", "desc"),
-          limit(50),
-        );
-        unsubscribeActivities = onSnapshot(
-          activityQuery,
-          (snapshot) => {
-            const data = snapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-            setActivities(data);
-          },
-          () => {
-            // Silently handle error
-          },
-        );
+        const id = await messageService.getSuperAdminUid();
+        setResolvedAdminId(id);
       } catch (err) {
-        // Failed gracefully
+        console.warn("Failed to resolve global admin id", err);
       }
-    };
+    }
+    initAdmin();
+  }, []);
 
-    setupSubscriptions();
+  useEffect(() => {
+    // Calculate global aggregate unread count across all clients for this user
+    const adminId = resolvedAdminId;
+    const sum = conversations.reduce((acc, c) => acc + (c.unreadCount?.[adminId] || 0), 0);
+    setUnreadTotalCount(sum);
+  }, [conversations, resolvedAdminId]);
+
+  useEffect(() => {
+    setLoading(true);
+    setLoadingUsers(true);
+
+    const unsubscribeProjects = projectService.subscribeProjects(
+      (data) => {
+        setProjects(data);
+        setLoading(false);
+        setSyncError(null);
+      },
+      (err) => {
+        const errMessage = err instanceof Error ? err.message : String(err);
+        setSyncError(notificationService.mapSyncError(errMessage));
+        setLoading(false);
+      }
+    );
+
+    const unsubscribeClients = clientService.subscribeClients(
+      (data) => {
+        setUsers(data);
+        setLoadingUsers(false);
+      },
+      (err) => {
+        const errMessage = err instanceof Error ? err.message : String(err);
+        setSyncError(notificationService.mapSyncError(errMessage));
+        setLoadingUsers(false);
+      }
+    );
+
+    const unsubscribeActivities = activityService.subscribeActivities(
+      (data) => {
+        setActivities(data);
+      },
+      () => {
+        // Silently capture activity pipeline issues
+      }
+    );
 
     return () => {
       unsubscribeProjects();
-      unsubscribeUsers();
+      unsubscribeClients();
       unsubscribeActivities();
     };
   }, []);
@@ -197,109 +180,77 @@ export function AdminDashboard() {
     [users],
   );
 
-  const getAggregation = (arr: any[], key: string) => {
-    const counts = arr.reduce(
-      (acc, item) => {
-        const val = item[key]
-          ? String(item[key]).charAt(0).toUpperCase() +
-            String(item[key]).slice(1)
-          : "Unspecified";
-        acc[val] = (acc[val] || 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
-    return Object.entries(counts)
-      .map(([name, value]) => ({ name, value: Number(value) }))
-      .sort((a, b) => b.value - a.value);
-  };
-
   const industryData = useMemo(
-    () => getAggregation(projects, "industry"),
+    () => analyticsService.getAggregation(projects, "industry"),
     [projects],
   );
   const budgetData = useMemo(
-    () => getAggregation(projects, "budget"),
+    () => analyticsService.getAggregation(projects, "budget"),
     [projects],
   );
   const timelineData = useMemo(
-    () => getAggregation(projects, "timeline"),
+    () => analyticsService.getAggregation(projects, "timeline"),
     [projects],
   );
   const statusData = useMemo(
-    () => getAggregation(projects, "status"),
+    () => analyticsService.getAggregation(projects, "status"),
     [projects],
   );
 
   const averageLeadScore = useMemo(
-    () =>
-      projects.length > 0
-        ? Math.round(
-            projects.reduce((acc, p) => acc + (p.leadScore || 0), 0) /
-              projects.length,
-          )
-        : 0,
+    () => analyticsService.calculateAverageLeadScore(projects),
     [projects],
   );
 
-  // Intelligence calculations
   const totalPipelineValue = useMemo(
-    () =>
-      projects.reduce((acc, p) => {
-        if (!p.budget) return acc;
-        if (p.budget.includes("50k")) return acc + 50000;
-        if (p.budget.includes("100k")) return acc + 100000;
-        if (p.budget.includes("250k")) return acc + 250000;
-        if (p.budget.includes("500k+")) return acc + 500000;
-        return acc;
-      }, 0),
+    () => analyticsService.calculateTotalPipeline(projects),
     [projects],
   );
 
-  const formatCurrency = (val: number) => {
-    if (val >= 1000000) return `$${(val / 1000000).toFixed(1)}M`;
-    if (val >= 1000) return `$${(val / 1000).toFixed(0)}K`;
-    return `$${val}`;
-  };
+  const formatCurrency = analyticsService.formatCurrency;
+  const getRiskLevel = analyticsService.getRiskLevel;
 
-  const getRiskLevel = (proj: any) => {
-    let score = 0;
-    if (proj.urgency === "high") score += 3;
-    if (proj.leadScore < 40) score += 2;
-    if (proj.budget && proj.budget.includes("500k+")) score += 1;
-    if (score >= 4)
-      return {
-        label: "High Risk",
-        color: "text-red-400 bg-red-400/10 border-red-400/20",
-      };
-    if (score >= 2)
-      return {
-        label: "Elevated",
-        color: "text-yellow-400 bg-yellow-400/10 border-yellow-400/20",
-      };
-    return {
-      label: "Stable",
-      color: "text-green-400 bg-green-400/10 border-green-400/20",
-    };
-  };
-
-  const clientsWithProjects = useMemo(
-    () => new Set(projects.map((p) => p.userId)).size,
-    [projects],
+  const { abandonedPrototypes, conversionRate } = useMemo(
+    () => analyticsService.calculateCRMStats(projects, activeClientsCount),
+    [projects, activeClientsCount]
   );
-  const abandonedPrototypes = Math.max(
-    0,
-    activeClientsCount - clientsWithProjects,
-  );
-  const conversionRate =
-    activeClientsCount > 0
-      ? Math.round((clientsWithProjects / activeClientsCount) * 100)
-      : 0;
 
   const urgentProjectsCount = useMemo(
     () => projects.filter((p) => p.urgency === "high").length,
     [projects],
   );
+
+  const handleUpdateStatus = async (projectId: string, newStatus: string) => {
+    setSyncingProjects((prev) => ({ ...prev, [projectId]: true }));
+
+    const originalProjects = [...projects];
+
+    // Optimistic responsive UI transition
+    setProjects((prevProjects) =>
+      prevProjects.map((proj) =>
+        proj.id === projectId ? { ...proj, status: newStatus } : proj,
+      ),
+    );
+
+    const result = await projectService.updateStatus(projectId, newStatus as ProjectStatus);
+
+    if (!result.success) {
+      console.warn("[Orchestration Deviance]", result.message);
+      setSyncError(`Status state transition rejected. ${result.message}`);
+      setProjects(originalProjects);
+    } else {
+      setSyncError(null);
+      console.log(`Successfully orchestrated project ${projectId} status change to: ${newStatus}`);
+    }
+
+    setTimeout(() => {
+      setSyncingProjects((prev) => {
+        const next = { ...prev };
+        delete next[projectId];
+        return next;
+      });
+    }, 600);
+  };
 
   return (
     <section className="py-24 bg-surface min-h-[80vh] relative pt-32">
@@ -336,7 +287,45 @@ export function AdminDashboard() {
           </div>
         </FadeUp>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Navigation Tab Controllers */}
+        <div className="flex flex-wrap items-center gap-4 border-b border-white/[0.05] pb-6 mb-8 select-none">
+          <button
+            onClick={() => setActiveView("analytics")}
+            className={`px-5 py-2.5 rounded-xl border text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+              activeView === "analytics"
+                ? "bg-primary border-primary text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                : "bg-white/[0.015] border-white/[0.05] text-slate-400 hover:text-white hover:border-white/10"
+            }`}
+          >
+            <Briefcase size={13} />
+            Analytics & Pipeline
+          </button>
+          
+          <button
+            onClick={() => setActiveView("messaging")}
+            className={`px-5 py-2.5 rounded-xl border text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-2 relative cursor-pointer ${
+              activeView === "messaging"
+                ? "bg-primary border-primary text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                : "bg-white/[0.015] border-white/[0.05] text-slate-400 hover:text-white hover:border-white/10"
+            }`}
+          >
+            <MessageSquare size={13} />
+            Messaging Pipeline
+            {unreadTotalCount > 0 && (
+              <span className="flex items-center justify-center bg-cyan-400 text-[#030712] text-[9px] font-bold w-4 h-4 rounded-full font-mono shadow-[0_0_8px_rgba(34,211,238,0.7)] animate-pulse shrink-0">
+                {unreadTotalCount}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {activeView === "messaging" ? (
+          <FadeUp>
+            <AdminMessenger clients={users.filter(u => u.role === "client" || !u.role)} currentAdminId={resolvedAdminId} />
+          </FadeUp>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {[
             {
               label: "Active Projects",
@@ -453,7 +442,7 @@ export function AdminDashboard() {
               </CardHeader>
               <CardContent className="flex-1 flex flex-col pt-6">
                 <div className="h-[250px] w-full mt-4">
-                  <ResponsiveContainer width="100%" height="100%">
+                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={industryData}
@@ -687,7 +676,7 @@ export function AdminDashboard() {
                     <thead className="bg-white/[0.01] border-b border-white/[0.05]">
                       <tr>
                         {[...Array(8)].map((_, i) => (
-                          <th key={i} className="px-6 py-4">
+                           <th key={i} className="px-6 py-4">
                             <div className="h-3 bg-white/[0.03] rounded w-20"></div>
                           </th>
                         ))}
@@ -742,6 +731,7 @@ export function AdminDashboard() {
                     <tbody className="divide-y divide-white/5">
                       {projects.map((proj) => {
                         const risk = getRiskLevel(proj);
+                        const detailedPill = getDetailedStatusPill(proj.status);
                         return (
                           <React.Fragment key={proj.id}>
                             <tr
@@ -812,25 +802,219 @@ export function AdminDashboard() {
                                 </div>
                               </td>
                               <td className="px-6 py-5">
-                                <span className="px-2.5 py-1 bg-white/[0.03] border border-white/10 text-slate-300 text-[10px] uppercase font-bold tracking-widest rounded shadow-sm">
-                                  {proj.status || "New"}
-                                </span>
+                                <div className="flex flex-col gap-1.5 items-start">
+                                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] uppercase font-bold tracking-widest rounded border shadow-sm ${detailedPill.bgClass}`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${detailedPill.dotClass}`}></span>
+                                    {detailedPill.label}
+                                  </span>
+                                  <span className="text-[9px] uppercase font-mono tracking-wider text-slate-500 ml-1">
+                                    Stage: {proj.status || "New"}
+                                  </span>
+                                </div>
                               </td>
                             </tr>
                             {expandedProject === proj.id && (
                               <tr>
                                 <td colSpan={8} className="p-0 border-0">
                                   <div className="bg-[#0a0f1d] border-b border-t border-white/[0.05] px-8 pt-6 pb-8 shadow-[inset_0_2px_10px_rgba(0,0,0,0.2)]">
-                                    <div className="flex justify-between items-center mb-8">
-                                      <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold">
-                                        Intelligence Detail Pane
-                                      </p>
-                                      <button className="text-[11px] font-bold uppercase tracking-widest bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded shadow-[0_0_15px_rgba(59,130,246,0.2)] transition-all">
-                                        Accept Deal
-                                      </button>
+                                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 border-b border-white/5 pb-6">
+                                      <div>
+                                        <p className="text-[10px] uppercase tracking-widest text-[#64748b] font-bold mb-1 font-mono">
+                                          Deal Command Console
+                                        </p>
+                                        <h4 className="text-lg font-medium text-white font-display">
+                                          Pipeline Orchestrator & Audit
+                                        </h4>
+                                      </div>
+                                      
+                                      <div className="flex flex-wrap items-center gap-3">
+                                        {/* 11-Stage Pipeline Dropdown Selector */}
+                                        <div className="relative inline-block">
+                                          <select
+                                            value={proj.status || "pending"}
+                                            disabled={syncingProjects[proj.id]}
+                                            onChange={(e) => {
+                                              e.stopPropagation();
+                                              handleUpdateStatus(proj.id, e.target.value);
+                                            }}
+                                            className="bg-white/[0.02] border border-white/10 hover:border-white/20 transition-all text-slate-200 text-xs font-semibold rounded-xl pl-4 pr-10 py-2.5 outline-none cursor-pointer uppercase tracking-wider appearance-none shadow-sm font-sans"
+                                          >
+                                            {[
+                                              { value: "pending", label: "01. Pending Verification" },
+                                              { value: "discovery", label: "02. Discovery Phase" },
+                                              { value: "planning", label: "03. Architecture Planning" },
+                                              { value: "ui_ux", label: "04. UI/UX Prototyping" },
+                                              { value: "development", label: "05. Engineering & Dev" },
+                                              { value: "testing", label: "06. Testing & QA" },
+                                              { value: "review", label: "07. Governance Review" },
+                                              { value: "revision", label: "08. Revision Loop" },
+                                              { value: "deployment", label: "09. Deployment Prep" },
+                                              { value: "completed", label: "10. Live / Completed" },
+                                              { value: "cancelled", label: "11. Decommissioned / Cancelled" },
+                                            ].map((option) => (
+                                              <option key={option.value} value={option.value} className="bg-slate-950 text-white font-semibold font-sans">
+                                                {option.label}
+                                              </option>
+                                            ))}
+                                          </select>
+                                          <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 text-[10px]">
+                                            ▼
+                                          </div>
+                                        </div>
+
+                                        {/* Dynamic Stepping Button */}
+                                        {(() => {
+                                          const currentStatus = (proj.status || "pending").toLowerCase();
+                                          
+                                          // Normalise legacy or alternate states gracefully
+                                          let currentTarget = currentStatus;
+                                          if (currentStatus === "new") currentTarget = "pending";
+                                          if (currentStatus === "consultation") currentTarget = "planning";
+                                          if (currentStatus === "design" || currentStatus === "analysis") currentTarget = "ui_ux";
+                                          
+                                          const orderedStages = [
+                                            "pending",
+                                            "discovery",
+                                            "planning",
+                                            "ui_ux",
+                                            "development",
+                                            "testing",
+                                            "review",
+                                            "revision",
+                                            "deployment",
+                                            "completed"
+                                          ];
+
+                                          const currentIndex = orderedStages.indexOf(currentTarget);
+                                          let buttonText = "Accept Deal";
+                                          let nextStatusVal = "discovery";
+                                          let isCompleted = currentTarget === "completed";
+
+                                          if (currentIndex !== -1 && currentIndex < orderedStages.length - 1) {
+                                            const nextStatus = orderedStages[currentIndex + 1];
+                                            const nextLabel = nextStatus.replace("_", "/").toUpperCase();
+                                            buttonText = `Advance to ${nextLabel}`;
+                                            nextStatusVal = nextStatus;
+                                          } else if (currentTarget === "completed") {
+                                            buttonText = "Deal Fully Completed";
+                                          } else if (currentTarget === "cancelled") {
+                                            buttonText = "Re-Activate Project";
+                                            nextStatusVal = "pending";
+                                            isCompleted = false;
+                                          }
+
+                                          const isThisProjectSyncing = syncingProjects[proj.id];
+
+                                          return (
+                                            <button
+                                              disabled={isCompleted || isThisProjectSyncing}
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (!isCompleted && !isThisProjectSyncing) {
+                                                  handleUpdateStatus(proj.id, nextStatusVal);
+                                                }
+                                              }}
+                                              className={`flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all ${
+                                                isCompleted
+                                                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 cursor-not-allowed"
+                                                  : isThisProjectSyncing
+                                                  ? "bg-slate-800 text-slate-400 border border-white/5 cursor-wait"
+                                                  : "bg-primary hover:bg-primary/90 text-white shadow-[0_0_15px_rgba(59,130,246,0.30)] hover:scale-[1.02] active:scale-[0.98]"
+                                              }`}
+                                            >
+                                              {isThisProjectSyncing && (
+                                                <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+                                              )}
+                                              {isThisProjectSyncing ? "Syncing Pipeline..." : buttonText}
+                                            </button>
+                                          );
+                                        })()}
+
+                                        {/* Decommission / Delete Project */}
+                                        {deletingProjectId === proj.id ? (
+                                          <div className="flex items-center gap-2 bg-red-950/20 border border-red-500/20 px-4 py-1.5 rounded-xl animate-pulse text-[11px] font-bold uppercase tracking-widest">
+                                            <span className="text-red-300 font-mono text-[10px]">Decommission permanently?</span>
+                                            <button
+                                              onClick={async (e) => {
+                                                e.stopPropagation();
+                                                setIsDeleting(true);
+                                                try {
+                                                  await projectService.deleteProject(proj.id);
+                                                  setExpandedProject(null);
+                                                } catch (err) {
+                                                  console.error(err);
+                                                } finally {
+                                                  setIsDeleting(false);
+                                                  setDeletingProjectId(null);
+                                                }
+                                              }}
+                                              disabled={isDeleting}
+                                              className="px-3 py-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-lg transition-colors cursor-pointer"
+                                            >
+                                              {isDeleting ? "Deleting..." : "Confirm"}
+                                            </button>
+                                            <button
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                setDeletingProjectId(null);
+                                              }}
+                                              disabled={isDeleting}
+                                              className="px-2 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                                            >
+                                              Cancel
+                                            </button>
+                                          </div>
+                                        ) : (
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setDeletingProjectId(proj.id);
+                                            }}
+                                            className="flex items-center gap-1.5 px-5 py-2.5 bg-white/[0.02] hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-slate-400 hover:text-red-400 font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all duration-300 cursor-pointer"
+                                          >
+                                            <Trash2 size={13} />
+                                            Decommission Workspace
+                                          </button>
+                                        )}
+                                      </div>
                                     </div>
-                                    <div className="max-w-4xl mx-auto">
+                                    
+                                    <div className="max-w-4xl mx-auto mb-6 bg-white/[0.01] border border-white/5 rounded-2xl p-6">
                                       <ProjectTimeline status={proj.status} />
+                                    </div>
+
+                                    {/* Project Summary / Details Block inside index */}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-[#94a3b8] mt-6 bg-[#0c1224] border border-white/5 rounded-2xl p-6">
+                                      <div>
+                                        <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2 font-mono">Client Details</h5>
+                                        <p className="text-white font-medium">{proj.clientName || "Unknown Client"}</p>
+                                        <p className="text-xs text-slate-400 font-mono mt-1">{proj.email || "No Email listed"}</p>
+                                        {proj.company && <p className="text-xs text-slate-400 mt-1">Company: {proj.company}</p>}
+                                      </div>
+                                      <div>
+                                        <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2 font-mono font-semibold">Scope & Timeline</h5>
+                                        <p className="text-slate-300">Phase: <span className="text-white font-medium capitalize">{proj.projectType}</span></p>
+                                        <p className="text-slate-300 mt-1">Budget Allocation: <span className="text-emerald-400 font-mono">{proj.budget || "N/A"}</span></p>
+                                        <p className="text-slate-300 mt-1">Timeline Window: <span className="text-blue-400">{proj.timeline || "N/A"}</span></p>
+                                      </div>
+                                      <div>
+                                        <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2 font-mono font-semibold">Risk Auditing</h5>
+                                        <div className="flex flex-col gap-1 text-xs">
+                                          <p>Lead Quality Score: <span className="text-white font-mono">{proj.leadScore || "N/A"}/100</span></p>
+                                          <p>Complexity Index: <span className="text-white font-mono">{proj.complexityScore || "N/A"}/10</span></p>
+                                          <p className="mt-1">
+                                            Status: <span className="px-2 py-0.5 rounded bg-white/5 text-white border border-white/10 uppercase tracking-widest text-[9px] font-bold">{proj.status || "new"}</span>
+                                          </p>
+                                        </div>
+                                      </div>
+                                      {proj.requirements && (
+                                        <div className="col-span-1 md:col-span-3 border-t border-white/5 pt-4 mt-2">
+                                          <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2 font-mono font-semibold">Full Business Requirements</h5>
+                                          <p className="text-slate-300 bg-white/[0.01] border border-white/5 p-4 rounded-xl text-xs leading-relaxed whitespace-pre-wrap font-sans">
+                                            {proj.requirements}
+                                          </p>
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
                                 </td>
@@ -1002,6 +1186,8 @@ export function AdminDashboard() {
             </CardContent>
           </Card>
         </FadeUp>
+          </>
+        )}
       </Container>
     </section>
   );

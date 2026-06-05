@@ -8,26 +8,99 @@ import {
   ShieldCheck,
   Mail,
   Calendar,
+  Trash2,
+  MessageSquare,
 } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 import { Container } from "../../components/layout/Container";
 import { Card } from "../../components/ui/Card";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Button } from "../../components/ui/Button";
 import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
 import { useAuth } from "../../hooks/useAuth";
+import { projectService } from "../../services/admin/projectService";
+import { messageService } from "../../services/admin/messageService";
+import { ClientMessenger } from "./ClientMessenger";
+import { useMessaging } from "../../hooks/useMessaging";
 import {
   collection,
   query,
   where,
-  orderBy,
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
+
+const getDetailedStatusPill = (status: string) => {
+  const currentStatus = (status || "pending").toLowerCase();
+  
+  if (currentStatus === "cancelled") {
+    return {
+      label: "Cancelled",
+      bgClass: "bg-red-500/10 text-red-400 border-red-500/20",
+      dotClass: "bg-red-400 shadow-[0_0_8px_rgba(239,68,68,0.8)]",
+    };
+  }
+  
+  const pendingStages = ["pending", "new", "discovery"];
+  const completedStages = ["completed", "launched", "deployment"];
+  
+  if (pendingStages.includes(currentStatus)) {
+    return {
+      label: "Pending Review",
+      bgClass: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+      dotClass: "bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse",
+    };
+  }
+  
+  if (completedStages.includes(currentStatus)) {
+    return {
+      label: "Completed",
+      bgClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+      dotClass: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]",
+    };
+  }
+  
+  return {
+    label: "In Progress",
+    bgClass: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    dotClass: "bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse",
+  };
+};
 
 export function ClientPortal() {
   const { userData, user } = useAuth();
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showMessenger, setShowMessenger] = useState(false);
+  const [unreadAlertCount, setUnreadAlertCount] = useState(0);
+  const [superAdminId, setSuperAdminId] = useState<string>("super_admin");
+
+  const { conversations } = useMessaging();
+
+  useEffect(() => {
+    async function resolveAdmin() {
+      try {
+        const adminId = await messageService.getSuperAdminUid();
+        setSuperAdminId(adminId);
+      } catch (err) {
+        console.warn("Could not dynamically resolve super admin:", err);
+      }
+    }
+    resolveAdmin();
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const conversationId = `${user.uid}_${superAdminId}`;
+    const found = conversations.find((c) => c.id === conversationId);
+    if (found?.unreadCount) {
+      setUnreadAlertCount(found.unreadCount[user.uid] || 0);
+    } else {
+      setUnreadAlertCount(0);
+    }
+  }, [user, conversations, superAdminId]);
 
   useEffect(() => {
     if (!user || !db) {
@@ -36,58 +109,109 @@ export function ClientPortal() {
     }
 
     const activeDb = db;
+    let projectsByUid: any[] = [];
+    let projectsByEmail: any[] = [];
+    let hasError = false;
 
-    const q = query(
+    const handleMerge = (byUid: any[], byEmail: any[]) => {
+      if (hasError) return;
+
+      const map = new Map();
+      byUid.forEach((p) => map.set(p.id, p));
+      byEmail.forEach((p) => map.set(p.id, p));
+
+      const merged = Array.from(map.values());
+
+      // Sort by createdAt descending
+      merged.sort((a, b) => {
+        const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 
+                     (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0);
+        const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 
+                     (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0);
+        return timeB - timeA;
+      });
+
+      setProjects(merged);
+      setLoading(false);
+    };
+
+    const qUid = query(
       collection(activeDb, "projects"),
-      where("userId", "==", user.uid),
-      orderBy("createdAt", "desc"),
+      where("userId", "==", user.uid)
     );
 
-    const unsubscribe = onSnapshot(
-      q,
+    const unsubscribeUid = onSnapshot(
+      qUid,
       (snapshot) => {
-        const p = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setProjects(p);
-        setLoading(false);
+        projectsByUid = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        handleMerge(projectsByUid, projectsByEmail);
       },
       (error: any) => {
         if (error.code === "permission-denied") {
-          setProjects([
-            {
-              id: "permission-error",
-              company: "Access Restricted",
-              projectType: "System Notification",
-              industry: "Security",
-              status: "degraded",
-              budget: "N/A",
-              timeline: "N/A",
-              createdAt: { toDate: () => new Date() },
-              isError: true,
-            },
-          ]);
+          console.warn("UID projects restricted");
+        } else {
+          console.error("Error fetching projects by UID:", error);
         }
-        setLoading(false);
-      },
+      }
     );
 
-    return () => unsubscribe();
-  }, [user?.uid]);
+    let unsubscribeEmail = () => {};
+    if (user.email) {
+      const qEmail = query(
+        collection(activeDb, "projects"),
+        where("email", "==", user.email)
+      );
+
+      unsubscribeEmail = onSnapshot(
+        qEmail,
+        (snapshot) => {
+          projectsByEmail = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+          handleMerge(projectsByUid, projectsByEmail);
+        },
+        (error: any) => {
+          if (error.code === "permission-denied" && projectsByUid.length === 0) {
+            console.warn("Email projects restricted, falling back gracefully.");
+          } else if (error.code !== "permission-denied") {
+            console.error("Error fetching projects by Email:", error);
+          }
+        }
+      );
+    }
+
+    return () => {
+      unsubscribeUid();
+      unsubscribeEmail();
+    };
+  }, [user?.uid, user?.email]);
 
   const stages = [
-    { key: "new", label: "Discovery" },
-    { key: "analysis", label: "Planning" },
-    { key: "design", label: "UI/UX Architecture" },
+    { key: "pending", label: "Submission" },
+    { key: "discovery", label: "Discovery" },
+    { key: "planning", label: "Planning" },
+    { key: "ui_ux", label: "UI / UX Design" },
     { key: "development", label: "Engineering" },
-    { key: "testing", label: "QA & Review" },
-    { key: "completed", label: "Deployed" },
+    { key: "testing", label: "QA & Inspection" },
+    { key: "review", label: "Governance Review" },
+    { key: "revision", label: "Revision Loop" },
+    { key: "deployment", label: "Staging & Release" },
+    { key: "completed", label: "Launched" },
   ];
 
   const getStageIndex = (status: string) => {
     if (!status) return 0;
     const s = status.toLowerCase();
+
+    // Map any legacy or near-matching status strings
+    let target = s;
+    if (s === "new") target = "pending";
+    if (s === "analysis") target = "planning";
+    if (s === "design") target = "ui_ux";
+
     const index = stages.findIndex(
       (st) =>
-        s.includes(st.key) || s.includes(st.label.toLowerCase().split(" ")[0]),
+        st.key === target ||
+        target.includes(st.key) ||
+        st.key.includes(target)
     );
     return index === -1 ? 0 : index;
   };
@@ -181,6 +305,7 @@ export function ClientPortal() {
               <div className="space-y-6">
                 {projects.map((proj, i) => {
                   const currentStageIndex = getStageIndex(proj.status);
+                  const detailedPill = getDetailedStatusPill(proj.status);
 
                   return (
                     <FadeUp key={proj.id} delay={0.1 + i * 0.1}>
@@ -211,27 +336,30 @@ export function ClientPortal() {
                             </div>
 
                             {/* Live Status indicator */}
-                            <div
-                              className={`flex items-center gap-2 text-[10px] uppercase font-bold tracking-widest px-3 py-1.5 rounded-full border shadow-sm ${proj.isError ? "bg-red-500/10 border-red-500/20 text-red-400" : "bg-white/[0.03] border-white/10 text-white"}`}
-                            >
+                            <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2.5">
+                              <div
+                                className={`flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-widest px-3 py-1.5 rounded-xl border shadow-sm ${proj.isError ? "bg-red-500/10 border-red-500/20 text-red-400" : detailedPill.bgClass}`}
+                              >
+                                {!proj.isError && (
+                                  <span className={`w-1.5 h-1.5 rounded-full ${detailedPill.dotClass} block`}></span>
+                                )}
+                                {proj.isError ? "Error" : detailedPill.label}
+                              </div>
                               {!proj.isError && (
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] pulse-glow block"></span>
+                                <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400 px-3 py-1.5 bg-white/[0.02] border border-white/5 rounded-xl">
+                                  Stage: {proj.status || "New"}
+                                </span>
                               )}
-                              {proj.status || "In Review"}
                             </div>
                           </div>
 
                           {proj.isError ? (
-                            <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-6 text-sm text-red-200 leading-relaxed font-mono">
-                              <p className="mb-2">
-                                SYSTEM ALERT: Authentication payload rejected by
-                                upstream data ingress.
+                            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 text-sm text-slate-300">
+                              <p className="mb-2 font-medium">
+                                Project details unavailable
                               </p>
                               <p className="opacity-70 text-xs">
-                                Missing valid IAM roles or strict Firestore
-                                security evaluation denied access to the project
-                                subspace. Verify the rules topology to clear the
-                                disruption state.
+                                Information for this project is currently initializing or restricted.
                               </p>
                             </div>
                           ) : (
@@ -251,7 +379,9 @@ export function ClientPortal() {
                                     % CLR
                                   </p>
                                 </div>
-                                <div className="relative">
+                                
+                                {/* Desktop 10-Node Horizontal Ribbon */}
+                                <div className="relative hidden md:block">
                                   {/* Track Line */}
                                   <div className="absolute top-1/2 left-0 w-full h-[2px] bg-white/[0.05] -translate-y-1/2"></div>
                                   {/* Active Track Line */}
@@ -294,6 +424,27 @@ export function ClientPortal() {
                                     })}
                                   </div>
                                 </div>
+
+                                {/* Mobile High-Contrast Milestone Stepper Grid */}
+                                <div className="md:hidden space-y-4">
+                                  <div className="flex justify-between items-center bg-white/[0.01] border border-white/5 rounded-2xl p-4">
+                                    <div>
+                                      <p className="text-[9px] uppercase font-bold tracking-widest text-slate-500">
+                                        Active Engagement milestone
+                                      </p>
+                                      <p className="text-sm font-semibold text-white mt-1">
+                                        {stages[currentStageIndex]?.label || "N/A"}
+                                      </p>
+                                    </div>
+                                    <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-xs font-mono text-primary font-bold">
+                                      {Math.round(((currentStageIndex + 1) / stages.length) * 100)}% Complete
+                                    </span>
+                                  </div>
+                                  <div className="text-xs text-slate-400 flex justify-between items-center px-1">
+                                    <span>Next Step: {stages[currentStageIndex + 1] ? stages[currentStageIndex + 1].label : "None (In Release Mode)"}</span>
+                                    <span className="font-mono text-slate-500">{currentStageIndex + 1} / {stages.length}</span>
+                                  </div>
+                                </div>
                               </div>
 
                               {/* Project Metadata Grid */}
@@ -330,6 +481,47 @@ export function ClientPortal() {
                                       : "Just now"}
                                   </p>
                                 </div>
+                              </div>
+
+                              {/* Client Action Panel */}
+                              <div className="flex justify-end gap-3 pt-6 mt-6 border-t border-white/5">
+                                {deletingId === proj.id ? (
+                                  <div className="flex items-center gap-3 bg-red-950/20 border border-red-500/20 px-4 py-2 rounded-2xl animate-pulse">
+                                    <span className="text-xs text-red-300 font-mono">Decommission this build?</span>
+                                    <button
+                                      onClick={async () => {
+                                        setIsDeleting(true);
+                                        try {
+                                          await projectService.deleteProject(proj.id);
+                                        } catch (e) {
+                                          console.error(e);
+                                        } finally {
+                                          setIsDeleting(false);
+                                          setDeletingId(null);
+                                        }
+                                      }}
+                                      disabled={isDeleting}
+                                      className="flex items-center gap-1.5 px-3 py-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-[10px] uppercase tracking-wider rounded-lg transition-colors cursor-pointer"
+                                    >
+                                      {isDeleting ? "Decommissioning..." : "Confirm"}
+                                    </button>
+                                    <button
+                                      onClick={() => setDeletingId(null)}
+                                      disabled={isDeleting}
+                                      className="px-2 py-1 text-[10px] uppercase tracking-wider text-slate-400 hover:text-white transition-colors cursor-pointer"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => setDeletingId(proj.id)}
+                                    className="flex items-center gap-1.5 px-4 py-2 bg-white/[0.02] hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-slate-400 hover:text-red-400 font-bold text-[10px] uppercase tracking-wider rounded-xl transition-all duration-300 cursor-pointer"
+                                  >
+                                    <Trash2 size={13} />
+                                    Delete Request
+                                  </button>
+                                )}
                               </div>
                             </>
                           )}
@@ -394,46 +586,92 @@ export function ClientPortal() {
             </FadeUp>
 
             <FadeUp delay={0.4}>
-              <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-3xl p-8 hover:border-white/10 transition-colors group">
-                <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-8 border-b border-white/[0.05] pb-4">
-                  Dedicated Support
-                </h3>
-                <div className="space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center shrink-0">
-                      <Mail className="w-4 h-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-white font-medium tracking-wide mb-1">
-                        Priority Channel
-                      </p>
-                      <p className="text-xs text-slate-500 leading-relaxed font-light mb-3">
-                        Direct access to your assigned engineering lead.
-                      </p>
-                      <a
-                        href="mailto:einortsolutions237@gmail.com"
-                        className="text-[10px] uppercase font-bold tracking-widest text-primary hover:text-white transition-colors flex items-center gap-1"
-                      >
-                        Contact Architect <ArrowRight size={10} />
-                      </a>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center shrink-0">
-                      <Calendar className="w-4 h-4 text-emerald-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-white font-medium tracking-wide mb-1">
-                        Agile Syncs
-                      </p>
-                      <p className="text-xs text-slate-500 leading-relaxed font-light">
-                        Scheduled alignment meetings will populate here
-                        post-kickoff.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+              <AnimatePresence mode="wait">
+                {showMessenger ? (
+                  <motion.div
+                    key="messenger"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    className="w-full"
+                  >
+                    <ClientMessenger
+                      userId={user?.uid || ""}
+                      userEmail={user?.email || ""}
+                      userName={userData?.fullName || "Valued Partner"}
+                      onClose={() => setShowMessenger(false)}
+                    />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="support-card"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                  >
+                    <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-3xl p-8 hover:border-white/10 transition-colors group relative overflow-hidden">
+                      {unreadAlertCount > 0 && (
+                        <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-cyan-400/10 border border-cyan-400/20 px-2.5 py-1 rounded-full animate-pulse shadow-[0_0_12px_rgba(34,211,238,0.2)]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,1)]"></span>
+                          <span className="text-[9px] font-bold text-cyan-400 font-mono">
+                            {unreadAlertCount} REPLY WAIT
+                          </span>
+                        </div>
+                      )}
+                      
+                      <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-8 border-b border-white/[0.05] pb-4">
+                        Dedicated Support
+                      </h3>
+                      <div className="space-y-6">
+                        {/* Live support button */}
+                        <div className="pb-4 border-b border-white/5">
+                          <button
+                            onClick={() => setShowMessenger(true)}
+                            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-primary-hover border border-primary/20 text-white text-[11px] font-bold uppercase tracking-widest rounded-2xl shadow-[0_0_15px_rgba(59,130,246,0.2)] hover:shadow-[0_0_25px_rgba(59,130,246,0.4)] transition-all duration-300 cursor-pointer"
+                          >
+                            <MessageSquare size={13} className="animate-pulse" />
+                            Open Live Pipeline
+                          </button>
+                        </div>
+
+                        <div className="flex items-start gap-4">
+                          <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center shrink-0">
+                            <Mail className="w-4 h-4 text-primary" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-white font-medium tracking-wide mb-1">
+                              Priority Channel
+                            </p>
+                            <p className="text-xs text-slate-500 leading-relaxed font-light mb-3">
+                              Direct access to your assigned engineering lead.
+                            </p>
+                            <a
+                              href="mailto:einortsolutions237@gmail.com"
+                              className="text-[10px] uppercase font-bold tracking-widest text-primary hover:text-white transition-colors flex items-center gap-1"
+                            >
+                              Contact Architect <ArrowRight size={10} />
+                            </a>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-4">
+                          <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center shrink-0">
+                            <Calendar className="w-4 h-4 text-emerald-400" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-white font-medium tracking-wide mb-1">
+                              Agile Syncs
+                            </p>
+                            <p className="text-xs text-slate-500 leading-relaxed font-light">
+                              Scheduled alignment meetings will populate here
+                              post-kickoff.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </FadeUp>
           </div>
         </div>

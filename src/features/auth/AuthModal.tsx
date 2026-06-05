@@ -85,7 +85,13 @@ export function AuthModal({
         return;
       }
       const docRef = doc(db, "users", uid);
-      const docSnap = await getDoc(docRef);
+      
+      // Prevent indefinite hangs if Firestore network is unstable
+      const docSnap = await Promise.race([
+        getDoc(docRef),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 4000))
+      ]) as any;
+
       if (docSnap.exists()) {
         const data = docSnap.data();
         if (data.role === "admin" || data.role === "super_admin") {
@@ -96,31 +102,42 @@ export function AuthModal({
       } else {
         // Orphaned account recovery - recreate profile if missing
         if (fallbackData) {
-          await setDoc(docRef, {
-            uid: uid,
-            email: fallbackData.email,
-            fullName: fallbackData.fullName,
-            role: "client",
-            accountType: "enterprise",
-            permissions: ["read_own_profile", "read_own_projects"],
-            createdAt: serverTimestamp(),
-            lastLogin: serverTimestamp(),
-            emailVerified: fallbackData.emailVerified || false,
-            profileCompleted: true,
-          });
+          try {
+            await Promise.race([
+              setDoc(docRef, {
+                uid: uid,
+                email: fallbackData.email,
+                fullName: fallbackData.fullName,
+                role: "client",
+                accountType: "enterprise",
+                permissions: ["read_own_profile", "read_own_projects"],
+                isAdmin: false,
+                createdAt: serverTimestamp(),
+                lastLogin: serverTimestamp(),
+                emailVerified: fallbackData.emailVerified || false,
+                profileCompleted: true,
+              }),
+              new Promise((_, reject) => setTimeout(() => reject(new Error("setDoc timeout")), 4000))
+            ]);
+          } catch (err) {
+            console.warn("Failed to create orphaned user profile", err);
+          }
         }
         navigate("/client-portal");
       }
       onClose();
     } catch (e) {
+      console.warn("Redirect User caught error:", e);
       navigate("/client-portal");
       onClose();
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const onLogin = async (data: LoginData) => {
     if (!auth) {
-      setErrorStatus("Auth service not available");
+      setErrorStatus("Authentication service offline.");
       return;
     }
     setIsLoading(true);
@@ -132,7 +149,7 @@ export function AuthModal({
         data.email,
         data.password,
       );
-      setSuccessStatus("Secure connection established. Redirecting...");
+      setSuccessStatus("Tunnel verified. Establishing secure connection...");
       await redirectUser(cred.user.uid, {
         email: data.email,
         fullName: "User",
@@ -145,11 +162,16 @@ export function AuthModal({
       if (
         error.code === "auth/invalid-credential" ||
         error.code === "auth/user-not-found" ||
-        error.code === "auth/wrong-password"
+        error.code === "auth/wrong-password" ||
+        error.code === "auth/invalid-email"
       ) {
-        setErrorStatus("Password or Email Incorrect");
+        setErrorStatus("Invalid email or password");
+      } else if (error.code === "auth/network-request-failed") {
+        setErrorStatus("Network connection issue");
+      } else if (error.code === "auth/too-many-requests") {
+        setErrorStatus("Too many failed attempts. Please try again later.");
       } else {
-        setErrorStatus(error.message || "Authentication failed. Please attempt again later.");
+        setErrorStatus("Authentication failed. Please attempt again later.");
       }
     }
   };
@@ -180,6 +202,7 @@ export function AuthModal({
         role: "client",
         accountType: "enterprise",
         permissions: ["read_own_profile", "read_own_projects"],
+        isAdmin: false,
         createdAt: serverTimestamp(),
         lastLogin: serverTimestamp(),
         emailVerified: user.emailVerified,
@@ -187,7 +210,7 @@ export function AuthModal({
       });
 
       setSuccessStatus(
-        "Account created successfully. Redirecting automatically...",
+        "Account created successfully. Configuring Workspace...",
       );
       await redirectUser(user.uid, {
         email: data.email,
@@ -200,9 +223,15 @@ export function AuthModal({
       console.error(`[Firebase Signup Error] Code: ${error.code}, Message: ${error.message}`, error);
       
       if (error.code === "auth/email-already-in-use") {
-        setErrorStatus("User already exists. Sign in?");
+        setErrorStatus("Email already exists");
+      } else if (error.code === "auth/weak-password") {
+        setErrorStatus("Weak password - must be at least 6 characters");
+      } else if (error.code === "auth/invalid-email") {
+        setErrorStatus("Please enter a valid email address");
+      } else if (error.code === "auth/network-request-failed") {
+        setErrorStatus("Network connection issue");
       } else {
-        setErrorStatus(error.message || "Registration failed. Please attempt again later.");
+        setErrorStatus("Registration failed. Please attempt again later.");
       }
     }
   };
@@ -252,7 +281,7 @@ export function AuthModal({
                       <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
                       <div className="text-sm text-red-200">
                         {errorStatus}
-                        {errorStatus === "User already exists. Sign in?" && (
+                        {errorStatus === "Email already exists" && (
                           <button
                             onClick={() => switchMode("login")}
                             className="ml-2 underline font-bold hover:text-white"

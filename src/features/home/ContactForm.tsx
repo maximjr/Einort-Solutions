@@ -17,8 +17,6 @@ import {
   LayoutTemplate,
   Briefcase,
 } from "lucide-react";
-import { collection, serverTimestamp, setDoc, doc } from "firebase/firestore";
-import { db } from "../../lib/firebase";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "../../lib/utils";
 
@@ -61,6 +59,7 @@ const timelines = [
 ];
 
 import { useAuth } from "../../hooks/useAuth";
+import { ProjectOrchestrator } from "../services/projectOrchestrator";
 
 export function ContactForm() {
   const [step, setStep] = useState(1);
@@ -113,39 +112,28 @@ export function ContactForm() {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
-      const leadScore = Math.floor(Math.random() * 40) + 60; // Mock score 60-100
-      const complexityScore = Math.floor(Math.random() * 5) + 5; // Mock score 5-10
-      
-      if (db) {
-        const docRef = doc(collection(db, "projects"));
-        const projectData = {
-          id: docRef.id,
-          projectId: docRef.id,
-          userId: user?.uid || "anonymous",
-          email: data.email,
-          clientName: data.clientName,
-          company: data.company,
-          industry: data.industry,
-          projectType: data.projectType,
-          selectedFeatures: data.selectedFeatures,
-          requirements: data.requirements,
-          budget: data.budget,
-          timeline: data.timeline,
-          urgency: data.urgency,
-          leadScore,
-          complexityScore,
-          status: "new",
-          createdAt: serverTimestamp(),
-        };
+      const result = await ProjectOrchestrator.submitProject({
+        userId: user?.uid || "anonymous",
+        email: data.email,
+        clientName: data.clientName,
+        company: data.company,
+        industry: data.industry,
+        projectType: data.projectType,
+        selectedFeatures: data.selectedFeatures,
+        requirements: data.requirements,
+        budget: data.budget,
+        timeline: data.timeline,
+        urgency: data.urgency,
+        status: "pending",
+      });
 
-        await setDoc(docRef, projectData);
+      if (result.success) {
+        setIsSuccess(true);
+        reset();
+        setStep(1);
       } else {
-        console.warn("Database not configured. Bypassing project submission.");
+        setSubmitError(result.message || "An error occurred submitting your request.");
       }
-
-      setIsSuccess(true);
-      reset();
-      setStep(1);
     } catch (error) {
       setSubmitError("An error occurred submitting your request.");
     } finally {
