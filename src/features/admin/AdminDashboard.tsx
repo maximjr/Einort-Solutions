@@ -269,7 +269,7 @@ export function AdminDashboard() {
       // Simulate network wait for real-time Firebase sync assurance
       await new Promise(resolve => setTimeout(resolve, 800));
     }}>
-      <section className="py-24 bg-surface min-h-[80vh] relative pt-32">
+      <section className="py-24 bg-surface min-h-[80dvh] relative pt-32">
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[150px] pointer-events-none rounded-full translate-x-1/2 -translate-y-1/2"></div>
 
       <Container>

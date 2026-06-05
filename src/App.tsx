@@ -47,6 +47,7 @@ function Layout() {
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
+      syncTouch: false,
       wheelMultiplier: 1,
       touchMultiplier: 2,
     });
@@ -64,7 +65,7 @@ function Layout() {
   }, []);
 
   return (
-    <div className="bg-background min-h-screen text-text-main font-sans selection:bg-primary selection:text-white flex flex-col">
+    <div className="bg-background min-h-[100dvh] text-text-main font-sans selection:bg-primary selection:text-white flex flex-col">
       <Navbar />
       <main className="flex-grow">
         <Suspense

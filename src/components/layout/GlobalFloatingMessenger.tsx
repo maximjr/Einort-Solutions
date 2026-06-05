@@ -115,7 +115,7 @@ export function GlobalFloatingMessenger() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: "100%", scale: 1 }}
               transition={{ type: "spring", damping: 28, stiffness: 220 }}
-              className="fixed inset-x-0 bottom-0 top-16 md:top-auto md:inset-auto z-[95] md:bottom-28 md:right-8 md:w-[420px] md:h-[650px] max-h-[85vh] flex flex-col pointer-events-auto rounded-t-3xl md:rounded-3xl shadow-[0_-30px_100px_rgba(0,0,0,0.5)] md:shadow-[0_30px_100px_rgba(0,0,0,0.5)] overflow-hidden"
+              className="fixed inset-x-0 bottom-0 top-16 md:top-auto md:inset-auto z-[95] md:bottom-28 md:right-8 md:w-[420px] md:h-[650px] max-h-[85dvh] flex flex-col pointer-events-auto rounded-t-3xl md:rounded-3xl shadow-[0_-30px_100px_rgba(0,0,0,0.5)] md:shadow-[0_30px_100px_rgba(0,0,0,0.5)] overflow-hidden"
             >
               {/* Glossy shadow container for desktop */}
               <div className="hidden md:block absolute -inset-1 bg-gradient-to-b from-primary/20 to-transparent blur-xl -z-10 rounded-3xl opacity-50"></div>

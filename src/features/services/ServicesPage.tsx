@@ -135,7 +135,7 @@ export function ServicesPage() {
         description={service.description}
         schema={jsonLdSchema}
       />
-      <section className="pt-32 pb-24 bg-surface min-h-[80vh] relative overflow-hidden">
+      <section className="pt-32 pb-24 bg-surface min-h-[80dvh] relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 blur-[200px] pointer-events-none rounded-full translate-x-1/3 -translate-y-1/3"></div>
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-24 relative z-10">

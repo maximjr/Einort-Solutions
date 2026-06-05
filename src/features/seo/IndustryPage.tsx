@@ -26,7 +26,7 @@ export function IndustryPage() {
   return (
     <>
       <SEO schema={schema} />
-      <section className="pt-32 pb-24 bg-surface min-h-[80vh] relative overflow-hidden">
+      <section className="pt-32 pb-24 bg-surface min-h-[80dvh] relative overflow-hidden">
         {/* Ambient background */}
         <div className="absolute top-1/4 right-1/4 w-[600px] h-[600px] bg-primary/5 blur-[150px] rounded-full mix-blend-screen pointer-events-none"></div>
 
