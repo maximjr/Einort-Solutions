@@ -10,8 +10,7 @@ import {
   Archive,
   CheckCircle2,
   FolderLock,
-  Globe,
-  BellRing
+  Globe
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { messageService, Conversation, Message } from "../../services/admin/messageService";
@@ -199,205 +198,212 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
   const activeSelectedClient = clients.find((c) => c.id === selectedClientId);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-[#030712] rounded-3xl border border-white/[0.05] p-6 lg:p-8 min-h-[550px] shadow-2xl relative overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-full lg:h-[650px] bg-[#0a0f18]/90 border border-white/[0.05] rounded-3xl overflow-hidden shadow-2xl relative">
       {/* Background flare */}
-      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-primary/5 blur-[80px] rounded-full pointer-events-none -mr-40 -mt-40"></div>
-
-      {syncError && (
-        <div className="lg:col-span-12 bg-red-500/10 border border-red-500/20 px-5 py-3 rounded-2xl text-red-500 text-xs font-mono flex items-center gap-2 mb-2">
-          <Activity size={14} className="animate-pulse" />
-          <span>{syncError}</span>
-        </div>
-      )}
+      <div className="hidden lg:block absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[100px] rounded-full pointer-events-none -mr-40 -mt-40"></div>
 
       {/* LEFT PANEL: Conversation and client directory */}
-      <div className="lg:col-span-4 flex flex-col space-y-4 border-r border-white/5 pr-0 lg:pr-6">
-        <div>
-          <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 mb-1 flex items-center gap-1.5">
-            <MessageSquare size={14} className="text-primary" /> Active Pipeline Directory
+      <div className="w-full lg:w-[320px] flex flex-col border-r border-white/[0.05] bg-black/20 shrink-0">
+        <div className="p-5 border-b border-white/[0.05]">
+          <h3 className="text-[13px] font-semibold tracking-wide text-white flex items-center gap-2">
+            <MessageSquare size={16} className="text-primary" /> Active Clients
           </h3>
-          <p className="text-[10px] text-slate-500 font-mono">Live synchronization with user database</p>
+          <p className="text-[11px] text-slate-500 font-light mt-1 w-full truncate">Select a client to manage communications</p>
         </div>
 
-        <div className="flex-1 overflow-y-auto space-y-2 max-h-[440px] pr-2 scrollbar-thin">
+        <div className="flex-1 overflow-y-auto w-full scrollbar-none pb-4">
           {clients.length === 0 ? (
-            <div className="py-12 text-center text-slate-600 text-xs font-light">
-              No registered clients to display.
+            <div className="p-8 text-center text-slate-500 text-[13px] font-light">
+              No registered clients.
             </div>
           ) : (
-            clients.map((c) => {
-              // Find matching conversation in list to check last message and unread count
-              const convId = `${c.id}_${currentAdminId}`;
-              const conv = conversations.find((v) => v.id === convId);
-              const unread = conv?.unreadCount?.[currentAdminId] || 0;
-              const online = clientPresence[c.id] || false;
-              const isSelected = selectedClientId === c.id;
+            <div className="px-3 pt-3 space-y-1">
+              {clients.map((c) => {
+                const convId = `${c.id}_${currentAdminId}`;
+                const conv = conversations.find((v) => v.id === convId);
+                const unread = conv?.unreadCount?.[currentAdminId] || 0;
+                const online = clientPresence[c.id] || false;
+                const isSelected = selectedClientId === c.id;
 
-              return (
-                <button
-                  key={c.id}
-                  onClick={() => setSelectedClientId(c.id)}
-                  className={`w-full flex items-start gap-3 p-3.5 rounded-2xl border text-left transition-all relative ${
-                    isSelected
-                      ? "bg-primary/10 border-primary/30 text-white shadow-[0_0_15px_rgba(59,130,246,0.1)]"
-                      : "bg-white/[0.015] border-white/[0.04] hover:bg-white/[0.03] text-slate-400 hover:text-white"
-                  }`}
-                >
-                  <div className="relative shrink-0 mt-0.5">
-                    <div className="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/5 flex items-center justify-center font-bold text-xs uppercase">
-                      {c.name ? c.name.substring(0, 2) : "CL"}
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => setSelectedClientId(c.id)}
+                    className={`w-full flex items-center gap-3 p-3 text-left transition-all rounded-xl relative ${
+                      isSelected
+                        ? "bg-primary/10 border-transparent shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                        : "bg-transparent hover:bg-white/[0.03] border-transparent"
+                    }`}
+                  >
+                    <div className="relative shrink-0">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-[13px] uppercase transition-colors ${isSelected ? "bg-primary text-white shadow-lg" : "bg-white/[0.05] text-slate-300"}`}>
+                        {c.name ? c.name.substring(0, 2) : "CL"}
+                      </div>
+                      <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#0a0f18] transition-colors ${online ? "bg-emerald-400" : "bg-transparent border-transparent"}`}></span>
                     </div>
-                    <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-[#030712] ${online ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,1)]" : "bg-slate-600"}`}></span>
-                  </div>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-0.5">
-                      <p className="text-xs font-semibold truncate text-white">{c.name || "Client User"}</p>
-                      {unread > 0 && (
-                        <span className="flex items-center gap-1 bg-cyan-400 text-[#030712] text-[9px] font-bold px-1.5 py-0.5 rounded-full font-mono animate-bounce">
-                          <BellRing size={7} /> {unread}
-                        </span>
+                    <div className="flex-1 min-w-0 overflow-hidden">
+                      <div className="flex items-center justify-between mb-0.5">
+                        <p className={`text-[13px] font-medium truncate pr-2 ${isSelected ? "text-white" : "text-slate-300"}`}>{c.name || "Client User"}</p>
+                        {unread > 0 && (
+                          <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 bg-cyan-500 text-[#0a0f18] text-[10px] font-bold rounded-full shadow-[0_0_10px_rgba(34,211,238,0.4)]">
+                            {unread}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {conv?.lastMessage ? (
+                        <p className={`text-[11px] truncate leading-relaxed font-light ${isSelected ? "text-slate-300" : "text-slate-500"}`}>
+                          {conv.lastMessage}
+                        </p>
+                      ) : (
+                        <p className={`text-[11px] truncate font-light italic ${isSelected ? "text-slate-400" : "text-slate-600"}`}>
+                          No messages yet
+                        </p>
                       )}
                     </div>
-                    <p className="text-[10px] text-slate-500 font-mono truncate mb-1.5">{c.email}</p>
-                    
-                    {conv?.lastMessage ? (
-                      <p className="text-[10px] text-slate-400 truncate leading-relaxed font-light font-sans italic">
-                        {conv.lastMessage}
-                      </p>
-                    ) : (
-                      <p className="text-[10px] text-slate-600 truncate font-light font-mono">
-                        Pipeline established
-                      </p>
-                    )}
-                  </div>
 
-                  {conv?.priority && conv.priority !== "none" && (
-                    <span className={`absolute right-3 bottom-3 w-1.5 h-1.5 rounded-full ${
-                      conv.priority === "high" ? "bg-red-500" : conv.priority === "medium" ? "bg-orange-500" : "bg-yellow-500"
-                    }`}></span>
-                  )}
-                </button>
-              );
-            })
+                    {conv?.priority && conv.priority !== "none" && (
+                      <span className={`absolute left-0 top-1/2 -mt-2 w-1 h-4 rounded-r-md ${
+                        conv.priority === "high" ? "bg-red-500/80" : conv.priority === "medium" ? "bg-orange-500/80" : "bg-yellow-500/80"
+                      }`}></span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           )}
         </div>
       </div>
 
       {/* RIGHT PANEL: Dynamic messaging zone */}
-      <div className="lg:col-span-8 flex flex-col space-y-4 min-h-[460px]">
+      <div className="flex-1 flex flex-col relative z-10 w-full min-h-[460px]">
+        {syncError && (
+          <div className="absolute top-0 left-0 right-0 z-50 bg-red-500/10 backdrop-blur-md border-b border-red-500/20 px-5 py-2.5 text-red-500 text-[11px] flex items-center justify-center gap-2">
+            <Activity size={14} className="animate-pulse" />
+            <span>{syncError}</span>
+          </div>
+        )}
+
         {selectedClientId && activeSelectedClient ? (
-          <div className="flex flex-col h-full bg-[#070a13] border border-white/[0.05] rounded-2xl overflow-hidden shadow-inner flex-1">
+          <div className="flex flex-col h-full bg-transparent flex-1">
             {/* Header / Client Info & Flags controller */}
-            <div className="px-5 py-4 bg-white/[0.02] border-b border-white/[0.05] flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center font-bold text-xs uppercase shrink-0">
-                  {activeSelectedClient.name ? activeSelectedClient.name.substring(0, 2) : "CL"}
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-white">
-                      {activeSelectedClient.name}
-                    </h4>
-                    <span className={`text-[8px] px-1.5 py-0.5 rounded-full font-mono uppercase bg-white/5 border border-white/5 text-slate-400 capitalize`}>
-                      {activeSelectedClient.accountType || "Standard"} Client
-                    </span>
-                    <span className={`w-2 h-2 rounded-full ${clientPresence[activeSelectedClient.id] ? "bg-emerald-400" : "bg-slate-600"}`}></span>
+            <div className="px-5 py-4 border-b border-white/[0.05] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-black/10 backdrop-blur-3xl shrink-0">
+               <div className="flex items-center gap-3.5">
+                  <div className="relative">
+                    <div className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/10 text-white flex items-center justify-center font-medium text-sm uppercase shrink-0">
+                      {activeSelectedClient.name ? activeSelectedClient.name.substring(0, 2) : "CL"}
+                    </div>
                   </div>
-                  <p className="text-[10px] text-slate-500 font-mono mt-0.5">{activeSelectedClient.email}</p>
-                </div>
-              </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-[14px] font-semibold tracking-wide text-white">
+                        {activeSelectedClient.name}
+                      </h4>
+                      <span className={`text-[9px] px-2 py-0.5 rounded-full font-medium uppercase ${clientPresence[activeSelectedClient.id] ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-slate-400"}`}>
+                        {clientPresence[activeSelectedClient.id] ? "Online" : "Offline"}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-0.5 font-light">{activeSelectedClient.email}</p>
+                  </div>
+               </div>
 
               {/* CRM Priority Flags Selector & Thread status */}
-              <div className="flex flex-wrap items-center gap-3 bg-white/[0.01] border border-white/5 p-2 rounded-xl shrink-0">
-                <div className="flex items-center gap-1.5">
+              <div className="flex flex-wrap items-center gap-1.5 md:gap-3 bg-white/[0.02] border border-white/[0.05] p-1.5 rounded-xl shrink-0">
+                <div className="flex items-center gap-1.5 px-2">
                   <Flag size={12} className="text-slate-500" />
                   <select
                     value={selectedConversation?.priority || "none"}
                     onChange={(e) => updatePriority(e.target.value)}
-                    className="bg-transparent text-slate-400 hover:text-white text-[10px] uppercase font-bold tracking-wider rounded border border-white/5 focus:outline-none focus:border-primary px-1.5 py-0.5 h-6 font-mono cursor-pointer"
+                    className="bg-transparent text-slate-300 hover:text-white text-[11px] font-medium tracking-wide rounded focus:outline-none cursor-pointer py-1 appearance-none"
                   >
-                    <option value="none">Priority: None</option>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
+                    <option value="none" className="bg-[#0a0f18] text-slate-300">Standard Priority</option>
+                    <option value="low" className="bg-[#0a0f18] text-slate-300">Low Priority</option>
+                    <option value="medium" className="bg-[#0a0f18] text-slate-300">Medium Priority</option>
+                    <option value="high" className="bg-[#0a0f18] text-slate-300">High Priority</option>
                   </select>
                 </div>
 
-                <div className="w-[1px] h-4 bg-white/5"></div>
+                <div className="w-[1px] h-4 bg-white/10 hidden md:block"></div>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 px-2">
                   <Archive size={12} className="text-slate-500" />
                   <select
                     value={selectedConversation?.status || "active"}
                     onChange={(e) => updateStatus(e.target.value)}
-                    className="bg-transparent text-slate-400 hover:text-white text-[10px] uppercase font-bold tracking-wider rounded border border-white/5 focus:outline-none focus:border-primary px-1.5 py-0.5 h-6 font-mono cursor-pointer"
+                    className="bg-transparent text-slate-300 hover:text-white text-[11px] font-medium tracking-wide rounded focus:outline-none cursor-pointer py-1 appearance-none"
                   >
-                    <option value="active">Active</option>
-                    <option value="archived">Archived</option>
-                    <option value="closed">Closed</option>
+                    <option value="active" className="bg-[#0a0f18] text-slate-300">Active</option>
+                    <option value="archived" className="bg-[#0a0f18] text-slate-300">Archived</option>
+                    <option value="closed" className="bg-[#0a0f18] text-slate-300">Closed</option>
                   </select>
                 </div>
               </div>
             </div>
 
             {/* Timeline Stream Scroll */}
-            <div className="flex-1 overflow-y-auto px-5 py-6 space-y-4 max-h-[280px] bg-[#05070e]/80">
+            <div className="flex-1 overflow-y-auto px-5 py-6 bg-gradient-to-b from-transparent to-black/10">
               {loadingMessages ? (
-                <div className="h-full flex flex-col items-center justify-center gap-2 py-12">
+                <div className="h-full flex flex-col items-center justify-center gap-4 py-12 text-slate-400">
                   <Loader2 className="w-5 h-5 text-primary animate-spin" />
-                  <p className="text-[9px] uppercase font-bold tracking-widest text-slate-500 font-mono">Syncing archive...</p>
+                  <p className="text-[11px] font-medium tracking-wide">Retrieving channel history...</p>
                 </div>
               ) : messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-3 py-12">
-                  <Globe className="w-10 h-10 text-slate-700 animate-pulse" />
-                  <div>
-                    <h5 className="text-[11px] font-bold text-white uppercase tracking-wider mb-0.5">Secure Feed Established</h5>
-                    <p className="text-slate-500 font-light text-[10px] leading-relaxed max-w-xs">
-                      Send a message to sync with {activeSelectedClient.name}. All administrative logs and project updates are replicated securely.
+                <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-5 py-12">
+                  <div className="w-16 h-16 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-400 shadow-xl relative">
+                    <div className="absolute inset-0 rounded-full bg-white/[0.02] blur-xl"></div>
+                    <Globe className="w-6 h-6 relative z-10 opacity-50" />
+                  </div>
+                  <div className="space-y-2">
+                    <h5 className="text-[15px] font-semibold text-white tracking-wide">Secure Link Established</h5>
+                    <p className="text-slate-400 font-light text-[13px] leading-relaxed max-w-sm mx-auto">
+                      Channel is open with {activeSelectedClient.name}. You may now send deliverables and secure communications.
                     </p>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {messages.map((ms, idx) => {
                     const isMe = ms.senderId === currentAdminId;
                     return (
-                      <div 
+                      <motion.div 
+                        layout
+                        initial={{ opacity: 0, y: 10, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
                         key={ms.id || idx}
-                        className={`flex ${isMe ? "justify-end" : "justify-start"} items-end gap-2`}
+                        className={`flex ${isMe ? "justify-end" : "justify-start"} items-end gap-2.5 group`}
                       >
                         {!isMe && (
-                          <div className="w-6 h-6 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-400 flex items-center justify-center font-mono text-[9px] font-bold uppercase shrink-0">
+                          <div className="w-7 h-7 rounded-full bg-white/[0.05] border border-white/10 text-white flex items-center justify-center text-[10px] font-medium uppercase shrink-0 shadow-sm mb-5">
                             CL
                           </div>
                         )}
-                        <div className="max-w-[75%] flex flex-col">
-                          <div className={`px-4 py-3 rounded-2xl text-xs font-light tracking-wide shadow-lg ${
+                        <div className={`max-w-[75%] flex flex-col ${isMe ? "items-end" : "items-start"}`}>
+                          <div className={`px-4 py-3 text-[13.5px] font-light shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-all ${
                             isMe 
-                              ? "bg-primary text-white rounded-br-none border border-primary/10" 
-                              : "bg-white/[0.02] text-slate-200 rounded-bl-none border border-white/5"
+                              ? "bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl text-white rounded-2xl rounded-br-sm border border-white/[0.08]" 
+                              : "bg-white/[0.06] backdrop-blur-xl text-slate-100 rounded-2xl rounded-bl-sm border border-white/[0.08]"
                           }`}>
-                            <p className="whitespace-pre-wrap leading-relaxed break-all">{ms.text}</p>
+                            <p className="whitespace-pre-wrap leading-relaxed break-words">{ms.text}</p>
                             
                             {ms.attachments && ms.attachments.length > 0 && (
-                              <div className="mt-2 pt-2 border-t border-white/10 space-y-1">
+                              <div className={`mt-3 pt-3 border-t space-y-2 ${isMe ? "border-white/10" : "border-white/10"}`}>
                                 {ms.attachments.map((attach, aIdx) => (
                                   <a 
                                     key={aIdx}
                                     href={attach.url} 
                                     target="_blank" 
                                     rel="noreferrer"
-                                    className="flex items-center gap-1.5 text-[10px] font-mono text-cyan-400 hover:underline hover:text-cyan-300"
+                                    className={`flex items-center gap-2 text-[12px] font-medium hover:underline transition-colors text-cyan-400 hover:text-cyan-300`}
                                   >
-                                    <Paperclip size={10} className="shrink-0" />
+                                    <Paperclip size={12} className="shrink-0" />
                                     <span>{attach.name || "Attachment"}</span>
                                   </a>
                                 ))}
                               </div>
                             )}
                           </div>
-                          <div className={`flex items-center gap-1.5 mt-1 text-[9px] text-slate-500 font-mono ${isMe ? "justify-end" : "justify-start"}`}>
+                          <div className={`flex items-center gap-1.5 mt-1.5 px-1 text-[10px] text-slate-500 font-medium ${isMe ? "justify-end" : "justify-start"} opacity-0 group-hover:opacity-100 transition-opacity`}>
                             <span>
                               {ms.timestamp ? (
                                 ms.timestamp.toDate ? (
@@ -411,93 +417,97 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                             </span>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     );
                   })}
-                  <div ref={messageEndRef} />
+                  <div ref={messageEndRef} className="h-2" />
                 </div>
               )}
             </div>
 
             {/* Admin reply composer */}
-            <form onSubmit={handleSendMessage} className="p-4 bg-white/[0.01] border-t border-white/[0.05] space-y-3">
+            <form onSubmit={handleSendMessage} className="p-3 md:p-4 bg-black/20 border-t border-white/[0.05] backdrop-blur-3xl shrink-0">
               {mockAttachment && (
-                <div className="flex items-center justify-between bg-emerald-950/20 border border-emerald-500/20 rounded-xl px-3 py-1.5 text-[10px] font-mono text-emerald-400 animate-pulse">
-                  <span className="truncate flex items-center gap-1.5">
-                    <CheckCircle2 size={10} /> Document attached
+                <div className="flex items-center justify-between mb-3 bg-cyan-500/10 border border-cyan-500/20 rounded-xl px-3 py-2 text-[12px] text-cyan-400">
+                  <span className="truncate flex items-center gap-2 font-medium">
+                    <CheckCircle2 size={14} /> Document attached
                   </span>
                   <button 
                     type="button" 
                     onClick={() => setMockAttachment(null)}
-                    className="text-slate-500 hover:text-white p-0.5 cursor-pointer"
+                    className="text-cyan-400/80 hover:text-cyan-400 p-0.5 cursor-pointer rounded-full hover:bg-cyan-500/10 transition-colors"
                   >
-                     <X size={12} />
+                     <X size={14} />
                   </button>
                 </div>
               )}
 
-              <div className="flex gap-2">
-                <div className="relative shrink-0">
+              <div className="flex flex-col sm:flex-row items-end sm:items-end gap-2.5">
+                <div className="relative shrink-0 mb-1 w-full sm:w-auto flex justify-between sm:block">
                   <button
                     type="button"
                     onClick={() => setShowAttachMock(!showAttachMock)}
-                    className="w-10 h-10 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 hover:bg-white/[0.04] flex items-center justify-center text-slate-400 hover:text-white transition-all cursor-pointer"
+                    className="w-9 h-9 rounded-full bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all cursor-pointer shadow-sm"
                   >
-                    <Paperclip size={14} />
+                    <Paperclip size={15} />
                   </button>
                   <AnimatePresence>
                     {showAttachMock && (
                       <motion.div 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute bottom-12 left-0 w-44 bg-[#0e1322] border border-white/10 rounded-xl shadow-2xl p-2 z-30"
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        className="absolute bottom-12 left-0 w-48 bg-[#1a2133] border border-white/[0.08] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] p-2 space-y-0.5 z-30"
                       >
                         <button 
                           type="button"
                           onClick={simulateAttachment}
-                          className="w-full text-left font-mono text-[9px] text-slate-300 hover:text-white hover:bg-white/5 py-1 px-1.5 rounded transition-colors cursor-pointer"
+                          className="w-full text-left font-medium text-[12px] text-slate-200 hover:text-white hover:bg-white/5 py-2 px-3 rounded-lg transition-colors cursor-pointer flex items-center gap-2"
                         >
-                          ✦ Attach Engineering Audit
+                          <Paperclip size={12} className="text-primary" /> Engineering Audit
                         </button>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </div>
 
-                <div className="flex-1 relative">
+                <div className="w-full sm:flex-1 relative">
                   <textarea
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={handleKeyPress}
-                    placeholder={`Administrative secure payload ... (Ctrl + Enter to send)`}
+                    placeholder={`Reply to ${activeSelectedClient.name}...`}
                     disabled={sending}
                     rows={1}
-                    className="w-full h-10 min-h-[40px] max-h-24 bg-white/[0.015] border border-white/5 focus:border-primary/50 focus:ring-1 focus:ring-primary/20 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none resize-none scrollbar-none"
+                    className="w-full min-h-[44px] max-h-32 bg-white/[0.04] border border-white/[0.08] focus:border-white/20 focus:ring-1 focus:ring-white/10 rounded-2xl px-4 py-3 text-[14px] text-white placeholder-slate-400 font-light focus:outline-none resize-none transition-all scrollbar-none shadow-inner"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={sending || (!inputText.trim() && !mockAttachment)}
-                  className="h-10 px-4 rounded-xl bg-primary hover:bg-primary-hover disabled:opacity-50 text-white flex items-center justify-center shrink-0 cursor-pointer"
+                  className="w-full sm:w-11 h-11 sm:mb-0.5 rounded-full bg-white/10 hover:bg-white/20 disabled:bg-white/5 disabled:cursor-not-allowed text-white flex items-center justify-center shrink-0 shadow-sm hover:scale-105 active:scale-95 transition-all cursor-pointer font-medium text-[13px] sm:text-base"
                 >
-                  {sending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+                  {sending ? <Loader2 size={16} className="animate-spin" /> : (
+                    <>
+                      <span className="sm:hidden block mr-2">Send</span>
+                      <Send size={16} className="sm:ml-0.5" />
+                    </>
+                  )}
                 </button>
               </div>
             </form>
           </div>
         ) : (
-          <div className="bg-[#070a13]/50 border border-white/[0.05] rounded-3xl p-16 flex flex-col items-center justify-center text-center space-y-4 flex-1">
-            <div className="w-14 h-14 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-primary shadow-[0_0_20px_rgba(59,130,246,0.1)]">
-              <FolderLock size={22} className="text-primary animate-pulse" />
+          <div className="flex-1 flex flex-col items-center justify-center text-center p-8 bg-transparent">
+            <div className="w-20 h-20 rounded-full bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-600 shadow-2xl relative mb-6">
+              <div className="absolute inset-0 rounded-full bg-white/[0.01] blur-2xl"></div>
+              <FolderLock size={28} className="relative z-10" />
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-1">Administrative Message Command Panel</h3>
-              <p className="text-slate-500 font-light text-xs max-w-sm leading-relaxed">
-                Configure CRM priorities, archive threads, and respond in real-time to active user pipelines. Select a client from the left directory to open the channel.
-              </p>
-            </div>
+            <h3 className="text-[17px] font-semibold text-white tracking-wide mb-2">Executive Command Center</h3>
+            <p className="text-slate-400 font-light text-[14px] max-w-sm mx-auto leading-relaxed">
+              Select a client from the directory to monitor pipelines, reply to inquiries, and manage secure deliverables.
+            </p>
           </div>
         )}
       </div>

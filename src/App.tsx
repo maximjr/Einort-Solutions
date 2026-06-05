@@ -5,6 +5,7 @@ import Lenis from "lenis";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
 import { SEO } from "./components/seo/SEO";
+import { GlobalFloatingMessenger } from "./components/layout/GlobalFloatingMessenger";
 
 import { ProtectedRoute } from "./components/shared/ProtectedRoute";
 
@@ -77,6 +78,7 @@ function Layout() {
         </Suspense>
       </main>
       <Footer />
+      <GlobalFloatingMessenger />
     </div>
   );
 }

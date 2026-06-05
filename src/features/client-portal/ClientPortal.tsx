@@ -9,9 +9,7 @@ import {
   Mail,
   Calendar,
   Trash2,
-  MessageSquare,
 } from "lucide-react";
-import { motion, AnimatePresence } from "motion/react";
 import { Container } from "../../components/layout/Container";
 import { Card } from "../../components/ui/Card";
 import { FadeUp } from "../../components/animations/FadeUp";
@@ -19,9 +17,7 @@ import { Button } from "../../components/ui/Button";
 import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
 import { useAuth } from "../../hooks/useAuth";
 import { projectService } from "../../services/admin/projectService";
-import { messageService } from "../../services/admin/messageService";
-import { ClientMessenger } from "./ClientMessenger";
-import { useMessaging } from "../../hooks/useMessaging";
+import { PullToRefresh } from "../../components/ui/PullToRefresh";
 import {
   collection,
   query,
@@ -73,34 +69,6 @@ export function ClientPortal() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [showMessenger, setShowMessenger] = useState(false);
-  const [unreadAlertCount, setUnreadAlertCount] = useState(0);
-  const [superAdminId, setSuperAdminId] = useState<string>("super_admin");
-
-  const { conversations } = useMessaging();
-
-  useEffect(() => {
-    async function resolveAdmin() {
-      try {
-        const adminId = await messageService.getSuperAdminUid();
-        setSuperAdminId(adminId);
-      } catch (err) {
-        console.warn("Could not dynamically resolve super admin:", err);
-      }
-    }
-    resolveAdmin();
-  }, []);
-
-  useEffect(() => {
-    if (!user) return;
-    const conversationId = `${user.uid}_${superAdminId}`;
-    const found = conversations.find((c) => c.id === conversationId);
-    if (found?.unreadCount) {
-      setUnreadAlertCount(found.unreadCount[user.uid] || 0);
-    } else {
-      setUnreadAlertCount(0);
-    }
-  }, [user, conversations, superAdminId]);
 
   useEffect(() => {
     if (!user || !db) {
@@ -217,9 +185,14 @@ export function ClientPortal() {
   };
 
   return (
-    <section className="py-24 bg-[#030712] min-h-screen relative pt-32 overflow-hidden">
-      {/* Premium Background Ambience */}
-      <div className="absolute top-0 left-1/2 w-[800px] h-[600px] bg-primary/5 blur-[150px] pointer-events-none rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+    <PullToRefresh onRefresh={async () => {
+      // Simulate network wait for real-time Firebase sync assurance
+      await new Promise(resolve => setTimeout(resolve, 800));
+    }}>
+      <section className="py-24 bg-[#030712] min-h-screen relative pt-32 overflow-hidden">
+        {/* Premium Background Ambience */}
+        <div className="absolute top-0 left-1/2 w-[800px] h-[600px] bg-primary/5 blur-[150px] pointer-events-none rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+
 
       <Container className="relative z-10">
         <Breadcrumbs
@@ -250,17 +223,17 @@ export function ClientPortal() {
           </div>
         </FadeUp>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="lg:col-span-8 space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+          <div className="lg:col-span-8 flex flex-col gap-6 md:gap-8">
             <FadeUp delay={0.1}>
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-0 md:mb-2 bg-white/[0.02] md:bg-transparent border border-white/[0.05] md:border-transparent rounded-2xl p-4 md:p-0">
                 <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
                   Active Engagements
                 </h2>
                 {projects.length > 0 && !projects[0].isError && (
                   <Link to="/#contact">
-                    <span className="text-[11px] font-bold uppercase tracking-widest text-primary hover:text-white transition-colors cursor-pointer flex items-center gap-1">
-                      Request New Build <ArrowRight size={12} />
+                    <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-primary hover:text-white transition-colors cursor-pointer flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-full md:bg-transparent md:px-0">
+                      Request Build <ArrowRight size={12} />
                     </span>
                   </Link>
                 )}
@@ -272,29 +245,27 @@ export function ClientPortal() {
                 {[1, 2].map((i) => (
                   <div
                     key={i}
-                    className="h-64 bg-white/[0.02] border border-white/[0.05] rounded-3xl w-full"
+                    className="h-64 bg-white/[0.02] border border-white/[0.05] rounded-[2rem] w-full"
                   ></div>
                 ))}
               </div>
             ) : projects.length === 0 ? (
               <FadeUp delay={0.2}>
-                <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-3xl p-16 text-center flex flex-col items-center justify-center relative overflow-hidden group">
+                <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-[2.5rem] p-8 md:p-16 text-center flex flex-col items-center justify-center relative overflow-hidden group">
                   <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
-                  <div className="w-20 h-20 rounded-2xl bg-white/[0.03] border border-white/[0.05] shadow-inner flex items-center justify-center mb-6 relative z-10 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
+                  <div className="w-20 h-20 rounded-[1.5rem] bg-white/[0.03] border border-white/[0.05] shadow-inner flex items-center justify-center mb-6 relative z-10 shadow-[0_0_30px_rgba(59,130,246,0.1)]">
                     <Box className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-2xl font-display text-white mb-4 relative z-10 tracking-tight">
+                  <h3 className="text-xl md:text-2xl font-display text-white mb-4 relative z-10 tracking-tight px-4">
                     You're ready to build something exceptional.
                   </h3>
-                  <p className="text-slate-400 font-light mb-10 max-w-md relative z-10 leading-relaxed">
-                    Initiate a private consultation to discuss architecture,
-                    timelines, and resourcing for your next enterprise
-                    application.
+                  <p className="text-sm md:text-base text-slate-400 font-light mb-10 max-w-md relative z-10 leading-relaxed px-2">
+                    Initiate a private consultation to discuss architecture, timelines, and resourcing for your next enterprise application.
                   </p>
-                  <Link to="/#contact" className="relative z-10">
+                  <Link to="/#contact" className="relative z-10 w-full md:w-auto">
                     <Button
                       variant="primary"
-                      className="uppercase tracking-widest text-[11px] font-bold h-12 px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all duration-300"
+                      className="w-full md:w-auto uppercase tracking-widest text-[11px] font-bold h-14 md:h-12 px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all duration-300 rounded-2xl"
                     >
                       Initiate Discovery
                     </Button>
@@ -302,7 +273,7 @@ export function ClientPortal() {
                 </Card>
               </FadeUp>
             ) : (
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 gap-6 md:gap-8">
                 {projects.map((proj, i) => {
                   const currentStageIndex = getStageIndex(proj.status);
                   const detailedPill = getDetailedStatusPill(proj.status);
@@ -310,35 +281,35 @@ export function ClientPortal() {
                   return (
                     <FadeUp key={proj.id} delay={0.1 + i * 0.1}>
                       <Card
-                        className={`bg-white/[0.015] border-white/[0.05] shadow-none rounded-3xl overflow-hidden transition-all duration-500 relative group ${proj.isError ? "border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.05)]" : "hover:border-white/10 hover:shadow-[0_0_40px_rgba(59,130,246,0.03)]"}`}
+                        className={`bg-white/[0.015] border-white/[0.05] shadow-none rounded-[2rem] overflow-hidden transition-all duration-500 relative group flex flex-col ${proj.isError ? "border-red-500/20 shadow-[0_0_30px_rgba(239,68,68,0.05)]" : "hover:border-white/10 hover:shadow-[0_0_40px_rgba(59,130,246,0.03)]"}`}
                       >
                         {/* Premium Top Highlight */}
                         <div
                           className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${proj.isError ? "from-red-500/50 to-transparent" : "from-primary/50 to-transparent"} opacity-50`}
                         ></div>
 
-                        <div className="p-8 md:p-10">
-                          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-10">
+                        <div className="p-6 md:p-10 flex flex-col flex-grow">
+                          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-8 md:mb-10">
                             <div>
                               <h3
-                                className={`text-2xl md:text-3xl font-display tracking-tight transition-colors mb-2 ${proj.isError ? "text-red-400 font-mono" : "text-white"}`}
+                                className={`text-2xl md:text-3xl font-display tracking-tight transition-colors mb-3 md:mb-2 ${proj.isError ? "text-red-400 font-mono" : "text-white"}`}
                               >
                                 {proj.company || "Classified Build"}
                               </h3>
-                              <div className="flex items-center gap-3">
-                                <span className="text-[11px] uppercase font-bold tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
+                              <div className="flex flex-wrap items-center gap-2 md:gap-3">
+                                <span className="text-[10px] md:text-[11px] uppercase font-bold tracking-widest text-primary bg-primary/10 px-2.5 py-1 md:py-0.5 rounded-lg md:rounded border border-primary/20">
                                   {proj.projectType || "Enterprise Platform"}
                                 </span>
-                                <span className="text-[11px] uppercase font-bold tracking-widest text-slate-500">
+                                <span className="text-[10px] md:text-[11px] uppercase font-bold tracking-widest text-slate-500 px-2.5 py-1 bg-white/[0.02] rounded-lg md:bg-transparent md:p-0 border border-white/5 md:border-transparent">
                                   {proj.industry || "N/A"}
                                 </span>
                               </div>
                             </div>
 
                             {/* Live Status indicator */}
-                            <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2.5">
+                            <div className="flex flex-row items-center gap-2 mt-2 md:mt-0">
                               <div
-                                className={`flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-widest px-3 py-1.5 rounded-xl border shadow-sm ${proj.isError ? "bg-red-500/10 border-red-500/20 text-red-400" : detailedPill.bgClass}`}
+                                className={`flex flex-1 md:flex-none items-center justify-center gap-1.5 text-[10px] uppercase font-bold tracking-widest px-3 py-2 md:py-1.5 rounded-xl border shadow-sm ${proj.isError ? "bg-red-500/10 border-red-500/20 text-red-400" : detailedPill.bgClass}`}
                               >
                                 {!proj.isError && (
                                   <span className={`w-1.5 h-1.5 rounded-full ${detailedPill.dotClass} block`}></span>
@@ -346,7 +317,7 @@ export function ClientPortal() {
                                 {proj.isError ? "Error" : detailedPill.label}
                               </div>
                               {!proj.isError && (
-                                <span className="text-[10px] uppercase font-mono tracking-wider text-slate-400 px-3 py-1.5 bg-white/[0.02] border border-white/5 rounded-xl">
+                                <span className="hidden sm:inline-block text-[10px] uppercase font-mono tracking-wider text-slate-400 px-3 py-1.5 bg-white/[0.02] border border-white/5 rounded-xl">
                                   Stage: {proj.status || "New"}
                                 </span>
                               )}
@@ -363,14 +334,14 @@ export function ClientPortal() {
                               </p>
                             </div>
                           ) : (
-                            <>
+                            <div className="flex flex-col flex-grow">
                               {/* Linear Progress Tracking */}
-                              <div className="mb-10 block">
+                              <div className="mb-8 md:mb-10 block">
                                 <div className="flex justify-between items-end mb-3">
                                   <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500">
                                     Delivery Velocity
                                   </p>
-                                  <p className="text-[11px] font-mono text-primary">
+                                  <p className="text-[11px] font-mono text-primary bg-primary/10 px-2 py-0.5 rounded-md border border-primary/20">
                                     {Math.round(
                                       ((currentStageIndex + 1) /
                                         stages.length) *
@@ -380,7 +351,7 @@ export function ClientPortal() {
                                   </p>
                                 </div>
                                 
-                                {/* Desktop 10-Node Horizontal Ribbon */}
+                                {/* Desktop Horizontal Ribbon */}
                                 <div className="relative hidden md:block">
                                   {/* Track Line */}
                                   <div className="absolute top-1/2 left-0 w-full h-[2px] bg-white/[0.05] -translate-y-1/2"></div>
@@ -427,55 +398,60 @@ export function ClientPortal() {
 
                                 {/* Mobile High-Contrast Milestone Stepper Grid */}
                                 <div className="md:hidden space-y-4">
-                                  <div className="flex justify-between items-center bg-white/[0.01] border border-white/5 rounded-2xl p-4">
-                                    <div>
-                                      <p className="text-[9px] uppercase font-bold tracking-widest text-slate-500">
-                                        Active Engagement milestone
-                                      </p>
-                                      <p className="text-sm font-semibold text-white mt-1">
-                                        {stages[currentStageIndex]?.label || "N/A"}
-                                      </p>
+                                  <div className="flex flex-col bg-white/[0.02] border border-white/5 rounded-[1.5rem] p-5 relative overflow-hidden">
+                                     <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 rounded-full blur-2xl pointer-events-none"></div>
+                                    <div className="flex justify-between items-start mb-4">
+                                      <div>
+                                        <p className="text-[9px] uppercase font-bold tracking-widest text-slate-500 mb-1">
+                                          Current Milestone
+                                        </p>
+                                        <p className="text-lg font-semibold text-white tracking-tight">
+                                          {stages[currentStageIndex]?.label || "N/A"}
+                                        </p>
+                                      </div>
                                     </div>
-                                    <span className="px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-xs font-mono text-primary font-bold">
-                                      {Math.round(((currentStageIndex + 1) / stages.length) * 100)}% Complete
-                                    </span>
-                                  </div>
-                                  <div className="text-xs text-slate-400 flex justify-between items-center px-1">
-                                    <span>Next Step: {stages[currentStageIndex + 1] ? stages[currentStageIndex + 1].label : "None (In Release Mode)"}</span>
-                                    <span className="font-mono text-slate-500">{currentStageIndex + 1} / {stages.length}</span>
+                                    <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden mb-3">
+                                       <div 
+                                         className="h-full bg-primary" 
+                                         style={{width: `${((currentStageIndex + 1) / stages.length) * 100}%`}}></div>
+                                    </div>
+                                    <div className="text-[10px] text-slate-400 flex justify-between items-center w-full">
+                                      <span className="truncate pr-2">Next: <span className="text-white">{stages[currentStageIndex + 1] ? stages[currentStageIndex + 1].label : "None"}</span></span>
+                                      <span className="font-mono bg-white/5 px-2 py-1 rounded text-slate-300 flex-shrink-0">{currentStageIndex + 1}/{stages.length}</span>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
 
                               {/* Project Metadata Grid */}
-                              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-8 border-t border-white/5">
-                                <div>
-                                  <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-2">
+                              <div className="flex-grow grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 pt-6 md:pt-8 border-t border-white/5">
+                                <div className="bg-white/[0.01] p-4 rounded-2xl md:p-0 md:bg-transparent md:rounded-none border border-white/[0.02] md:border-none">
+                                  <p className="text-[9px] md:text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5 md:mb-2 text-center md:text-left">
                                     Estimated Budget
                                   </p>
-                                  <p className="text-sm text-white font-mono object-contain">
+                                  <p className="text-sm md:text-base text-white font-mono object-contain text-center md:text-left">
                                     {proj.budget || "TBD"}
                                   </p>
                                 </div>
-                                <div>
-                                  <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-2">
+                                <div className="bg-white/[0.01] p-4 rounded-2xl md:p-0 md:bg-transparent md:rounded-none border border-white/[0.02] md:border-none">
+                                  <p className="text-[9px] md:text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5 md:mb-2 text-center md:text-left">
                                     Delivery Scope
                                   </p>
-                                  <p className="text-sm text-white font-mono">
+                                  <p className="text-sm md:text-base text-white font-mono text-center md:text-left">
                                     {proj.timeline || "TBD"}
                                   </p>
                                 </div>
-                                <div className="lg:col-span-2">
-                                  <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-2">
-                                    Commencement Date
+                                <div className="col-span-2 lg:col-span-2 bg-white/[0.01] p-4 rounded-2xl md:p-0 md:bg-transparent md:rounded-none border border-white/[0.02] md:border-none flex items-center justify-between md:block">
+                                  <p className="text-[9px] md:text-[10px] uppercase font-bold tracking-widest text-slate-500 md:mb-2 mb-0">
+                                    Commencement
                                   </p>
-                                  <p className="text-sm text-slate-400 font-mono">
+                                  <p className="text-xs md:text-sm text-slate-400 font-mono">
                                     {proj.createdAt
                                       ? proj.createdAt
                                           .toDate()
                                           .toLocaleDateString("en-US", {
                                             year: "numeric",
-                                            month: "long",
+                                            month: "short",
                                             day: "numeric",
                                           })
                                       : "Just now"}
@@ -483,47 +459,49 @@ export function ClientPortal() {
                                 </div>
                               </div>
 
-                              {/* Client Action Panel */}
+                              {/* Client Action Panel (Thumb Friendly) */}
                               <div className="flex justify-end gap-3 pt-6 mt-6 border-t border-white/5">
                                 {deletingId === proj.id ? (
-                                  <div className="flex items-center gap-3 bg-red-950/20 border border-red-500/20 px-4 py-2 rounded-2xl animate-pulse">
-                                    <span className="text-xs text-red-300 font-mono">Decommission this build?</span>
-                                    <button
-                                      onClick={async () => {
-                                        setIsDeleting(true);
-                                        try {
-                                          await projectService.deleteProject(proj.id);
-                                        } catch (e) {
-                                          console.error(e);
-                                        } finally {
-                                          setIsDeleting(false);
-                                          setDeletingId(null);
-                                        }
-                                      }}
-                                      disabled={isDeleting}
-                                      className="flex items-center gap-1.5 px-3 py-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-[10px] uppercase tracking-wider rounded-lg transition-colors cursor-pointer"
-                                    >
-                                      {isDeleting ? "Decommissioning..." : "Confirm"}
-                                    </button>
-                                    <button
-                                      onClick={() => setDeletingId(null)}
-                                      disabled={isDeleting}
-                                      className="px-2 py-1 text-[10px] uppercase tracking-wider text-slate-400 hover:text-white transition-colors cursor-pointer"
-                                    >
-                                      Cancel
-                                    </button>
+                                  <div className="flex flex-col sm:flex-row items-center w-full sm:w-auto gap-3 bg-red-950/20 border border-red-500/20 p-3 sm:px-4 sm:py-2 rounded-[1.5rem] sm:rounded-2xl animate-pulse">
+                                    <span className="text-xs text-red-300 font-mono text-center sm:text-left w-full sm:w-auto">Decommission build?</span>
+                                    <div className="flex w-full sm:w-auto gap-2">
+                                      <button
+                                        onClick={async () => {
+                                          setIsDeleting(true);
+                                          try {
+                                            await projectService.deleteProject(proj.id);
+                                          } catch (e) {
+                                            console.error(e);
+                                          } finally {
+                                            setIsDeleting(false);
+                                            setDeletingId(null);
+                                          }
+                                        }}
+                                        disabled={isDeleting}
+                                        className="flex-1 sm:flex-none justify-center items-center gap-1.5 px-4 h-10 sm:h-auto sm:py-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-[10px] uppercase tracking-wider rounded-xl sm:rounded-lg transition-colors cursor-pointer"
+                                      >
+                                        {isDeleting ? "..." : "Confirm"}
+                                      </button>
+                                      <button
+                                        onClick={() => setDeletingId(null)}
+                                        disabled={isDeleting}
+                                        className="flex-1 sm:flex-none justify-center h-10 sm:h-auto sm:px-2 sm:py-1 text-[10px] uppercase tracking-wider text-slate-400 hover:text-white bg-white/5 sm:bg-transparent rounded-xl sm:rounded-none transition-colors cursor-pointer"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
                                   </div>
                                 ) : (
                                   <button
                                     onClick={() => setDeletingId(proj.id)}
-                                    className="flex items-center gap-1.5 px-4 py-2 bg-white/[0.02] hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-slate-400 hover:text-red-400 font-bold text-[10px] uppercase tracking-wider rounded-xl transition-all duration-300 cursor-pointer"
+                                    className="flex items-center justify-center w-full md:w-auto gap-1.5 px-4 h-12 md:h-9 bg-white/[0.02] hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-slate-400 hover:text-red-400 font-bold text-[10px] uppercase tracking-wider rounded-2xl transition-all duration-300 cursor-pointer"
                                   >
-                                    <Trash2 size={13} />
+                                    <Trash2 size={13} className="hidden md:inline" />
                                     Delete Request
                                   </button>
                                 )}
                               </div>
-                            </>
+                            </div>
                           )}
                         </div>
                       </Card>
@@ -534,43 +512,42 @@ export function ClientPortal() {
             )}
           </div>
 
-          <div className="lg:col-span-4 space-y-6">
+          <div className="lg:col-span-4 flex flex-col gap-6 md:gap-8">
             <FadeUp delay={0.3}>
-              <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-3xl p-8 relative overflow-hidden group">
+              <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-[2rem] p-6 md:p-8 relative overflow-hidden group">
                 <div className="absolute -right-10 -top-10 w-40 h-40 bg-primary/5 rounded-full blur-[40px] group-hover:bg-primary/10 transition-colors duration-700"></div>
-                <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-8 flex items-center border-b border-white/[0.05] pb-4">
-                  <Activity size={14} className="text-primary mr-2" /> Live
-                  Intelligence
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-6 md:mb-8 flex items-center border-b border-white/[0.05] pb-4">
+                  <Activity size={14} className="text-primary mr-2" /> Live Intelligence
                 </h3>
 
                 {projects.length > 0 && !projects[0].isError ? (
-                  <div className="space-y-6 relative z-10 pl-2">
+                  <div className="space-y-6 md:space-y-6 relative z-10 pl-2">
                     <div className="relative">
                       <div className="absolute left-[-16px] top-1.5 w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] pulse-glow"></div>
                       <div className="absolute left-[-13px] top-3 bottom-[-24px] w-[1px] bg-white/[0.05]"></div>
-                      <p className="text-sm text-white font-medium mb-1 tracking-wide">
+                      <p className="text-[13px] md:text-sm text-white font-medium mb-1 tracking-wide">
                         Project Synchronized
                       </p>
-                      <p className="text-[11px] font-mono text-emerald-400">
+                      <p className="text-[10px] md:text-[11px] font-mono text-emerald-400">
                         System Nominal • Live
                       </p>
                     </div>
                     <div className="relative">
                       <div className="absolute left-[-16px] top-1.5 w-1.5 h-1.5 rounded-full bg-white/20"></div>
                       <div className="absolute left-[-13px] top-3 bottom-[-24px] w-[1px] bg-white/[0.05]"></div>
-                      <p className="text-sm text-slate-300 font-medium mb-1 tracking-wide">
+                      <p className="text-[13px] md:text-sm text-slate-300 font-medium mb-1 tracking-wide">
                         Engineering Review
                       </p>
-                      <p className="text-[11px] font-mono text-slate-500">
+                      <p className="text-[10px] md:text-[11px] font-mono text-slate-500">
                         Pending Assignment
                       </p>
                     </div>
                     <div className="relative">
                       <div className="absolute left-[-16px] top-1.5 w-1.5 h-1.5 rounded-full bg-white/20"></div>
-                      <p className="text-sm text-slate-400 font-medium mb-1 tracking-wide">
+                      <p className="text-[13px] md:text-sm text-slate-400 font-medium mb-1 tracking-wide">
                         Executive Discovery Call
                       </p>
-                      <p className="text-[11px] font-mono text-slate-600">
+                      <p className="text-[10px] md:text-[11px] font-mono text-slate-600">
                         Locked
                       </p>
                     </div>
@@ -586,96 +563,50 @@ export function ClientPortal() {
             </FadeUp>
 
             <FadeUp delay={0.4}>
-              <AnimatePresence mode="wait">
-                {showMessenger ? (
-                  <motion.div
-                    key="messenger"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    className="w-full"
-                  >
-                    <ClientMessenger
-                      userId={user?.uid || ""}
-                      userEmail={user?.email || ""}
-                      userName={userData?.fullName || "Valued Partner"}
-                      onClose={() => setShowMessenger(false)}
-                    />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="support-card"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                  >
-                    <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-3xl p-8 hover:border-white/10 transition-colors group relative overflow-hidden">
-                      {unreadAlertCount > 0 && (
-                        <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-cyan-400/10 border border-cyan-400/20 px-2.5 py-1 rounded-full animate-pulse shadow-[0_0_12px_rgba(34,211,238,0.2)]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,1)]"></span>
-                          <span className="text-[9px] font-bold text-cyan-400 font-mono">
-                            {unreadAlertCount} REPLY WAIT
-                          </span>
-                        </div>
-                      )}
-                      
-                      <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-8 border-b border-white/[0.05] pb-4">
+                    <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-[2rem] p-6 md:p-8 hover:border-white/10 transition-colors group relative overflow-hidden">
+                      <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-6 md:mb-8 border-b border-white/[0.05] pb-4">
                         Dedicated Support
                       </h3>
                       <div className="space-y-6">
-                        {/* Live support button */}
-                        <div className="pb-4 border-b border-white/5">
-                          <button
-                            onClick={() => setShowMessenger(true)}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-primary-hover border border-primary/20 text-white text-[11px] font-bold uppercase tracking-widest rounded-2xl shadow-[0_0_15px_rgba(59,130,246,0.2)] hover:shadow-[0_0_25px_rgba(59,130,246,0.4)] transition-all duration-300 cursor-pointer"
-                          >
-                            <MessageSquare size={13} className="animate-pulse" />
-                            Open Live Pipeline
-                          </button>
-                        </div>
-
-                        <div className="flex items-start gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center shrink-0">
-                            <Mail className="w-4 h-4 text-primary" />
+                        <div className="flex items-start gap-4 flex-col lg:flex-row">
+                          <div className="w-12 h-12 md:w-10 md:h-10 rounded-2xl md:rounded-xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center shrink-0">
+                            <Mail className="w-5 h-5 md:w-4 md:h-4 text-primary" />
                           </div>
                           <div>
-                            <p className="text-sm text-white font-medium tracking-wide mb-1">
-                              Priority Channel
+                            <p className="text-[13px] md:text-sm text-white font-medium tracking-wide mb-1">
+                              Secondary Support Line
                             </p>
                             <p className="text-xs text-slate-500 leading-relaxed font-light mb-3">
-                              Direct access to your assigned engineering lead.
+                              Use the global floating pipeline for instant architectural communication.
                             </p>
                             <a
                               href="mailto:einortsolutions237@gmail.com"
-                              className="text-[10px] uppercase font-bold tracking-widest text-primary hover:text-white transition-colors flex items-center gap-1"
+                              className="text-[10px] md:text-[11px] uppercase font-bold tracking-widest text-primary hover:text-white transition-colors flex items-center gap-1 bg-white/[0.02] inline-flex px-3 py-1.5 rounded-lg border border-white/5"
                             >
-                              Contact Architect <ArrowRight size={10} />
+                              Legacy Email <ArrowRight size={10} />
                             </a>
                           </div>
                         </div>
                         <div className="flex items-start gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center shrink-0">
-                            <Calendar className="w-4 h-4 text-emerald-400" />
+                          <div className="w-12 h-12 md:w-10 md:h-10 rounded-2xl md:rounded-xl bg-white/[0.03] border border-white/[0.05] flex items-center justify-center shrink-0">
+                            <Calendar className="w-5 h-5 md:w-4 md:h-4 text-emerald-400" />
                           </div>
                           <div>
-                            <p className="text-sm text-white font-medium tracking-wide mb-1">
+                            <p className="text-[13px] md:text-sm text-white font-medium tracking-wide mb-1">
                               Agile Syncs
                             </p>
                             <p className="text-xs text-slate-500 leading-relaxed font-light">
-                              Scheduled alignment meetings will populate here
-                              post-kickoff.
+                              Scheduled alignment meetings will populate here post-kickoff.
                             </p>
                           </div>
                         </div>
                       </div>
                     </Card>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </FadeUp>
           </div>
         </div>
       </Container>
-    </section>
+      </section>
+    </PullToRefresh>
   );
 }

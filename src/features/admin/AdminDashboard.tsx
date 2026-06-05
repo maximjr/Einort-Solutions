@@ -7,6 +7,8 @@ import {
 } from "../../components/ui/Card";
 import { FadeUp } from "../../components/animations/FadeUp";
 import React, { useEffect, useState, useMemo } from "react";
+import { useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "motion/react";
 import { ProjectStatus } from "../../types";
 import {
   Users,
@@ -46,6 +48,7 @@ import { notificationService } from "../../services/admin/notificationService";
 import { messageService } from "../../services/admin/messageService";
 import { AdminMessenger } from "./AdminMessenger";
 import { useMessaging } from "../../hooks/useMessaging";
+import { PullToRefresh } from "../../components/ui/PullToRefresh";
 
 const COLORS = [
   "#3b82f6",
@@ -95,6 +98,7 @@ const getDetailedStatusPill = (status: string) => {
 };
 
 export function AdminDashboard() {
+  const location = useLocation();
   const [projects, setProjects] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [activities, setActivities] = useState<any[]>([]);
@@ -110,6 +114,14 @@ export function AdminDashboard() {
 
   const { conversations } = useMessaging();
   const [resolvedAdminId, setResolvedAdminId] = useState<string>("super_admin");
+
+  useEffect(() => {
+    if (location.hash === "#messages") {
+      setActiveView("messaging");
+    } else if (location.hash === "#projects" || location.hash === "") {
+      setActiveView("analytics");
+    }
+  }, [location.hash]);
 
   useEffect(() => {
     async function initAdmin() {
@@ -253,8 +265,13 @@ export function AdminDashboard() {
   };
 
   return (
-    <section className="py-24 bg-surface min-h-[80vh] relative pt-32">
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[150px] pointer-events-none rounded-full translate-x-1/2 -translate-y-1/2"></div>
+    <PullToRefresh onRefresh={async () => {
+      // Simulate network wait for real-time Firebase sync assurance
+      await new Promise(resolve => setTimeout(resolve, 800));
+    }}>
+      <section className="py-24 bg-surface min-h-[80vh] relative pt-32">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[150px] pointer-events-none rounded-full translate-x-1/2 -translate-y-1/2"></div>
+
       <Container>
         <Breadcrumbs
           items={[
@@ -288,31 +305,33 @@ export function AdminDashboard() {
         </FadeUp>
 
         {/* Navigation Tab Controllers */}
-        <div className="flex flex-wrap items-center gap-4 border-b border-white/[0.05] pb-6 mb-8 select-none">
+        <div className="grid grid-cols-2 md:flex md:flex-wrap items-center gap-3 md:gap-4 border-b border-white/[0.05] pb-6 mb-8 select-none">
           <button
             onClick={() => setActiveView("analytics")}
-            className={`px-5 py-2.5 rounded-xl border text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+            className={`min-h-[44px] justify-center px-4 md:px-5 py-2.5 rounded-xl border-2 md:border text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-2 cursor-pointer ${
               activeView === "analytics"
                 ? "bg-primary border-primary text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]"
-                : "bg-white/[0.015] border-white/[0.05] text-slate-400 hover:text-white hover:border-white/10"
+                : "bg-white/[0.015] border-transparent text-slate-400 hover:text-white hover:bg-white/[0.05]"
             }`}
           >
-            <Briefcase size={13} />
-            Analytics & Pipeline
+            <Briefcase className="w-4 h-4" />
+            <span className="hidden sm:inline">Analytics & Pipeline</span>
+            <span className="sm:hidden">Analytics</span>
           </button>
           
           <button
             onClick={() => setActiveView("messaging")}
-            className={`px-5 py-2.5 rounded-xl border text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-2 relative cursor-pointer ${
+            className={`min-h-[44px] justify-center px-4 md:px-5 py-2.5 rounded-xl border-2 md:border text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-2 relative cursor-pointer ${
               activeView === "messaging"
                 ? "bg-primary border-primary text-white shadow-[0_0_15px_rgba(59,130,246,0.3)]"
-                : "bg-white/[0.015] border-white/[0.05] text-slate-400 hover:text-white hover:border-white/10"
+                : "bg-white/[0.015] border-transparent text-slate-400 hover:text-white hover:bg-white/[0.05]"
             }`}
           >
-            <MessageSquare size={13} />
-            Messaging Pipeline
+            <MessageSquare className="w-4 h-4" />
+            <span className="hidden sm:inline">Messaging Pipeline</span>
+            <span className="sm:hidden">Messages</span>
             {unreadTotalCount > 0 && (
-              <span className="flex items-center justify-center bg-cyan-400 text-[#030712] text-[9px] font-bold w-4 h-4 rounded-full font-mono shadow-[0_0_8px_rgba(34,211,238,0.7)] animate-pulse shrink-0">
+              <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center bg-cyan-400 text-[#030712] text-[9px] font-bold w-4 h-4 rounded-full font-mono shadow-[0_0_8px_rgba(34,211,238,0.7)] animate-pulse shrink-0">
                 {unreadTotalCount}
               </span>
             )}
@@ -325,13 +344,13 @@ export function AdminDashboard() {
           </FadeUp>
         ) : (
           <>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8">
           {[
             {
               label: "Active Projects",
               value: projects.length,
               trend: "Live",
-              icon: <Briefcase size={20} />,
+              icon: <Briefcase className="w-4 h-4 md:w-5 md:h-5" />,
               color: "text-blue-400",
               bg: "bg-blue-400/10",
               border: "border-blue-400/20",
@@ -340,7 +359,7 @@ export function AdminDashboard() {
               label: "Est. Revenue Pipeline",
               value: formatCurrency(totalPipelineValue),
               trend: "Volume",
-              icon: <DollarSign size={20} />,
+              icon: <DollarSign className="w-4 h-4 md:w-5 md:h-5" />,
               color: "text-emerald-400",
               bg: "bg-emerald-400/10",
               border: "border-emerald-400/20",
@@ -349,7 +368,7 @@ export function AdminDashboard() {
               label: "High Priority Deals",
               value: urgentProjectsCount,
               trend: "Urgent",
-              icon: <Zap size={20} />,
+              icon: <Zap className="w-4 h-4 md:w-5 md:h-5" />,
               color: "text-orange-400",
               bg: "bg-orange-400/10",
               border: "border-orange-400/20",
@@ -358,7 +377,7 @@ export function AdminDashboard() {
               label: "Projected Conversion",
               value: `${conversionRate}%`,
               trend: "Avg",
-              icon: <Target size={20} />,
+              icon: <Target className="w-4 h-4 md:w-5 md:h-5" />,
               color: "text-purple-400",
               bg: "bg-purple-400/10",
               border: "border-purple-400/20",
@@ -367,7 +386,7 @@ export function AdminDashboard() {
               label: "Active Client Base",
               value: loadingUsers ? "-" : activeClientsCount,
               trend: "Users",
-              icon: <Users size={20} />,
+              icon: <Users className="w-4 h-4 md:w-5 md:h-5" />,
               color: "text-cyan-400",
               bg: "bg-cyan-400/10",
               border: "border-cyan-400/20",
@@ -376,7 +395,7 @@ export function AdminDashboard() {
               label: "Avg. Lead Score",
               value: loading ? "-" : averageLeadScore,
               trend: "Score",
-              icon: <Activity size={20} />,
+              icon: <Activity className="w-4 h-4 md:w-5 md:h-5" />,
               color: "text-indigo-400",
               bg: "bg-indigo-400/10",
               border: "border-indigo-400/20",
@@ -385,7 +404,7 @@ export function AdminDashboard() {
               label: "Abandoned Drafts",
               value: abandonedPrototypes,
               trend: "Lost",
-              icon: <ShieldAlert size={20} />,
+              icon: <ShieldAlert className="w-4 h-4 md:w-5 md:h-5" />,
               color: "text-red-400",
               bg: "bg-red-400/10",
               border: "border-red-400/20",
@@ -394,35 +413,35 @@ export function AdminDashboard() {
               label: "System Health",
               value: syncError ? "Degraded" : "Nominal",
               trend: "Ops",
-              icon: <Activity size={20} />,
+              icon: <Activity className="w-4 h-4 md:w-5 md:h-5" />,
               color: syncError ? "text-red-400" : "text-green-400",
               bg: syncError ? "bg-red-400/10" : "bg-green-400/10",
               border: syncError ? "border-red-400/20" : "border-green-400/20",
             },
           ].map((stat, i) => (
             <FadeUp key={i} delay={i * 0.05}>
-              <Card className="bg-white/[0.015] border-white/[0.05] hover:border-white/10 transition-all relative overflow-hidden group shadow-none hover:shadow-2xl hover:shadow-primary/5 rounded-2xl">
+              <Card className="bg-white/[0.015] border-white/[0.05] hover:border-white/10 transition-all relative overflow-hidden group shadow-none hover:shadow-2xl hover:shadow-primary/5 rounded-[1.5rem] md:rounded-[2rem]">
                 <div
-                  className={`absolute top-0 right-0 w-32 h-32 ${stat.bg} blur-[60px] -mt-10 -mr-10 transition-all duration-500 opacity-30 group-hover:opacity-80 scale-100 group-hover:scale-150`}
+                  className={`absolute top-0 right-0 w-24 h-24 md:w-32 md:h-32 ${stat.bg} blur-[60px] -mt-10 -mr-10 transition-all duration-500 opacity-30 group-hover:opacity-80 scale-100 group-hover:scale-150`}
                 ></div>
-                <CardContent className="p-6 relative z-10 flex flex-col justify-between min-h-[140px]">
-                  <div className="flex justify-between items-start mb-4">
+                <CardContent className="p-4 md:p-6 relative z-10 flex flex-col justify-between min-h-[110px] md:min-h-[140px]">
+                  <div className="flex justify-between items-start mb-3 md:mb-4">
                     <div
-                      className={`w-10 h-10 rounded-xl ${stat.bg} ${stat.border} border ${stat.color} flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300`}
+                      className={`w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl ${stat.bg} ${stat.border} border ${stat.color} flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-300`}
                     >
                       {stat.icon}
                     </div>
                     <span
-                      className={`text-[9px] uppercase tracking-widest font-bold ${stat.color} bg-white/5 px-2 py-0.5 rounded-full border border-white/5 shadow-sm`}
+                      className={`text-[8px] md:text-[9px] uppercase tracking-widest font-bold ${stat.color} bg-white/5 px-1.5 md:px-2 py-[2px] md:py-0.5 rounded-full border border-white/5 shadow-sm transform scale-90 md:scale-100 origin-top-right`}
                     >
                       {stat.trend}
                     </span>
                   </div>
                   <div>
-                    <h3 className="text-3xl font-mono text-white tracking-tight mb-1">
+                    <h3 className="text-xl md:text-3xl font-mono text-white tracking-tight mb-0.5 font-medium md:font-normal">
                       {stat.value}
                     </h3>
-                    <p className="text-[11px] uppercase tracking-widest text-slate-400 font-medium">
+                    <p className="text-[9px] md:text-[11px] uppercase tracking-widest text-slate-400 font-semibold md:font-medium leading-tight">
                       {stat.label}
                     </p>
                   </div>
@@ -432,7 +451,7 @@ export function AdminDashboard() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 md:gap-6 mb-8 md:mb-12">
           <FadeUp delay={0.2}>
             <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-2xl h-full flex flex-col">
               <CardHeader className="border-b border-white/[0.05] pb-4">
@@ -663,72 +682,243 @@ export function AdminDashboard() {
         </div>
 
         <FadeUp delay={0.6}>
-          <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-2xl overflow-hidden mb-6">
-            <CardHeader className="border-b border-white/[0.05] bg-white/[0.01]">
-              <CardTitle className="text-lg font-medium text-white">
-                Project Pipeline Command Center
+          <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-[2rem] overflow-hidden mb-6">
+            <CardHeader className="border-b border-white/[0.05] bg-white/[0.01] p-6 lg:p-8">
+              <CardTitle className="text-lg font-medium text-white flex items-center justify-between">
+                <span>Project Pipeline Command Center</span>
+                <span className="bg-white/5 px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-bold text-slate-400 border border-white/5">{projects.length} Total</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
               {loading ? (
-                <div className="w-full animate-pulse">
-                  <table className="w-full text-sm text-left">
-                    <thead className="bg-white/[0.01] border-b border-white/[0.05]">
-                      <tr>
-                        {[...Array(8)].map((_, i) => (
-                           <th key={i} className="px-6 py-4">
-                            <div className="h-3 bg-white/[0.03] rounded w-20"></div>
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/[0.05]">
-                      {[...Array(5)].map((_, i) => (
-                        <tr key={i}>
-                          <td className="px-6 py-5">
-                            <div className="h-4 bg-white/[0.05] rounded w-32 mb-2"></div>
-                            <div className="h-3 bg-white/[0.03] rounded w-24"></div>
-                          </td>
-                          <td className="px-6 py-5"><div className="h-4 bg-white/[0.03] rounded w-24"></div></td>
-                          <td className="px-6 py-5"><div className="h-4 bg-white/[0.03] rounded w-28"></div></td>
-                          <td className="px-6 py-5">
-                            <div className="h-4 bg-white/[0.05] rounded w-20 mb-2"></div>
-                            <div className="h-3 bg-white/[0.03] rounded w-16"></div>
-                          </td>
-                          <td className="px-6 py-5">
-                            <div className="h-5 bg-white/[0.03] rounded w-20 mb-2"></div>
-                            <div className="h-5 bg-white/[0.03] rounded w-24"></div>
-                          </td>
-                          <td className="px-6 py-5"><div className="h-4 bg-white/[0.03] rounded w-32"></div></td>
-                          <td className="px-6 py-5"><div className="h-2 bg-white/[0.05] rounded w-16"></div></td>
-                          <td className="px-6 py-5"><div className="h-6 bg-white/[0.05] rounded w-16"></div></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="w-full animate-pulse p-6">
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="h-32 bg-white/[0.02] border border-white/[0.05] rounded-2xl w-full"></div>
+                    ))}
+                  </div>
                 </div>
               ) : projects.length === 0 ? (
                 <div className="p-12 text-center text-slate-500 font-medium">
                   No projects in the pipeline.
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left whitespace-nowrap">
-                    <thead className="bg-white/[0.01] text-[10px] uppercase tracking-widest text-slate-500 border-b border-white/[0.05]">
-                      <tr>
-                        <th className="px-4 py-3">Client</th>
-                        <th className="px-4 py-3">Industry</th>
-                        <th className="px-4 py-3">Type</th>
-                        <th className="px-4 py-3">Budget & Timeline</th>
-                        <th className="px-4 py-3">Urgency & Risk</th>
-                        <th className="px-4 py-3 max-w-[200px]">
-                          Requirements
-                        </th>
-                        <th className="px-4 py-3">Lead Score</th>
-                        <th className="px-4 py-3">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
+                <>
+                  {/* Mobile Cards View */}
+                  <div className="lg:hidden flex flex-col p-4 space-y-4">
+                    {projects.map((proj) => {
+                      const risk = getRiskLevel(proj);
+                      const detailedPill = getDetailedStatusPill(proj.status);
+                      const isExpanded = expandedProject === proj.id;
+                      return (
+                        <div key={`m-${proj.id}`} className="bg-white/[0.02] border border-white/[0.05] rounded-3xl overflow-hidden shadow-sm">
+                          <div 
+                            onClick={() => setExpandedProject(isExpanded ? null : proj.id)}
+                            className="p-5 cursor-pointer hover:bg-white/[0.02] transition-colors"
+                          >
+                            <div className="flex justify-between items-start mb-4 gap-4">
+                              <div className="min-w-0">
+                                <h4 className="text-lg font-display text-white truncate mb-1">{proj.company || "Classified Build"}</h4>
+                                <span className="text-xs text-slate-400 capitalize">{proj.industry || "N/A"} • {proj.projectType}</span>
+                              </div>
+                              <div className="flex-shrink-0 flex flex-col items-end gap-2">
+                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] uppercase font-bold tracking-widest rounded-lg border shadow-sm ${detailedPill.bgClass}`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${detailedPill.dotClass}`}></span>
+                                  {detailedPill.label}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              <span
+                                className={`px-2 py-0.5 text-[9px] uppercase font-bold tracking-widest rounded border ${proj.urgency === "high" ? "bg-orange-500/10 text-orange-400 border-orange-500/20" : proj.urgency === "medium" ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20" : "bg-primary/10 text-primary border-primary/20"}`}
+                              >
+                                {proj.urgency || "Normal"} Urg
+                              </span>
+                              <span
+                                className={`px-2 py-0.5 text-[9px] uppercase font-bold tracking-widest rounded border ${risk.color}`}
+                              >
+                                {risk.label}
+                              </span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
+                               <div>
+                                 <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Budget</p>
+                                 <p className="font-mono text-sm text-slate-200">{proj.budget || "N/A"}</p>
+                               </div>
+                               <div>
+                                 <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Client</p>
+                                 <p className="text-sm text-slate-200 truncate">{proj.clientName || "Unknown"}</p>
+                               </div>
+                            </div>
+                          </div>
+                          
+                          <AnimatePresence>
+                            {isExpanded && (
+                              <motion.div 
+                                initial={{height: 0, opacity: 0}}
+                                animate={{height: 'auto', opacity: 1}}
+                                exit={{height: 0, opacity: 0}}
+                                className="overflow-hidden bg-[#070b14] border-t border-white/[0.05]"
+                              >
+                                <div className="p-5 flex flex-col gap-5">
+                                  <div>
+                                    <p className="text-[10px] uppercase tracking-widest text-[#64748b] font-bold mb-1 font-mono">Deal Command</p>
+                                  </div>
+                                  
+                                  <div className="w-full">
+                                    <select
+                                      value={proj.status || "pending"}
+                                      disabled={syncingProjects[proj.id]}
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        handleUpdateStatus(proj.id, e.target.value);
+                                      }}
+                                      className="w-full bg-white/[0.02] border border-white/10 text-slate-200 text-sm rounded-xl px-4 py-3.5 outline-none cursor-pointer uppercase tracking-wider appearance-none shadow-sm font-sans mb-3"
+                                    >
+                                      {[
+                                        { value: "pending", label: "01. Pending Verification" },
+                                        { value: "discovery", label: "02. Discovery Phase" },
+                                        { value: "planning", label: "03. Architecture Planning" },
+                                        { value: "ui_ux", label: "04. UI/UX Prototyping" },
+                                        { value: "development", label: "05. Engineering & Dev" },
+                                        { value: "testing", label: "06. Testing & QA" },
+                                        { value: "review", label: "07. Governance Review" },
+                                        { value: "revision", label: "08. Revision Loop" },
+                                        { value: "deployment", label: "09. Deployment Prep" },
+                                        { value: "completed", label: "10. Live / Completed" },
+                                        { value: "cancelled", label: "11. Decommissioned / Cancelled" },
+                                      ].map((option) => (
+                                        <option key={option.value} value={option.value} className="bg-slate-950 text-white font-sans">
+                                          {option.label}
+                                        </option>
+                                      ))}
+                                    </select>
+                                    
+                                    {(() => {
+                                          const currentStatus = (proj.status || "pending").toLowerCase();
+                                          let currentTarget = currentStatus;
+                                          if (currentStatus === "new") currentTarget = "pending";
+                                          if (currentStatus === "consultation") currentTarget = "planning";
+                                          if (currentStatus === "design" || currentStatus === "analysis") currentTarget = "ui_ux";
+                                          
+                                          const orderedStages = [
+                                            "pending", "discovery", "planning", "ui_ux", "development", "testing", "review", "revision", "deployment", "completed"
+                                          ];
+
+                                          const currentIndex = orderedStages.indexOf(currentTarget);
+                                          let buttonText = "Accept Deal";
+                                          let nextStatusVal = "discovery";
+                                          let isCompleted = currentTarget === "completed";
+
+                                          if (currentIndex !== -1 && currentIndex < orderedStages.length - 1) {
+                                            const nextStatus = orderedStages[currentIndex + 1];
+                                            const nextLabel = nextStatus.replace("_", "/").toUpperCase();
+                                            buttonText = `Advance to ${nextLabel}`;
+                                            nextStatusVal = nextStatus;
+                                          } else if (currentTarget === "completed") {
+                                            buttonText = "Deal Fully Completed";
+                                          } else if (currentTarget === "cancelled") {
+                                            buttonText = "Re-Activate Project";
+                                            nextStatusVal = "pending";
+                                            isCompleted = false;
+                                          }
+
+                                          const isThisSyncing = syncingProjects[proj.id];
+
+                                          return (
+                                            <button
+                                              disabled={isCompleted || isThisSyncing}
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                if (!isCompleted && !isThisSyncing) {
+                                                  handleUpdateStatus(proj.id, nextStatusVal);
+                                                }
+                                              }}
+                                              className={`w-full flex justify-center items-center gap-2 text-[11px] font-bold uppercase tracking-widest px-5 h-12 rounded-xl transition-all ${
+                                                isCompleted
+                                                  ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 cursor-not-allowed"
+                                                  : isThisSyncing
+                                                  ? "bg-slate-800 text-slate-400 border border-white/5 cursor-wait"
+                                                  : "bg-primary hover:bg-primary/90 text-white shadow-[0_0_15px_rgba(59,130,246,0.30)]"
+                                              }`}
+                                            >
+                                              {isThisSyncing ? <Loader2 className="w-4 h-4 animate-spin text-primary" /> : null}
+                                              {isThisSyncing ? "Syncing..." : buttonText}
+                                            </button>
+                                          );
+                                      })()}
+                                  </div>
+                                  
+                                  {/* Mobile Delete Button */}
+                                  <div className="flex justify-end pt-4 border-t border-white/5">
+                                    {deletingProjectId === proj.id ? (
+                                      <div className="flexflex-col w-full gap-3 bg-red-950/20 border border-red-500/20 p-4 rounded-xl animate-pulse">
+                                        <span className="text-red-300 font-mono text-[10px] block mb-3 text-center uppercase tracking-widest font-bold">Decommission permanently?</span>
+                                        <div className="flex gap-2">
+                                          <button
+                                            onClick={async (e) => {
+                                              e.stopPropagation();
+                                              setIsDeleting(true);
+                                              try {
+                                                await projectService.deleteProject(proj.id);
+                                                setExpandedProject(null);
+                                              } catch (err) {
+                                                console.error(err);
+                                              } finally {
+                                                setIsDeleting(false);
+                                                setDeletingProjectId(null);
+                                              }
+                                            }}
+                                            disabled={isDeleting}
+                                            className="flex-1 px-4 h-12 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-[11px] uppercase tracking-wider rounded-xl transition-colors cursor-pointer"
+                                          >
+                                            {isDeleting ? "..." : "Confirm"}
+                                          </button>
+                                          <button
+                                            onClick={(e) => { e.stopPropagation(); setDeletingProjectId(null); }}
+                                            disabled={isDeleting}
+                                            className="flex-1 px-4 h-12 bg-white/5 text-slate-400 hover:text-white font-bold text-[11px] uppercase tracking-wider rounded-xl transition-colors cursor-pointer"
+                                          >
+                                            Cancel
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <button
+                                        onClick={(e) => { e.stopPropagation(); setDeletingProjectId(proj.id); }}
+                                        className="h-12 w-full flex items-center justify-center gap-1.5 px-4 bg-white/[0.02] border border-white/5 text-slate-400 hover:text-red-400 font-bold text-[11px] uppercase tracking-wider rounded-xl transition-all cursor-pointer"
+                                      >
+                                        Delete Project
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Desktop Table View */}
+                  <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full text-sm text-left whitespace-nowrap">
+                      <thead className="bg-white/[0.01] text-[10px] uppercase tracking-widest text-slate-500 border-b border-white/[0.05]">
+                        <tr>
+                          <th className="px-4 py-3">Client</th>
+                          <th className="px-4 py-3">Industry</th>
+                          <th className="px-4 py-3">Type</th>
+                          <th className="px-4 py-3">Budget & Timeline</th>
+                          <th className="px-4 py-3">Urgency & Risk</th>
+                          <th className="px-4 py-3 max-w-[200px]">
+                            Requirements
+                          </th>
+                          <th className="px-4 py-3">Lead Score</th>
+                          <th className="px-4 py-3">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
                       {projects.map((proj) => {
                         const risk = getRiskLevel(proj);
                         const detailedPill = getDetailedStatusPill(proj.status);
@@ -1026,6 +1216,7 @@ export function AdminDashboard() {
                     </tbody>
                   </table>
                 </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -1072,8 +1263,38 @@ export function AdminDashboard() {
                   No clients registered.
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left whitespace-nowrap">
+                <>
+                  <div className="lg:hidden flex flex-col p-4 space-y-4">
+                    {users.map((u) => {
+                      const userProjects = projects.filter((p) => p.userId === u.id).length;
+                      return (
+                        <div key={`mob-u-${u.id}`} className="bg-white/[0.02] border border-white/[0.05] p-5 rounded-2xl">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <p className="font-medium text-white mb-1">{u.name || "Unknown"}</p>
+                              <p className="text-[10px] text-slate-500 font-mono">{u.email || ""}</p>
+                            </div>
+                            <span className={`px-2 py-0.5 text-[9px] uppercase font-bold tracking-widest rounded border ${u.role === "super_admin" ? "bg-purple-500/10 text-purple-400 border-purple-500/20" : u.role === "admin" ? "bg-primary/10 text-primary border-primary/20" : "bg-white/[0.02] text-slate-400 border-white/10"}`}>
+                              {u.role || "Client"}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/5">
+                            <div>
+                              <p className="text-[9px] uppercase tracking-widest text-slate-500">Account Type</p>
+                              <p className="text-xs text-slate-300 capitalize mt-1">{u.accountType || "Standard"}</p>
+                            </div>
+                            <div>
+                              <p className="text-[9px] uppercase tracking-widest text-slate-500">Projects</p>
+                              <p className="text-xs text-slate-300 mt-1">{userProjects}</p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full text-sm text-left whitespace-nowrap">
                     <thead className="bg-white/[0.01] text-[10px] uppercase tracking-widest text-slate-500 border-b border-white/[0.05]">
                       <tr>
                         <th className="px-4 py-3">Client</th>
@@ -1127,6 +1348,7 @@ export function AdminDashboard() {
                     </tbody>
                   </table>
                 </div>
+                </>
               )}
             </CardContent>
           </Card>
@@ -1189,6 +1411,7 @@ export function AdminDashboard() {
           </>
         )}
       </Container>
-    </section>
+      </section>
+    </PullToRefresh>
   );
 }

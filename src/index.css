@@ -5,12 +5,12 @@
   /* Color System */
   --color-primary: #0a66c2;
   --color-primary-dark: #004182;
-  --color-background: #000000;
-  --color-surface: #0a0a0a;
-  --color-surface-hover: #141414;
+  --color-background: #040918;
+  --color-surface: #0b1329;
+  --color-surface-hover: #121c38;
   --color-text-main: #fafafa;
   --color-text-muted: #a1a1aa;
-  --color-border: #1f1f22;
+  --color-border: #1f273d;
 
   /* Typography System */
   --font-sans: "Inter", system-ui, sans-serif;
