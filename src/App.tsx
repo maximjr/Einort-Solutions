@@ -1,28 +1,69 @@
-import { Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import Lenis from "lenis";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
 import { SEO } from "./components/seo/SEO";
-import { GlobalFloatingMessenger } from "./components/layout/GlobalFloatingMessenger";
 
 import { ProtectedRoute } from "./components/shared/ProtectedRoute";
 
-// Statically loaded features to prevent chunk-loading deadlocks and maximize render performance
+// Eagerly loaded features (Above the fold)
 import { Hero } from "./features/home/Hero";
-import { Services } from "./features/home/Services";
-import { ERP } from "./features/home/ERP";
-import { WhyChooseUs } from "./features/home/WhyChooseUs";
-import { Testimonials } from "./features/home/Testimonials";
-import { ContactForm } from "./features/home/ContactForm";
-import { AdminDashboard } from "./features/admin/AdminDashboard";
-import { ClientPortal } from "./features/client-portal/ClientPortal";
-import { ServicesPage } from "./features/services/ServicesPage";
+import { useAuth } from "./hooks/useAuth";
 
-// SEO Pages
-import { LocationPage } from "./features/seo/LocationPage";
-import { IndustryPage } from "./features/seo/IndustryPage";
+// Lazy loaded features
+const Services = lazy(() =>
+  import("./features/home/Services").then((m) => ({ default: m.Services })),
+);
+const ERP = lazy(() =>
+  import("./features/home/ERP").then((m) => ({ default: m.ERP })),
+);
+const WhyChooseUs = lazy(() =>
+  import("./features/home/WhyChooseUs").then((m) => ({
+    default: m.WhyChooseUs,
+  })),
+);
+const Testimonials = lazy(() =>
+  import("./features/home/Testimonials").then((m) => ({
+    default: m.Testimonials,
+  })),
+);
+const ContactForm = lazy(() =>
+  import("./features/home/ContactForm").then((m) => ({
+    default: m.ContactForm,
+  })),
+);
+const AdminDashboard = lazy(() =>
+  import("./features/admin/AdminDashboard").then((m) => ({
+    default: m.AdminDashboard,
+  })),
+);
+const ClientPortal = lazy(() =>
+  import("./features/client-portal/ClientPortal").then((m) => ({
+    default: m.ClientPortal,
+  })),
+);
+const ServicesPage = lazy(() =>
+  import("./features/services/ServicesPage").then((m) => ({
+    default: m.ServicesPage,
+  })),
+);
+const LocationPage = lazy(() =>
+  import("./features/seo/LocationPage").then((m) => ({
+    default: m.LocationPage,
+  })),
+);
+const IndustryPage = lazy(() =>
+  import("./features/seo/IndustryPage").then((m) => ({
+    default: m.IndustryPage,
+  })),
+);
+const GlobalFloatingMessenger = lazy(() =>
+  import("./components/layout/GlobalFloatingMessenger").then((m) => ({
+    default: m.GlobalFloatingMessenger,
+  })),
+);
 
 function HomePage() {
   return (
@@ -40,6 +81,24 @@ function HomePage() {
 }
 
 import { PullToRefresh } from "./components/layout/PullToRefresh";
+
+function MessengerWrapper() {
+  const { user, userData } = useAuth();
+  const isClient =
+    user &&
+    userData &&
+    userData.role !== "admin" &&
+    userData.role !== "super_admin" &&
+    !userData.isAdmin;
+
+  if (!isClient) return null;
+
+  return (
+    <Suspense fallback={null}>
+      <GlobalFloatingMessenger />
+    </Suspense>
+  );
+}
 
 function Layout() {
   useEffect(() => {
@@ -96,7 +155,7 @@ function Layout() {
           </Suspense>
         </main>
         <Footer />
-        <GlobalFloatingMessenger />
+        <MessengerWrapper />
       </div>
     </PullToRefresh>
   );

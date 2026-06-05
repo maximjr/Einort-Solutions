@@ -23,20 +23,20 @@ export function Hero() {
       {/* Abstract Background Elements with Parallax */}
       <motion.div
         style={{ y: yBackground }}
-        className="absolute top-0 inset-x-0 h-full overflow-hidden -z-10 pointer-events-none will-change-transform"
+        className="absolute top-0 inset-x-0 h-full overflow-hidden -z-10 pointer-events-none will-change-transform flex justify-center"
       >
         <motion.div
           initial={{ opacity: 0, scale: 1.2 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 3, ease: "easeOut" }}
-          className="absolute top-[-10%] left-[10%] w-[50%] h-[50%] rounded-full bg-primary/20 blur-[150px] animate-pulse"
+          className="absolute top-[-10%] left-[10%] w-[50%] h-[50%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/20 to-transparent animate-pulse rounded-full"
           style={{ animationDuration: "8s" }}
         ></motion.div>
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 3, ease: "easeOut", delay: 0.2 }}
-          className="absolute top-[20%] right-[-10%] w-[40%] h-[60%] rounded-full bg-blue-600/10 blur-[120px] animate-pulse"
+          className="absolute top-[20%] right-[-10%] w-[40%] h-[60%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-600/10 to-transparent animate-pulse rounded-full"
           style={{ animationDuration: "10s", animationDelay: "2s" }}
         ></motion.div>
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 mix-blend-overlay"></div>
@@ -65,7 +65,7 @@ export function Hero() {
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-primary to-blue-600">
                   REALITY.
                 </span>
-                <div className="absolute -inset-x-2 -inset-y-4 bg-primary/20 blur-[80px] -z-10 rounded-full"></div>
+                <div className="absolute -inset-x-8 -inset-y-8 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/30 to-transparent -z-10 rounded-full"></div>
               </span>
             </h1>
           </FadeUp>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import {
   Menu,
   X,
@@ -14,11 +14,14 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Container } from "./Container";
 import { Button } from "../ui/Button";
-import { AuthModal } from "../../features/auth/AuthModal";
 import { useAuth } from "../../hooks/useAuth";
-import { auth } from "../../lib/firebase";
-import { signOut } from "firebase/auth";
 import { Logo } from "../ui/Logo";
+
+const AuthModal = lazy(() =>
+  import("../../features/auth/AuthModal").then((m) => ({
+    default: m.AuthModal,
+  })),
+);
 
 const navLinks = [
   { name: "Services", href: "/#services" },
@@ -41,9 +44,29 @@ export function Navbar() {
     setMobileMenuOpen(false);
   };
 
+  const prefetchRoute = (path: string) => {
+    if (path.includes("admin")) {
+      import("../../features/admin/AdminDashboard").catch(() => {});
+    } else if (path.includes("client-portal")) {
+      import("../../features/client-portal/ClientPortal").catch(() => {});
+    } else if (path.includes("services")) {
+      import("../../features/services/ServicesPage").catch(() => {});
+    } else if (path.includes("industries")) {
+      import("../../features/seo/IndustryPage").catch(() => {});
+    } else if (path.includes("locations")) {
+      import("../../features/seo/LocationPage").catch(() => {});
+    }
+  };
+
   const handleSignOut = async () => {
-    if (auth) {
-      await signOut(auth);
+    try {
+      const { auth } = await import("../../lib/firebase");
+      const { signOut } = await import("firebase/auth");
+      if (auth) {
+        await signOut(auth);
+      }
+    } catch (e) {
+      console.warn("Failed to sign out", e);
     }
   };
 
@@ -153,6 +176,13 @@ export function Navbar() {
                         ? "/admin"
                         : "/client-portal"
                     }
+                    onMouseEnter={() => prefetchRoute(
+                      userData?.role === "admin" ||
+                      userData?.role === "super_admin" ||
+                      userData?.isAdmin
+                        ? "/admin"
+                        : "/client-portal"
+                    )}
                     className="text-[13px] font-bold tracking-[0.1em] uppercase text-text-muted hover:text-white transition-colors flex items-center gap-2 focus:outline-none"
                   >
                     <User size={16} className="text-primary" /> Dashboard
@@ -272,6 +302,13 @@ export function Navbar() {
                   </p>
 
                   <button
+                    onMouseEnter={() => prefetchRoute(
+                      userData?.role === "admin" ||
+                      userData?.role === "super_admin" ||
+                      userData?.isAdmin
+                        ? "/admin"
+                        : "/client-portal"
+                    )}
                     onClick={() =>
                       handleNavClick(
                         userData?.role === "admin" ||
@@ -412,11 +449,15 @@ export function Navbar() {
       </>
 
       {/* Auth Modal Portal */}
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-        initialMode={authMode}
-      />
+      {isAuthOpen && (
+        <Suspense fallback={null}>
+          <AuthModal
+            isOpen={isAuthOpen}
+            onClose={() => setIsAuthOpen(false)}
+            initialMode={authMode}
+          />
+        </Suspense>
+      )}
     </>
   );
 }
