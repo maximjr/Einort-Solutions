@@ -41,6 +41,17 @@ function HomePage() {
 
 function Layout() {
   useEffect(() => {
+    // Disable Lenis on touch devices for native iOS/Android scrolling performance
+    const isTouchDevice =
+      "ontouchstart" in window ||
+      navigator.maxTouchPoints > 0 ||
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
+    if (isTouchDevice) {
+      document.documentElement.classList.add("touch-device");
+      return;
+    }
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -52,14 +63,17 @@ function Layout() {
       touchMultiplier: 2,
     });
 
+    let animationFrameId: number;
+
     function raf(time: number) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      animationFrameId = requestAnimationFrame(raf);
     }
 
-    requestAnimationFrame(raf);
+    animationFrameId = requestAnimationFrame(raf);
 
     return () => {
+      cancelAnimationFrame(animationFrameId);
       lenis.destroy();
     };
   }, []);
@@ -95,66 +109,9 @@ export default function App() {
           <SEO />
           <ErrorBoundary>
             <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route
-                index
-                element={
-                  <Suspense
-                    fallback={
-                      <div className="min-h-screen bg-background flex items-center justify-center">
-                        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                      </div>
-                    }
-                  >
-                    <HomePage />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="services/:serviceId"
-                element={
-                  <Suspense
-                    fallback={
-                      <div className="min-h-screen bg-background flex items-center justify-center">
-                        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                      </div>
-                    }
-                  >
-                    <ServicesPage />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="locations/:region"
-                element={
-                  <Suspense
-                    fallback={
-                      <div className="min-h-screen bg-background flex items-center justify-center">
-                        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                      </div>
-                    }
-                  >
-                    <LocationPage />
-                  </Suspense>
-                }
-              />
-              <Route
-                path="industries/:industry"
-                element={
-                  <Suspense
-                    fallback={
-                      <div className="min-h-screen bg-background flex items-center justify-center">
-                        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                      </div>
-                    }
-                  >
-                    <IndustryPage />
-                  </Suspense>
-                }
-              />
-              <Route element={<ProtectedRoute requireAdmin={true} />}>
+              <Route path="/" element={<Layout />}>
                 <Route
-                  path="admin"
+                  index
                   element={
                     <Suspense
                       fallback={
@@ -163,14 +120,12 @@ export default function App() {
                         </div>
                       }
                     >
-                      <AdminDashboard />
+                      <HomePage />
                     </Suspense>
                   }
                 />
-              </Route>
-              <Route element={<ProtectedRoute />}>
                 <Route
-                  path="client-portal"
+                  path="services/:serviceId"
                   element={
                     <Suspense
                       fallback={
@@ -179,13 +134,72 @@ export default function App() {
                         </div>
                       }
                     >
-                      <ClientPortal />
+                      <ServicesPage />
                     </Suspense>
                   }
                 />
+                <Route
+                  path="locations/:region"
+                  element={
+                    <Suspense
+                      fallback={
+                        <div className="min-h-screen bg-background flex items-center justify-center">
+                          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      }
+                    >
+                      <LocationPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="industries/:industry"
+                  element={
+                    <Suspense
+                      fallback={
+                        <div className="min-h-screen bg-background flex items-center justify-center">
+                          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      }
+                    >
+                      <IndustryPage />
+                    </Suspense>
+                  }
+                />
+                <Route element={<ProtectedRoute requireAdmin={true} />}>
+                  <Route
+                    path="admin"
+                    element={
+                      <Suspense
+                        fallback={
+                          <div className="min-h-screen bg-background flex items-center justify-center">
+                            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                          </div>
+                        }
+                      >
+                        <AdminDashboard />
+                      </Suspense>
+                    }
+                  />
+                </Route>
+                <Route element={<ProtectedRoute />}>
+                  <Route
+                    path="client-portal"
+                    element={
+                      <Suspense
+                        fallback={
+                          <div className="min-h-screen bg-background flex items-center justify-center">
+                            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                          </div>
+                        }
+                      >
+                        <ClientPortal />
+                      </Suspense>
+                    }
+                  />
+                </Route>
               </Route>
-            </Route>
-          </Routes>
+            </Routes>
           </ErrorBoundary>
         </BrowserRouter>
       </AuthProvider>
