@@ -246,38 +246,93 @@ export function AuthModal({
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
         >
           <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.95, opacity: 0 }}
-            className="w-full max-w-md bg-surface border border-white/5 rounded-2xl shadow-2xl overflow-hidden relative"
+            initial={{ scale: 0.95, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 20 }}
+            className={`w-full max-w-4xl bg-surface border border-white/5 rounded-2xl shadow-2xl overflow-hidden relative flex flex-col md:flex-row transition-all duration-500`}
           >
-            <div className="absolute top-4 right-4 z-10">
+            <div className="absolute top-4 right-4 z-20">
               <button
                 onClick={onClose}
-                className="p-2 text-slate-400 hover:text-white transition-colors focus:outline-none"
+                className="p-2 bg-background/50 backdrop-blur-md rounded-full text-slate-400 hover:text-white transition-colors focus:outline-none border border-white/10"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
-            <div className="p-8">
-              <div className="mb-8 text-center relative z-10">
+            {/* Left Branding Panel (Hidden on mobile) */}
+            <div className="hidden md:flex w-full md:w-[45%] bg-background relative p-12 flex-col justify-between overflow-hidden border-r border-white/5">
+                <div className="absolute inset-0 bg-primary/5 z-0" />
+                <div className="absolute top-0 right-0 w-[150%] h-[150%] bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent opacity-60 z-0 mix-blend-screen pointer-events-none translate-x-1/4 -translate-y-1/4" />
+                
+                <div className="relative z-10">
+                  <Logo />
+                  <div className="mt-16">
+                    <h3 className="text-3xl font-display font-medium text-white mb-6 leading-[1.2]">
+                      {mode === "login" 
+                        ? "Welcome back to your workspace." 
+                        : "Join our elite network of innovators."}
+                    </h3>
+                    <p className="text-text-muted font-light leading-relaxed">
+                       {mode === "login" 
+                         ? "Securely access your active deployments, track ongoing projects, and communicate directly with your engineering team."
+                         : "Create an account to begin your project discovery, track development milestones, and access secure enterprise resources."}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="relative z-10 space-y-6">
+                    <div className="space-y-4">
+                      {mode === "register" && (
+                         <div className="flex flex-col gap-3">
+                           <div className="flex items-center gap-3 text-sm text-slate-300">
+                             <CheckCircle2 size={16} className="text-primary" />
+                             <span>Direct Engineering Access</span>
+                           </div>
+                           <div className="flex items-center gap-3 text-sm text-slate-300">
+                             <CheckCircle2 size={16} className="text-primary" />
+                             <span>Real-time Project Tracking</span>
+                           </div>
+                           <div className="flex items-center gap-3 text-sm text-slate-300">
+                             <CheckCircle2 size={16} className="text-primary" />
+                             <span>Secure Document Vault</span>
+                           </div>
+                         </div>
+                      )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Right Form Panel */}
+            <div className="w-full md:w-[55%] p-8 sm:p-12 relative z-10 bg-surface">
+              <div className="mb-8 md:hidden text-center relative z-10">
                 <div className="flex justify-center mb-6">
                   <Logo />
                 </div>
                 <h2 className="text-2xl font-display text-white mb-2">
                   {mode === "login" ? "Welcome Back" : "Create Account"}
                 </h2>
-                <p className="text-text-muted text-sm">
+                <p className="text-text-muted text-sm font-light">
                   {mode === "login"
                     ? "Sign in to access your client portal."
                     : "Register to start your architectural journey."}
                 </p>
               </div>
 
-              <div className="relative z-10">
+              <div className="hidden md:block mb-10">
+                <h2 className="text-3xl font-display font-medium text-white mb-2">
+                  {mode === "login" ? "Sign In" : "Create Account"}
+                </h2>
+                <p className="text-text-muted text-sm font-light">
+                  {mode === "login"
+                    ? "Enter your credentials to access your portal."
+                    : "Fill in your details to get started."}
+                </p>
+              </div>
+
+              <div className="relative z-10 w-full max-w-sm mx-auto md:mx-0 md:max-w-none">
                   {errorStatus && (
-                    <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-md flex items-start gap-3 relative z-10 transition-all">
+                    <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3 relative z-10 transition-all shadow-lg shadow-red-500/5">
                       <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
                       <div className="text-sm text-red-200">
                         {errorStatus}
@@ -294,7 +349,7 @@ export function AuthModal({
                   )}
 
                   {successStatus && (
-                    <div className="mb-6 p-3 bg-green-500/10 border border-green-500/20 rounded-md flex items-start gap-3 relative z-10 transition-all">
+                    <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-xl flex items-start gap-3 relative z-10 transition-all shadow-lg shadow-green-500/5">
                       <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0 mt-0.5" />
                       <div className="text-sm text-green-200">{successStatus}</div>
                     </div>
@@ -303,16 +358,16 @@ export function AuthModal({
                   {mode === "login" ? (
                     <form
                       onSubmit={loginForm.handleSubmit(onLogin)}
-                      className="space-y-4"
+                      className="space-y-5"
                     >
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-                          Email
+                        <label className="text-xs font-medium text-slate-300">
+                          Email Address
                         </label>
                         <Input
                           placeholder="name@company.com"
                           {...loginForm.register("email")}
-                          className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] h-12 ${loginForm.formState.errors.email ? "border-red-500/50" : ""}`}
+                          className={`bg-background/50 border-white/10 focus-visible:border-primary/50 text-[15px] h-12 shadow-inner transition-all ${loginForm.formState.errors.email ? "border-red-500/50" : ""}`}
                         />
                         {loginForm.formState.errors.email && (
                           <p className="text-red-400 text-xs">
@@ -323,7 +378,7 @@ export function AuthModal({
 
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
-                          <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
+                          <label className="text-xs font-medium text-slate-300">
                             Password
                           </label>
                         </div>
@@ -332,7 +387,7 @@ export function AuthModal({
                             type={showPassword ? "text" : "password"}
                             placeholder="••••••••"
                             {...loginForm.register("password")}
-                            className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] pr-10 h-12 ${loginForm.formState.errors.password ? "border-red-500/50" : ""}`}
+                            className={`bg-background/50 border-white/10 focus-visible:border-primary/50 text-[15px] pr-10 h-12 shadow-inner transition-all ${loginForm.formState.errors.password ? "border-red-500/50" : ""}`}
                           />
                           <button
                             type="button"
@@ -355,7 +410,7 @@ export function AuthModal({
 
                       <Button
                         type="submit"
-                        className="w-full uppercase tracking-[0.15em] font-bold mt-2 h-14 text-[11px]"
+                        className="w-full mt-4 h-12 tracking-wide font-medium shadow-xl shadow-primary/20 transition-all hover:shadow-primary/30"
                         disabled={isLoading}
                       >
                         {isLoading ? "Authenticating..." : "Sign In"}
@@ -364,32 +419,50 @@ export function AuthModal({
                   ) : (
                     <form
                       onSubmit={registerForm.handleSubmit(onRegister)}
-                      className="space-y-4"
+                      className="space-y-5"
                     >
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-                          Full Name
-                        </label>
-                        <Input
-                          placeholder="John Doe"
-                          {...registerForm.register("name")}
-                          className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] h-12 ${registerForm.formState.errors.name ? "border-red-500/50" : ""}`}
-                        />
-                        {registerForm.formState.errors.name && (
-                          <p className="text-red-400 text-xs">
-                            {registerForm.formState.errors.name.message}
-                          </p>
-                        )}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-slate-300">
+                            Full Name
+                          </label>
+                          <Input
+                            placeholder="John Doe"
+                            {...registerForm.register("name")}
+                            className={`bg-background/50 border-white/10 focus-visible:border-primary/50 text-[15px] h-12 shadow-inner transition-all ${registerForm.formState.errors.name ? "border-red-500/50" : ""}`}
+                          />
+                          {registerForm.formState.errors.name && (
+                            <p className="text-red-400 text-xs">
+                              {registerForm.formState.errors.name.message}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-slate-300">
+                            Phone Number
+                          </label>
+                          <Input
+                            placeholder="+1 (555) 000-0000"
+                            {...registerForm.register("phone")}
+                            className={`bg-background/50 border-white/10 focus-visible:border-primary/50 text-[15px] h-12 shadow-inner transition-all ${registerForm.formState.errors.phone ? "border-red-500/50" : ""}`}
+                          />
+                          {registerForm.formState.errors.phone && (
+                            <p className="text-red-400 text-xs">
+                              {registerForm.formState.errors.phone.message}
+                            </p>
+                          )}
+                        </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-                          Email
+                        <label className="text-xs font-medium text-slate-300">
+                          Email Address
                         </label>
                         <Input
                           placeholder="name@company.com"
                           {...registerForm.register("email")}
-                          className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] h-12 ${registerForm.formState.errors.email ? "border-red-500/50" : ""}`}
+                          className={`bg-background/50 border-white/10 focus-visible:border-primary/50 text-[15px] h-12 shadow-inner transition-all ${registerForm.formState.errors.email ? "border-red-500/50" : ""}`}
                         />
                         {registerForm.formState.errors.email && (
                           <p className="text-red-400 text-xs">
@@ -398,97 +471,73 @@ export function AuthModal({
                         )}
                       </div>
 
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-                          Phone Number
-                        </label>
-                        <Input
-                          placeholder="+1 (555) 000-0000"
-                          {...registerForm.register("phone")}
-                          className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] h-12 ${registerForm.formState.errors.phone ? "border-red-500/50" : ""}`}
-                        />
-                        {registerForm.formState.errors.phone && (
-                          <p className="text-red-400 text-xs">
-                            {registerForm.formState.errors.phone.message}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-                          Password
-                        </label>
-                        <div className="relative">
-                          <Input
-                            type={showPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            {...registerForm.register("password")}
-                            className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] pr-10 h-12 ${registerForm.formState.errors.password ? "border-red-500/50" : ""}`}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white focus:outline-none"
-                          >
-                            {showPassword ? (
-                              <EyeOff size={18} />
-                            ) : (
-                              <Eye size={18} />
-                            )}
-                          </button>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-slate-300">
+                            Password
+                          </label>
+                          <div className="relative">
+                            <Input
+                              type={showPassword ? "text" : "password"}
+                              placeholder="••••••••"
+                              {...registerForm.register("password")}
+                              className={`bg-background/50 border-white/10 focus-visible:border-primary/50 text-[15px] pr-10 h-12 shadow-inner transition-all ${registerForm.formState.errors.password ? "border-red-500/50" : ""}`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white focus:outline-none"
+                            >
+                              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                          </div>
+                          {registerForm.formState.errors.password && (
+                            <p className="text-red-400 text-xs">
+                              {registerForm.formState.errors.password.message}
+                            </p>
+                          )}
                         </div>
-                        {registerForm.formState.errors.password && (
-                          <p className="text-red-400 text-xs">
-                            {registerForm.formState.errors.password.message}
-                          </p>
-                        )}
-                      </div>
 
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-                          Repeat Password
-                        </label>
-                        <div className="relative">
-                          <Input
-                            type={showRepeatPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            {...registerForm.register("repeatPassword")}
-                            className={`bg-white/[0.02] border-white/5 focus-visible:border-primary/50 text-[15px] pr-10 h-12 ${registerForm.formState.errors.repeatPassword ? "border-red-500/50" : ""}`}
-                          />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setShowRepeatPassword(!showRepeatPassword)
-                            }
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white focus:outline-none"
-                          >
-                            {showRepeatPassword ? (
-                              <EyeOff size={18} />
-                            ) : (
-                              <Eye size={18} />
-                            )}
-                          </button>
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-slate-300">
+                            Repeat Password
+                          </label>
+                          <div className="relative">
+                            <Input
+                              type={showRepeatPassword ? "text" : "password"}
+                              placeholder="••••••••"
+                              {...registerForm.register("repeatPassword")}
+                              className={`bg-background/50 border-white/10 focus-visible:border-primary/50 text-[15px] pr-10 h-12 shadow-inner transition-all ${registerForm.formState.errors.repeatPassword ? "border-red-500/50" : ""}`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowRepeatPassword(!showRepeatPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white focus:outline-none"
+                            >
+                              {showRepeatPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                          </div>
+                          {registerForm.formState.errors.repeatPassword && (
+                            <p className="text-red-400 text-xs">
+                              {registerForm.formState.errors.repeatPassword.message}
+                            </p>
+                          )}
                         </div>
-                        {registerForm.formState.errors.repeatPassword && (
-                          <p className="text-red-400 text-xs">
-                            {registerForm.formState.errors.repeatPassword.message}
-                          </p>
-                        )}
                       </div>
 
                       <Button
                         type="submit"
-                        className="w-full uppercase tracking-[0.15em] font-bold mt-2 h-14 text-[11px]"
+                        className="w-full mt-4 h-12 tracking-wide font-medium shadow-xl shadow-primary/20 transition-all hover:shadow-primary/30"
                         disabled={isLoading}
                       >
-                        {isLoading ? "Creating Account..." : "Register"}
+                        {isLoading ? "Creating Account..." : "Create Account"}
                       </Button>
                     </form>
                   )}
               </div>
 
-              <div className="mt-6 pt-6 border-t border-white/5 text-center relative z-10">
-                <p className="text-xs text-slate-400 uppercase tracking-widest">
+              <div className="mt-8 pt-6 border-t border-white/5 text-center relative z-10 w-full max-w-sm mx-auto md:max-w-none md:mx-0">
+                <p className="text-sm text-slate-400">
                   {mode === "login"
                     ? "Don't have an account?"
                     : "Already have an account?"}
@@ -496,7 +545,7 @@ export function AuthModal({
                     onClick={() =>
                       switchMode(mode === "login" ? "register" : "login")
                     }
-                    className="ml-2 text-primary font-bold hover:text-white transition-colors focus:outline-none"
+                    className="ml-2 text-primary font-medium hover:text-white transition-colors focus:outline-none"
                   >
                     {mode === "login" ? "Create one" : "Sign in"}
                   </button>

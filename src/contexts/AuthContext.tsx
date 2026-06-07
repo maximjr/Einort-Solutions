@@ -138,6 +138,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     }
                   },
                   (error) => {
+                    console.error("[AuthProvider] Profile sync error:", error);
                     if (isMounted) {
                       if (authTimeout) clearTimeout(authTimeout);
                       clearTimeout(globalLoadingFailsafe);

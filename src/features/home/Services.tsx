@@ -7,51 +7,32 @@ import {
   CardHeader,
   CardTitle,
 } from "../../components/ui/Card";
-import {
-  Layers,
-  Database,
-  Smartphone,
-  LayoutTemplate,
-  ShieldCheck,
-  Code2,
-} from "lucide-react";
+import { Database, Smartphone, LayoutTemplate, Code2 } from "lucide-react";
 
 const services = [
   {
-    icon: <LayoutTemplate className="w-6 h-6 text-primary" />,
-    title: "Enterprise Web Apps",
+    icon: <Code2 className="w-6 h-6 text-primary" />,
+    title: "Websites & Web App Dev",
     description:
       "High-performance, scalable web applications built for business logic and data intensity.",
   },
   {
-    icon: <Layers className="w-6 h-6 text-primary" />,
+    icon: <LayoutTemplate className="w-6 h-6 text-primary" />,
     title: "UI/UX Design",
     description:
       "World-class interface design focused on conversion, usability, and brand authority.",
   },
   {
     icon: <Database className="w-6 h-6 text-primary" />,
-    title: "SaaS Platform Dev",
+    title: "ERP Solutions Dev",
     description:
       "End-to-end multi-tenant SaaS architecture, from database modeling to frontend execution.",
   },
   {
-    icon: <Code2 className="w-6 h-6 text-primary" />,
-    title: "Custom Integrations",
-    description:
-      "Seamless API integrations bridging your enterprise software, CRMs, and payment gateways.",
-  },
-  {
     icon: <Smartphone className="w-6 h-6 text-primary" />,
-    title: "Mobile Architecture",
+    title: "Mobile App Dev",
     description:
       "Cross-platform mobile experiences that extend your digital ecosystem.",
-  },
-  {
-    icon: <ShieldCheck className="w-6 h-6 text-primary" />,
-    title: "Security & DevOps",
-    description:
-      "Robust infrastructure provisioning, CI/CD pipelines, and enterprise-grade security.",
   },
 ];
 

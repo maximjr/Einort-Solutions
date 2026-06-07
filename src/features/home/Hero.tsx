@@ -89,13 +89,25 @@ export function Hero() {
           >
             <Button
               size="lg"
+              onClick={() => {
+                const el = document.getElementById("contact");
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
               className="w-full sm:w-auto uppercase tracking-[0.2em] text-[11px] px-12 h-14 font-bold shadow-2xl"
             >
-              Request Architecture Demo
+              Initiate Project Dev
             </Button>
             <Button
               variant="outline"
               size="lg"
+              onClick={() => {
+                const el = document.getElementById("case-studies");
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
               className="w-full sm:w-auto uppercase tracking-[0.2em] text-[11px] px-12 h-14 font-bold backdrop-blur-md"
             >
               View Our Work

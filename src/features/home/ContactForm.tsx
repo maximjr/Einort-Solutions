@@ -13,9 +13,9 @@ import {
   ArrowLeft,
   XCircle,
   Code2,
-  Cloud,
+  Database,
   LayoutTemplate,
-  Briefcase,
+  Smartphone,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "../../lib/utils";
@@ -38,10 +38,14 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 const projectTypes = [
-  { id: "enterprise", label: "Enterprise Web", icon: <Code2 size={24} /> },
-  { id: "saas", label: "SaaS Platform", icon: <Cloud size={24} /> },
+  {
+    id: "enterprise",
+    label: "Websites & Web App Dev",
+    icon: <Code2 size={24} />,
+  },
+  { id: "saas", label: "ERP Solutions Dev", icon: <Database size={24} /> },
   { id: "uiux", label: "UI/UX Redesign", icon: <LayoutTemplate size={24} /> },
-  { id: "other", label: "Architecture", icon: <Briefcase size={24} /> },
+  { id: "other", label: "Mobile App Dev", icon: <Smartphone size={24} /> },
 ];
 
 const budgetRanges = [
@@ -132,7 +136,9 @@ export function ContactForm() {
         reset();
         setStep(1);
       } else {
-        setSubmitError(result.message || "An error occurred submitting your request.");
+        setSubmitError(
+          result.message || "An error occurred submitting your request.",
+        );
       }
     } catch (error) {
       setSubmitError("An error occurred submitting your request.");
@@ -152,7 +158,7 @@ export function ContactForm() {
               Project Discovery
             </h2>
             <h3 className="text-4xl md:text-6xl font-display font-medium tracking-tighter text-white mb-6 leading-[1.1]">
-              INITIATE <br /> ALLIANCE.
+              INITIATE <br /> PROJECT DEV.
             </h3>
             <p className="text-lg text-text-muted mb-10 leading-relaxed font-light">
               Connect with our elite architecture team to evaluate your
@@ -198,417 +204,430 @@ export function ContactForm() {
           </FadeUp>
 
           <FadeUp delay={0.2} className="lg:col-span-7 relative min-h-[500px]">
-            {isSuccess ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="absolute inset-0 z-10 w-full h-full"
-              >
-                <Card className="h-full flex flex-col justify-center items-center text-center p-12">
-                  <div className="w-20 h-20 bg-primary/10 border border-primary/20 text-primary rounded-full flex items-center justify-center mb-6 shadow-xl">
-                    <CheckCircle2 size={40} />
-                  </div>
-                  <h4 className="text-3xl font-display font-medium text-white mb-3">
-                    Request Secured
-                  </h4>
-                  <p className="text-text-muted text-lg font-light mb-8 max-w-sm">
-                    Our elite engineering team has received your brief and will
-                    be in touch shortly.
-                  </p>
-                  <Button variant="outline" onClick={() => setIsSuccess(false)}>
-                    Submit Another Inquiry
-                  </Button>
-                </Card>
-              </motion.div>
-            ) : (
-              <div className="relative w-full h-full">
-                <Card className="bg-background/80 backdrop-blur-2xl border-white/10 shadow-2xl relative w-full overflow-hidden min-h-[550px]">
-                  <div className="h-1 bg-white/5 w-full absolute top-0 left-0">
-                    <motion.div
-                      className="h-full bg-primary"
-                      initial={{ width: "33%" }}
-                      animate={{ width: `${(step / 3) * 100}%` }}
-                      transition={{ duration: 0.5, ease: "easeInOut" }}
-                    />
-                  </div>
-                  <CardContent className="p-8 md:p-12 relative h-full flex flex-col">
-                    <AnimatePresence mode="wait">
-                      {step === 1 && (
-                        <motion.div
-                          key="step1"
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -20 }}
-                          className="flex-1"
-                        >
-                          <h4 className="text-2xl font-display text-white mb-6">
-                            What are we building?
-                          </h4>
-                          <div className="grid grid-cols-2 gap-4 mb-8">
-                            <Controller
-                              name="projectType"
-                              control={control}
-                              render={({ field }) => (
-                                <>
-                                  {projectTypes.map((type) => (
-                                    <button
-                                      key={type.id}
-                                      type="button"
-                                      onClick={() => field.onChange(type.id)}
+            <div className="relative w-full h-full">
+              <Card className="bg-background/80 backdrop-blur-2xl border-white/10 shadow-2xl relative w-full overflow-hidden min-h-[550px]">
+                <div className="h-1 bg-white/5 w-full absolute top-0 left-0">
+                  <motion.div
+                    className="h-full bg-primary"
+                    initial={{ width: "33%" }}
+                    animate={{ width: `${(step / 3) * 100}%` }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                  />
+                </div>
+                <CardContent className="p-8 md:p-12 relative h-full flex flex-col">
+                  <AnimatePresence mode="wait">
+                    {step === 1 && (
+                      <motion.div
+                        key="step1"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        className="flex-1"
+                      >
+                        <h4 className="text-2xl font-display text-white mb-6">
+                          What are we building?
+                        </h4>
+                        <div className="grid grid-cols-2 gap-4 mb-8">
+                          <Controller
+                            name="projectType"
+                            control={control}
+                            render={({ field }) => (
+                              <>
+                                {projectTypes.map((type) => (
+                                  <button
+                                    key={type.id}
+                                    type="button"
+                                    onClick={() => field.onChange(type.id)}
+                                    className={cn(
+                                      "p-4 rounded-xl border text-left transition-all duration-300 flex flex-col gap-3 group",
+                                      watchProjectType === type.id
+                                        ? "bg-primary/10 border-primary shadow-[0_0_20px_-5px_rgba(10,102,194,0.3)]"
+                                        : "bg-white/[0.02] border-white/5 hover:border-white/20 hover:bg-white/5",
+                                    )}
+                                  >
+                                    <div
                                       className={cn(
-                                        "p-4 rounded-xl border text-left transition-all duration-300 flex flex-col gap-3 group",
+                                        "text-slate-400 group-hover:text-primary transition-colors",
+                                        watchProjectType === type.id &&
+                                          "text-primary",
+                                      )}
+                                    >
+                                      {type.icon}
+                                    </div>
+                                    <span
+                                      className={cn(
+                                        "font-medium text-sm",
                                         watchProjectType === type.id
-                                          ? "bg-primary/10 border-primary shadow-[0_0_20px_-5px_rgba(10,102,194,0.3)]"
-                                          : "bg-white/[0.02] border-white/5 hover:border-white/20 hover:bg-white/5",
+                                          ? "text-white"
+                                          : "text-slate-400",
                                       )}
                                     >
-                                      <div
-                                        className={cn(
-                                          "text-slate-400 group-hover:text-primary transition-colors",
-                                          watchProjectType === type.id &&
-                                            "text-primary",
-                                        )}
-                                      >
-                                        {type.icon}
-                                      </div>
-                                      <span
-                                        className={cn(
-                                          "font-medium text-sm",
-                                          watchProjectType === type.id
-                                            ? "text-white"
-                                            : "text-slate-400",
-                                        )}
-                                      >
-                                        {type.label}
-                                      </span>
-                                    </button>
-                                  ))}
-                                </>
-                              )}
-                            />
-                          </div>
-                          {errors.projectType && (
-                            <p className="text-red-400 text-xs mt-1 mb-6 relative -top-4">
-                              {errors.projectType.message}
-                            </p>
-                          )}
+                                      {type.label}
+                                    </span>
+                                  </button>
+                                ))}
+                              </>
+                            )}
+                          />
+                        </div>
+                        {errors.projectType && (
+                          <p className="text-red-400 text-xs mt-1 mb-6 relative -top-4">
+                            {errors.projectType.message}
+                          </p>
+                        )}
 
-                          <h4 className="text-xl font-display text-white mb-4">
-                            Estimated Budget
-                          </h4>
-                          <div className="grid grid-cols-2 gap-3 mb-4">
-                            <Controller
-                              name="budget"
-                              control={control}
-                              render={({ field }) => (
-                                <>
-                                  {budgetRanges.map((range) => (
-                                    <button
-                                      key={range.id}
-                                      type="button"
-                                      onClick={() => field.onChange(range.id)}
-                                      className={cn(
-                                        "py-3 px-4 rounded-lg border text-center transition-all duration-300",
-                                        watchBudget === range.id
-                                          ? "bg-primary border-primary text-white"
-                                          : "bg-white/[0.02] border-white/5 text-slate-400 hover:border-white/20 hover:text-white",
-                                      )}
-                                    >
-                                      <span className="font-mono text-xs">
-                                        {range.label}
-                                      </span>
-                                    </button>
-                                  ))}
-                                </>
-                              )}
-                            />
-                          </div>
-                          {errors.budget && (
-                            <p className="text-red-400 text-xs mt-1 relative">
-                              {errors.budget.message}
-                            </p>
-                          )}
+                        <h4 className="text-xl font-display text-white mb-4">
+                          Estimated Budget
+                        </h4>
+                        <div className="grid grid-cols-2 gap-3 mb-4">
+                          <Controller
+                            name="budget"
+                            control={control}
+                            render={({ field }) => (
+                              <>
+                                {budgetRanges.map((range) => (
+                                  <button
+                                    key={range.id}
+                                    type="button"
+                                    onClick={() => field.onChange(range.id)}
+                                    className={cn(
+                                      "py-3 px-4 rounded-lg border text-center transition-all duration-300",
+                                      watchBudget === range.id
+                                        ? "bg-primary border-primary text-white"
+                                        : "bg-white/[0.02] border-white/5 text-slate-400 hover:border-white/20 hover:text-white",
+                                    )}
+                                  >
+                                    <span className="font-mono text-xs">
+                                      {range.label}
+                                    </span>
+                                  </button>
+                                ))}
+                              </>
+                            )}
+                          />
+                        </div>
+                        {errors.budget && (
+                          <p className="text-red-400 text-xs mt-1 relative">
+                            {errors.budget.message}
+                          </p>
+                        )}
 
-                          <div className="mt-8 pt-8 border-t border-white/5 flex justify-end">
-                            <Button
-                              type="button"
-                              onClick={handleNext}
-                              className="gap-2"
+                        <div className="mt-8 pt-8 border-t border-white/5 flex justify-end">
+                          <Button
+                            type="button"
+                            onClick={handleNext}
+                            className="gap-2"
+                          >
+                            Continue <ArrowRight size={16} />
+                          </Button>
+                        </div>
+                      </motion.div>
+                    )}
+                    {step === 2 && (
+                      <motion.div
+                        key="step2"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        className="flex-1"
+                      >
+                        <h4 className="text-2xl font-display text-white mb-6">
+                          Timeline & Details
+                        </h4>
+                        <div className="grid grid-cols-2 gap-3 mb-8">
+                          <Controller
+                            name="timeline"
+                            control={control}
+                            render={({ field }) => (
+                              <>
+                                {timelines.map((time) => (
+                                  <button
+                                    key={time.id}
+                                    type="button"
+                                    onClick={() => field.onChange(time.id)}
+                                    className={cn(
+                                      "py-3 px-4 rounded-lg border text-center transition-all duration-300",
+                                      watchTimeline === time.id
+                                        ? "bg-primary/20 border-primary text-white"
+                                        : "bg-white/[0.02] border-white/5 text-slate-400 hover:border-white/20 hover:text-white",
+                                    )}
+                                  >
+                                    <span className="font-mono text-xs">
+                                      {time.label}
+                                    </span>
+                                  </button>
+                                ))}
+                              </>
+                            )}
+                          />
+                        </div>
+                        {errors.timeline && (
+                          <p className="text-red-400 text-xs mt-1 mb-6 relative -top-4">
+                            {errors.timeline.message}
+                          </p>
+                        )}
+
+                        <div className="space-y-4 mb-4">
+                          <div className="space-y-2">
+                            <label
+                              className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
+                              htmlFor="urgency"
                             >
-                              Continue <ArrowRight size={16} />
-                            </Button>
-                          </div>
-                        </motion.div>
-                      )}
-                      {step === 2 && (
-                        <motion.div
-                          key="step2"
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -20 }}
-                          className="flex-1"
-                        >
-                          <h4 className="text-2xl font-display text-white mb-6">
-                            Timeline & Details
-                          </h4>
-                          <div className="grid grid-cols-2 gap-3 mb-8">
-                            <Controller
-                              name="timeline"
-                              control={control}
-                              render={({ field }) => (
-                                <>
-                                  {timelines.map((time) => (
-                                    <button
-                                      key={time.id}
-                                      type="button"
-                                      onClick={() => field.onChange(time.id)}
-                                      className={cn(
-                                        "py-3 px-4 rounded-lg border text-center transition-all duration-300",
-                                        watchTimeline === time.id
-                                          ? "bg-primary/20 border-primary text-white"
-                                          : "bg-white/[0.02] border-white/5 text-slate-400 hover:border-white/20 hover:text-white",
-                                      )}
-                                    >
-                                      <span className="font-mono text-xs">
-                                        {time.label}
-                                      </span>
-                                    </button>
-                                  ))}
-                                </>
-                              )}
-                            />
-                          </div>
-                          {errors.timeline && (
-                            <p className="text-red-400 text-xs mt-1 mb-6 relative -top-4">
-                              {errors.timeline.message}
-                            </p>
-                          )}
-
-                          <div className="space-y-4 mb-4">
-                            <div className="space-y-2">
-                              <label
-                                className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
-                                htmlFor="urgency"
-                              >
-                                Urgency Level
-                              </label>
-                              <select
-                                id="urgency"
-                                {...register("urgency")}
-                                className={`flex w-full rounded-md border border-white/5 bg-surface/50 px-4 py-3 text-[15px] text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all duration-300 ${errors.urgency ? "border-red-500/50" : ""}`}
-                              >
-                                <option value="">Select urgency</option>
-                                <option value="high">
-                                  High - Immediate Start
-                                </option>
-                                <option value="medium">
-                                  Medium - Within 3 Months
-                                </option>
-                                <option value="low">
-                                  Low - Exploring Options
-                                </option>
-                              </select>
-                              {errors.urgency && (
-                                <p className="text-red-400 text-xs mt-1">
-                                  {errors.urgency.message}
-                                </p>
-                              )}
-                            </div>
-
-                            <div className="space-y-2">
-                              <label
-                                className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
-                                htmlFor="requirements"
-                              >
-                                Project Requirements
-                              </label>
-                              <textarea
-                                id="requirements"
-                                rows={5}
-                                placeholder="Describe the core objectives, existing tech stack, and key deliverables..."
-                                {...register("requirements")}
-                                className={`flex w-full rounded-md border border-white/5 bg-surface/50 px-4 py-3 text-[15px] text-white placeholder:text-slate-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all duration-300 resize-none ${errors.requirements ? "border-red-500/50" : ""}`}
-                              />
-                              {errors.requirements && (
-                                <p className="text-red-400 text-xs mt-1">
-                                  {errors.requirements.message}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="mt-8 pt-8 border-t border-white/5 flex justify-between">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              onClick={() => setStep(1)}
-                              className="gap-2"
+                              Urgency Level
+                            </label>
+                            <select
+                              id="urgency"
+                              {...register("urgency")}
+                              className={`flex w-full rounded-md border border-white/5 bg-surface/50 px-4 py-3 text-[15px] text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all duration-300 ${errors.urgency ? "border-red-500/50" : ""}`}
                             >
-                              <ArrowLeft size={16} /> Back
-                            </Button>
-                            <Button
-                              type="button"
-                              onClick={handleNext}
-                              className="gap-2"
-                            >
-                              Continue <ArrowRight size={16} />
-                            </Button>
-                          </div>
-                        </motion.div>
-                      )}
-                      {step === 3 && (
-                        <motion.div
-                          key="step3"
-                          initial={{ opacity: 0, x: 20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -20 }}
-                          className="flex-1"
-                        >
-                          <h4 className="text-2xl font-display text-white mb-6">
-                            Identity Verification
-                          </h4>
-                          <div className="space-y-5 mb-8">
-                            <div className="space-y-2">
-                              <label
-                                className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
-                                htmlFor="clientName"
-                              >
-                                Full Name
-                              </label>
-                              <Input
-                                id="clientName"
-                                placeholder="Jane Doe"
-                                {...register("clientName")}
-                                className={
-                                  errors.clientName ? "border-red-500/50" : ""
-                                }
-                              />
-                              {errors.clientName && (
-                                <p className="text-red-400 text-xs">
-                                  {errors.clientName.message}
-                                </p>
-                              )}
-                            </div>
-                            <div className="space-y-2">
-                              <label
-                                className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
-                                htmlFor="company"
-                              >
-                                Company / Organization
-                              </label>
-                              <Input
-                                id="company"
-                                placeholder="Acme Global"
-                                {...register("company")}
-                                className={
-                                  errors.company ? "border-red-500/50" : ""
-                                }
-                              />
-                              {errors.company && (
-                                <p className="text-red-400 text-xs">
-                                  {errors.company.message}
-                                </p>
-                              )}
-                            </div>
-                            <div className="space-y-2">
-                              <label
-                                className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
-                                htmlFor="industry"
-                              >
-                                Industry
-                              </label>
-                              <Input
-                                id="industry"
-                                placeholder="Finance, Healthcare, Tech..."
-                                {...register("industry")}
-                                className={
-                                  errors.industry ? "border-red-500/50" : ""
-                                }
-                              />
-                              {errors.industry && (
-                                <p className="text-red-400 text-xs">
-                                  {errors.industry.message}
-                                </p>
-                              )}
-                            </div>
-                            <div className="space-y-2">
-                              <label
-                                className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
-                                htmlFor="email"
-                              >
-                                Work Email
-                              </label>
-                              <Input
-                                id="email"
-                                type="email"
-                                placeholder="jane@acmeglobal.com"
-                                {...register("email")}
-                                className={
-                                  errors.email ? "border-red-500/50" : ""
-                                }
-                              />
-                              {errors.email && (
-                                <p className="text-red-400 text-xs">
-                                  {errors.email.message}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-
-                          {submitError && (
-                            <div className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 p-3 rounded-lg border border-red-500/20 mb-4">
-                              <XCircle size={16} /> {submitError}
-                            </div>
-                          )}
-
-                          <div className="mt-8 pt-8 border-t border-white/5 flex justify-between items-center">
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              onClick={() => setStep(2)}
-                              className="gap-2 px-0"
-                            >
-                              <ArrowLeft size={16} /> Back
-                            </Button>
-                            {!user ? (
-                              <Button
-                                type="button"
-                                onClick={() =>
-                                  window.dispatchEvent(
-                                    new CustomEvent("open-auth", {
-                                      detail: { mode: "register" },
-                                    }),
-                                  )
-                                }
-                                className="tracking-[0.1em] font-bold gap-2"
-                              >
-                                Login to Submit
-                              </Button>
-                            ) : (
-                              <Button
-                                type="button"
-                                onClick={handleSubmit(onSubmit)}
-                                disabled={isSubmitting}
-                                className="tracking-[0.1em] font-bold gap-2"
-                              >
-                                {isSubmitting ? (
-                                  <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
-                                ) : (
-                                  "Initiate Alliance"
-                                )}
-                              </Button>
+                              <option value="">Select urgency</option>
+                              <option value="high">
+                                High - Immediate Start
+                              </option>
+                              <option value="medium">
+                                Medium - Within 3 Months
+                              </option>
+                              <option value="low">
+                                Low - Exploring Options
+                              </option>
+                            </select>
+                            {errors.urgency && (
+                              <p className="text-red-400 text-xs mt-1">
+                                {errors.urgency.message}
+                              </p>
                             )}
                           </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+
+                          <div className="space-y-2">
+                            <label
+                              className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
+                              htmlFor="requirements"
+                            >
+                              Project Requirements
+                            </label>
+                            <textarea
+                              id="requirements"
+                              rows={5}
+                              placeholder="Describe the core objectives, existing tech stack, and key deliverables..."
+                              {...register("requirements")}
+                              className={`flex w-full rounded-md border border-white/5 bg-surface/50 px-4 py-3 text-[15px] text-white placeholder:text-slate-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all duration-300 resize-none ${errors.requirements ? "border-red-500/50" : ""}`}
+                            />
+                            {errors.requirements && (
+                              <p className="text-red-400 text-xs mt-1">
+                                {errors.requirements.message}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="mt-8 pt-8 border-t border-white/5 flex justify-between">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => setStep(1)}
+                            className="gap-2"
+                          >
+                            <ArrowLeft size={16} /> Back
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={handleNext}
+                            className="gap-2"
+                          >
+                            Continue <ArrowRight size={16} />
+                          </Button>
+                        </div>
+                      </motion.div>
+                    )}
+                    {step === 3 && (
+                      <motion.div
+                        key="step3"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        className="flex-1"
+                      >
+                        <h4 className="text-2xl font-display text-white mb-6">
+                          Identity Verification
+                        </h4>
+                        <div className="space-y-5 mb-8">
+                          <div className="space-y-2">
+                            <label
+                              className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
+                              htmlFor="clientName"
+                            >
+                              Full Name
+                            </label>
+                            <Input
+                              id="clientName"
+                              placeholder="Jane Doe"
+                              {...register("clientName")}
+                              className={
+                                errors.clientName ? "border-red-500/50" : ""
+                              }
+                            />
+                            {errors.clientName && (
+                              <p className="text-red-400 text-xs">
+                                {errors.clientName.message}
+                              </p>
+                            )}
+                          </div>
+                          <div className="space-y-2">
+                            <label
+                              className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
+                              htmlFor="company"
+                            >
+                              Company / Organization
+                            </label>
+                            <Input
+                              id="company"
+                              placeholder="Acme Global"
+                              {...register("company")}
+                              className={
+                                errors.company ? "border-red-500/50" : ""
+                              }
+                            />
+                            {errors.company && (
+                              <p className="text-red-400 text-xs">
+                                {errors.company.message}
+                              </p>
+                            )}
+                          </div>
+                          <div className="space-y-2">
+                            <label
+                              className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
+                              htmlFor="industry"
+                            >
+                              Industry
+                            </label>
+                            <Input
+                              id="industry"
+                              placeholder="Finance, Healthcare, Tech..."
+                              {...register("industry")}
+                              className={
+                                errors.industry ? "border-red-500/50" : ""
+                              }
+                            />
+                            {errors.industry && (
+                              <p className="text-red-400 text-xs">
+                                {errors.industry.message}
+                              </p>
+                            )}
+                          </div>
+                          <div className="space-y-2">
+                            <label
+                              className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
+                              htmlFor="email"
+                            >
+                              Work Email
+                            </label>
+                            <Input
+                              id="email"
+                              type="email"
+                              placeholder="jane@acmeglobal.com"
+                              {...register("email")}
+                              className={
+                                errors.email ? "border-red-500/50" : ""
+                              }
+                            />
+                            {errors.email && (
+                              <p className="text-red-400 text-xs">
+                                {errors.email.message}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+
+                        {submitError && (
+                          <div className="flex items-center gap-2 text-red-400 text-sm bg-red-500/10 p-3 rounded-lg border border-red-500/20 mb-4">
+                            <XCircle size={16} /> {submitError}
+                          </div>
+                        )}
+
+                        <div className="mt-8 pt-8 border-t border-white/5 flex justify-between items-center">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => setStep(2)}
+                            className="gap-2 px-0"
+                          >
+                            <ArrowLeft size={16} /> Back
+                          </Button>
+                          {!user ? (
+                            <Button
+                              type="button"
+                              onClick={() =>
+                                window.dispatchEvent(
+                                  new CustomEvent("open-auth", {
+                                    detail: { mode: "register" },
+                                  }),
+                                )
+                              }
+                              className="tracking-[0.1em] font-bold gap-2"
+                            >
+                              Login to Submit
+                            </Button>
+                          ) : (
+                            <Button
+                              type="button"
+                              onClick={handleSubmit(onSubmit)}
+                              disabled={isSubmitting}
+                              className="tracking-[0.1em] font-bold gap-2"
+                            >
+                              {isSubmitting ? (
+                                <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+                              ) : (
+                                "Initiate Project Dev"
+                              )}
+                            </Button>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </CardContent>
+              </Card>
+            </div>
           </FadeUp>
         </div>
       </Container>
+
+      {/* Success Modal */}
+      <AnimatePresence>
+        {isSuccess && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+              onClick={() => setIsSuccess(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative z-10 w-full max-w-lg"
+            >
+              <Card className="bg-surface/95 border-white/10 shadow-2xl flex flex-col justify-center items-center text-center p-12">
+                <div className="w-20 h-20 bg-primary/10 border border-primary/20 text-primary rounded-full flex items-center justify-center mb-6 shadow-xl">
+                  <CheckCircle2 size={40} />
+                </div>
+                <h4 className="text-3xl font-display font-medium text-white mb-3">
+                  Request Secured
+                </h4>
+                <p className="text-text-muted text-lg font-light mb-8 max-w-sm">
+                  Our elite engineering team has received your brief and will be
+                  in touch shortly.
+                </p>
+                <Button variant="outline" onClick={() => setIsSuccess(false)}>
+                  Close & Continue
+                </Button>
+              </Card>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

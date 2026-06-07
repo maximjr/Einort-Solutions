@@ -29,6 +29,21 @@ const Testimonials = lazy(() =>
     default: m.Testimonials,
   })),
 );
+const ContactUs = lazy(() =>
+  import("./features/home/ContactUs").then((m) => ({
+    default: m.ContactUs,
+  })),
+);
+const FAQ = lazy(() =>
+  import("./features/home/FAQ").then((m) => ({
+    default: m.FAQ,
+  })),
+);
+const CaseStudies = lazy(() =>
+  import("./features/home/CaseStudies").then((m) => ({
+    default: m.CaseStudies,
+  })),
+);
 const ContactForm = lazy(() =>
   import("./features/home/ContactForm").then((m) => ({
     default: m.ContactForm,
@@ -59,6 +74,11 @@ const IndustryPage = lazy(() =>
     default: m.IndustryPage,
   })),
 );
+const CaseStudyPage = lazy(() =>
+  import("./features/case-studies/CaseStudyPage").then((m) => ({
+    default: m.CaseStudyPage,
+  })),
+);
 const GlobalFloatingMessenger = lazy(() =>
   import("./components/layout/GlobalFloatingMessenger").then((m) => ({
     default: m.GlobalFloatingMessenger,
@@ -73,8 +93,11 @@ function HomePage() {
         <Services />
         <ERP />
         <WhyChooseUs />
+        <CaseStudies />
         <Testimonials />
         <ContactForm />
+        <ContactUs />
+        <FAQ />
       </Suspense>
     </>
   );
@@ -226,6 +249,20 @@ export default function App() {
                       }
                     >
                       <IndustryPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="case-studies/:caseId"
+                  element={
+                    <Suspense
+                      fallback={
+                        <div className="min-h-screen bg-background flex items-center justify-center">
+                          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      }
+                    >
+                      <CaseStudyPage />
                     </Suspense>
                   }
                 />
