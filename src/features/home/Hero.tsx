@@ -39,7 +39,7 @@ export function Hero() {
           className="absolute top-[20%] right-[-10%] w-[40%] h-[60%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-600/10 to-transparent animate-pulse rounded-full"
           style={{ animationDuration: "10s", animationDelay: "2s" }}
         ></motion.div>
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-[0.08] pointer-events-none"></div>
         <div className="absolute inset-x-0 bottom-0 h-[60vh] bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none"></div>
       </motion.div>
 
@@ -48,45 +48,36 @@ export function Hero() {
           style={{ opacity: opacityText, scale: scaleText }}
           className="flex flex-col md:items-center w-full"
         >
-          <FadeUp delay={0.1}>
-            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-10 backdrop-blur-xl shadow-2xl hover:border-white/20 transition-all mx-auto cursor-default">
-              <span className="flex h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_rgba(10,102,194,0.8)] animate-pulse"></span>
-              <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-slate-300">
-                Enterprise Grade Engineering
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-10 backdrop-blur-xl shadow-2xl hover:border-white/20 transition-all mx-auto cursor-default opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]">
+            <span className="flex h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_rgba(10,102,194,0.8)] animate-pulse"></span>
+            <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-slate-300">
+              Enterprise Grade Engineering
+            </span>
+          </div>
+
+          <h1 className="text-[3.5rem] md:text-8xl lg:text-[8.5rem] font-display font-medium tracking-tighter leading-[0.9] mb-8 text-white max-w-6xl mx-auto drop-shadow-2xl opacity-0 animate-[fadeInUp_0.8s_ease-out_forwards]">
+            WE ENGINEER <br className="hidden md:block" />
+            TOMORROW'S{" "}
+            <span className="relative whitespace-nowrap">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-primary to-blue-600">
+                REALITY.
               </span>
-            </div>
-          </FadeUp>
+              <div className="absolute -inset-x-8 -inset-y-8 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/30 to-transparent -z-10 rounded-full"></div>
+            </span>
+          </h1>
 
-          <FadeUp delay={0.2} duration={1.2}>
-            <h1 className="text-[3.5rem] md:text-8xl lg:text-[8.5rem] font-display font-medium tracking-tighter leading-[0.9] mb-8 text-white max-w-6xl mx-auto drop-shadow-2xl">
-              WE ENGINEER <br className="hidden md:block" />
-              TOMORROW'S{" "}
-              <span className="relative whitespace-nowrap">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-primary to-blue-600">
-                  REALITY.
-                </span>
-                <div className="absolute -inset-x-8 -inset-y-8 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/30 to-transparent -z-10 rounded-full"></div>
-              </span>
-            </h1>
-          </FadeUp>
+          <h2 className="sr-only">
+            Custom Web Development & Enterprise Software Engineering in USA,
+            Canada, and Europe
+          </h2>
+          <p className="text-lg md:text-2xl text-text-muted mb-12 max-w-3xl mx-auto leading-relaxed font-light tracking-wide opacity-0 animate-[fadeInUp_0.8s_ease-out_0.2s_forwards]">
+            Partner with Einort Solutions for premium custom software
+            architecture. We engineer highly scalable SaaS platforms,
+            enterprise web applications, and world-class AI automation systems
+            for industry leaders across the US, Canada, and Europe.
+          </p>
 
-          <FadeUp delay={0.4}>
-            <h2 className="sr-only">
-              Custom Web Development & Enterprise Software Engineering in USA,
-              Canada, and Europe
-            </h2>
-            <p className="text-lg md:text-2xl text-text-muted mb-12 max-w-3xl mx-auto leading-relaxed font-light tracking-wide">
-              Partner with Einort Solutions for premium custom software
-              architecture. We engineer highly scalable SaaS platforms,
-              enterprise web applications, and world-class AI automation systems
-              for industry leaders across the US, Canada, and Europe.
-            </p>
-          </FadeUp>
-
-          <FadeUp
-            delay={0.5}
-            className="flex flex-col sm:flex-row items-center gap-6 w-full md:w-auto"
-          >
+          <div className="flex flex-col sm:flex-row items-center gap-6 w-full md:w-auto opacity-0 animate-[fadeInUp_0.8s_ease-out_0.3s_forwards]">
             <Button
               size="lg"
               onClick={() => {
@@ -112,7 +103,7 @@ export function Hero() {
             >
               View Our Work
             </Button>
-          </FadeUp>
+          </div>
         </motion.div>
 
         <FadeUp

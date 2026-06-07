@@ -1,7 +1,6 @@
 import { lazy, Suspense, useEffect } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
-import Lenis from "lenis";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
 import { SEO } from "./components/seo/SEO";
@@ -89,13 +88,21 @@ function HomePage() {
   return (
     <>
       <Hero />
-      <Suspense fallback={<div className="h-40"></div>}>
+      <Suspense fallback={<div className="h-32"></div>}>
         <Services />
+      </Suspense>
+      <Suspense fallback={<div className="h-32"></div>}>
         <ERP />
+      </Suspense>
+      <Suspense fallback={<div className="h-32"></div>}>
         <WhyChooseUs />
         <CaseStudies />
+      </Suspense>
+      <Suspense fallback={<div className="h-32"></div>}>
         <Testimonials />
         <ContactForm />
+      </Suspense>
+      <Suspense fallback={<div className="h-32"></div>}>
         <ContactUs />
         <FAQ />
       </Suspense>
@@ -136,29 +143,34 @@ function Layout() {
       return;
     }
 
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: "vertical",
-      gestureOrientation: "vertical",
-      smoothWheel: true,
-      syncTouch: false,
-      wheelMultiplier: 1,
-      touchMultiplier: 2,
-    });
-
     let animationFrameId: number;
+    let lenisInstance: any = null;
 
-    function raf(time: number) {
-      lenis.raf(time);
+    import("lenis").then(({ default: Lenis }) => {
+      lenisInstance = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: "vertical",
+        gestureOrientation: "vertical",
+        smoothWheel: true,
+        syncTouch: false,
+        wheelMultiplier: 1,
+        touchMultiplier: 2,
+      });
+
+      function raf(time: number) {
+        lenisInstance.raf(time);
+        animationFrameId = requestAnimationFrame(raf);
+      }
+
       animationFrameId = requestAnimationFrame(raf);
-    }
-
-    animationFrameId = requestAnimationFrame(raf);
+    });
 
     return () => {
       cancelAnimationFrame(animationFrameId);
-      lenis.destroy();
+      if (lenisInstance) {
+        lenisInstance.destroy();
+      }
     };
   }, []);
 

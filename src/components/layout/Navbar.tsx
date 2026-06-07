@@ -254,12 +254,15 @@ export function Navbar() {
 
         {/* Drawer Sheet */}
         <div
-          className={`fixed inset-x-0 bottom-0 z-[55] h-[92dvh] bg-[#0b0f19] border-t border-white/10 rounded-t-[2.5rem] md:hidden flex flex-col transform transition-transform duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
+          className={`fixed inset-x-0 bottom-0 z-[55] h-[92dvh] bg-[#0b0f19] border-t border-white/10 rounded-t-[2.5rem] md:hidden flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
             mobileMenuOpen
-              ? "translate-y-0 shadow-[0_-20px_80px_rgba(0,0,0,0.6)] pointer-events-auto"
-              : "translate-y-[130%] shadow-none pointer-events-none"
+              ? "shadow-[0_-20px_80px_rgba(0,0,0,0.6)] pointer-events-auto"
+              : "shadow-none pointer-events-none"
           }`}
-          style={{ willChange: "transform" }}
+          style={{ 
+            willChange: "transform",
+            transform: mobileMenuOpen ? "translate3d(0, 0, 0)" : "translate3d(0, 130%, 0)"
+          }}
           aria-hidden={!mobileMenuOpen}
         >
           {/* Premium Ambience Glow (No expensive backdrop blur) */}
