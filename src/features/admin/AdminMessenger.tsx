@@ -4,6 +4,8 @@ import {
   MessageSquare, 
   Loader2, 
   X,
+  Check,
+  CheckCheck,
   Paperclip,
   Activity,
   Flag,
@@ -21,6 +23,24 @@ interface AdminMessengerProps {
 }
 
 import { useMessaging } from "../../hooks/useMessaging";
+
+function safelyFormatTime(timestamp: any): string {
+  try {
+    if (!timestamp) return "Now";
+    if (typeof timestamp.toDate === "function") {
+      return timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    if (timestamp instanceof Date) {
+      return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    if (typeof timestamp === 'number') {
+      return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+  } catch (err) {
+    console.debug("Failed parsing timestamp:", err);
+  }
+  return "Sent";
+}
 
 export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps) {
   const { conversations } = useMessaging();
@@ -237,14 +257,14 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                   >
                     <div className="relative shrink-0">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-[13px] uppercase transition-colors ${isSelected ? "bg-primary text-white shadow-lg" : "bg-white/[0.05] text-slate-300"}`}>
-                        {c.name ? c.name.substring(0, 2) : "CL"}
+                        {(c.fullName || c.displayName || c.name || "Client User").substring(0, 2)}
                       </div>
                       <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#0a0f18] transition-colors ${online ? "bg-emerald-400" : "bg-transparent border-transparent"}`}></span>
                     </div>
 
                     <div className="flex-1 min-w-0 overflow-hidden">
                       <div className="flex items-center justify-between mb-0.5">
-                        <p className={`text-[13px] font-medium truncate pr-2 ${isSelected ? "text-white" : "text-slate-300"}`}>{c.name || "Client User"}</p>
+                        <p className={`text-[13px] font-medium truncate pr-2 ${isSelected ? "text-white" : "text-slate-300"}`}>{c.fullName || c.displayName || c.name || "Client User"}</p>
                         {unread > 0 && (
                           <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 bg-cyan-500 text-[#0a0f18] text-[10px] font-bold rounded-full shadow-[0_0_10px_rgba(34,211,238,0.4)]">
                             {unread}
@@ -292,13 +312,13 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                <div className="flex items-center gap-3.5">
                   <div className="relative">
                     <div className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/10 text-white flex items-center justify-center font-medium text-sm uppercase shrink-0">
-                      {activeSelectedClient.name ? activeSelectedClient.name.substring(0, 2) : "CL"}
+                      {(activeSelectedClient.fullName || activeSelectedClient.displayName || activeSelectedClient.name || "CL").substring(0, 2)}
                     </div>
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <h4 className="text-[14px] font-semibold tracking-wide text-white">
-                        {activeSelectedClient.name}
+                        {activeSelectedClient.fullName || activeSelectedClient.displayName || activeSelectedClient.name || "Client User"}
                       </h4>
                       <span className={`text-[9px] px-2 py-0.5 rounded-full font-medium uppercase ${clientPresence[activeSelectedClient.id] ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-slate-400"}`}>
                         {clientPresence[activeSelectedClient.id] ? "Online" : "Offline"}
@@ -357,7 +377,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                   <div className="space-y-2">
                     <h5 className="text-[15px] font-semibold text-white tracking-wide">Secure Link Established</h5>
                     <p className="text-slate-400 font-light text-[13px] leading-relaxed max-w-sm mx-auto">
-                      Channel is open with {activeSelectedClient.name}. You may now send deliverables and secure communications.
+                      Channel is open with {activeSelectedClient.fullName || activeSelectedClient.displayName || activeSelectedClient.name || "Client User"}. You may now send deliverables and secure communications.
                     </p>
                   </div>
                 </div>
@@ -403,18 +423,19 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                               </div>
                             )}
                           </div>
-                          <div className={`flex items-center gap-1.5 mt-1.5 px-1 text-[10px] text-slate-500 font-medium ${isMe ? "justify-end" : "justify-start"} opacity-0 group-hover:opacity-100 transition-opacity`}>
+                          <div className={`flex items-center gap-1.5 mt-1.5 px-1 text-[10px] text-slate-500 font-medium ${isMe ? "justify-end" : "justify-start"} transition-opacity`}>
                             <span>
-                              {ms.timestamp ? (
-                                ms.timestamp.toDate ? (
-                                  ms.timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                                ) : (
-                                  "Sent"
-                                )
-                              ) : (
-                                "Now"
-                              )}
+                              {safelyFormatTime(ms.timestamp)}
                             </span>
+                            {isMe && (
+                              <span className="flex items-center ml-0.5">
+                                {ms.read ? (
+                                  <CheckCheck size={14} className="text-primary" />
+                                ) : (
+                                  <Check size={12} className="text-slate-500" />
+                                )}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </motion.div>
@@ -476,7 +497,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     onKeyDown={handleKeyPress}
-                    placeholder={`Reply to ${activeSelectedClient.name}...`}
+                    placeholder={`Reply to ${activeSelectedClient.fullName || activeSelectedClient.displayName || activeSelectedClient.name || "Client User"}...`}
                     disabled={sending}
                     rows={1}
                     className="w-full min-h-[44px] max-h-32 bg-white/[0.04] border border-white/[0.08] focus:border-white/20 focus:ring-1 focus:ring-white/10 rounded-2xl px-4 py-3 text-[14px] text-white placeholder-slate-400 font-light focus:outline-none resize-none transition-all scrollbar-none shadow-inner"

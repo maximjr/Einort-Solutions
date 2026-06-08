@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";

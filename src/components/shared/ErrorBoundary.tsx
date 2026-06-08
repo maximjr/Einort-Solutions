@@ -6,35 +6,103 @@ interface Props {
 
 interface State {
   hasError: boolean;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
+  globalError: string | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
-    hasError: false
+    hasError: false,
+    error: null,
+    errorInfo: null,
+    globalError: null
   };
 
-  public static getDerivedStateFromError(_: Error): State {
-    return { hasError: true };
+  private handleGlobalError = (event: ErrorEvent) => {
+    console.error("[Global Error]:", event.error);
+    this.setState({
+      hasError: true,
+      globalError: `[Global] ${event.message}\n${event.filename}:${event.lineno}:${event.colno}`,
+      error: event.error
+    });
+  };
+
+  private handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+    console.error("[Unhandled Promise Rejection]:", event.reason);
+    this.setState({
+      hasError: true,
+      globalError: `[Promise Rejection] ${event.reason}`,
+      error: event.reason instanceof Error ? event.reason : new Error(String(event.reason))
+    });
+  };
+
+  public componentDidMount() {
+    window.addEventListener("error", this.handleGlobalError);
+    window.addEventListener("unhandledrejection", this.handleUnhandledRejection);
+  }
+
+  public componentWillUnmount() {
+    window.removeEventListener("error", this.handleGlobalError);
+    window.removeEventListener("unhandledrejection", this.handleUnhandledRejection);
+  }
+
+  public static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error, errorInfo: null, globalError: null };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
+    console.error("[React ErrorBoundary Crash]:", error, errorInfo);
+    this.setState({ errorInfo });
   }
 
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-background text-text flex items-center justify-center p-8 flex-col text-center">
-          <h1 className="text-3xl font-display font-medium text-white mb-4">Something went wrong.</h1>
-          <p className="text-text-muted mb-8 max-w-md mx-auto">
-            We've encountered an unexpected issue. Please try refreshing the page.
-          </p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="bg-primary text-white px-6 py-3 rounded-md font-bold tracking-widest text-[11px] uppercase hover:bg-primary/90 transition-colors"
-          >
-            Refresh Page
-          </button>
+        <div className="min-h-screen bg-background text-text flex items-center justify-center p-8 flex-col text-left">
+          <div className="w-full max-w-4xl bg-[#0a0f18] border border-red-500/30 p-6 rounded-lg shadow-2xl overflow-hidden">
+            <h1 className="text-2xl font-mono font-bold text-red-400 mb-4 flex items-center gap-2">
+              <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+              RUNTIME CRASH DETECTED
+            </h1>
+            
+            <div className="space-y-4 font-mono text-sm">
+              <div className="bg-red-500/10 border border-red-500/20 p-4 rounded text-red-200 break-words">
+                <span className="text-red-400 font-bold block mb-1">Error Message:</span>
+                {this.state.error?.message || this.state.error?.toString() || this.state.globalError || "Unknown error"}
+              </div>
+
+              {this.state.errorInfo?.componentStack && (
+                <div className="bg-white/5 border border-white/10 p-4 rounded text-gray-300 overflow-x-auto">
+                  <span className="text-gray-400 font-bold block mb-1">Component Stack:</span>
+                  <pre className="whitespace-pre-wrap">{this.state.errorInfo.componentStack}</pre>
+                </div>
+              )}
+
+              {this.state.error?.stack && (
+                <div className="bg-white/5 border border-white/10 p-4 rounded text-gray-300 overflow-x-auto">
+                  <span className="text-gray-400 font-bold block mb-1">Stack Trace:</span>
+                  <pre className="whitespace-pre-wrap">{this.state.error.stack}</pre>
+                </div>
+              )}
+              
+              <div className="bg-white/5 border border-white/10 p-4 rounded text-gray-300">
+                <span className="text-gray-400 font-bold block mb-1">Lifecycle State:</span>
+                <div>User Agent: {navigator.userAgent}</div>
+                <div>URL: {window.location.href}</div>
+                <div>Time: {new Date().toISOString()}</div>
+              </div>
+            </div>
+
+            <div className="mt-8 flex gap-4">
+              <button 
+                onClick={() => window.location.reload()}
+                className="bg-red-500/20 text-red-400 border border-red-500/30 px-6 py-2 rounded font-mono font-bold hover:bg-red-500/30 transition-colors auto-focus"
+              >
+                RELOAD SYSTEM
+              </button>
+            </div>
+          </div>
         </div>
       );
     }

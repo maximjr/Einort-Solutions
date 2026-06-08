@@ -5,7 +5,7 @@ import {
   Loader2,
   X,
   Check,
-  CheckCircle,
+  CheckCheck,
   Paperclip,
   Activity,
 } from "lucide-react";
@@ -22,6 +22,24 @@ interface ClientMessengerProps {
   userEmail: string;
   userName: string;
   onClose?: () => void;
+}
+
+function safelyFormatTime(timestamp: any): string {
+  try {
+    if (!timestamp) return "Now";
+    if (typeof timestamp.toDate === "function") {
+      return timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    if (timestamp instanceof Date) {
+      return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    if (typeof timestamp === 'number') {
+      return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+  } catch (err) {
+    console.debug("Failed parsing timestamp:", err);
+  }
+  return "Sent";
 }
 
 export function ClientMessenger({
@@ -343,26 +361,17 @@ export function ClientMessenger({
                     </div>
                     {/* Timestamp & Read ticks */}
                     <div
-                      className={`flex items-center gap-1.5 mt-1.5 px-1 text-[10px] text-slate-500 font-medium ${isMe ? "justify-end" : "justify-start"} opacity-0 group-hover:opacity-100 transition-opacity`}
+                      className={`flex items-center gap-1.5 mt-1.5 px-1 text-[10px] text-slate-500 font-medium ${isMe ? "justify-end" : "justify-start"} transition-opacity`}
                     >
                       <span>
-                        {ms.timestamp
-                          ? ms.timestamp.toDate
-                            ? ms.timestamp
-                                .toDate()
-                                .toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })
-                            : "Sent"
-                          : "Now"}
+                        {safelyFormatTime(ms.timestamp)}
                       </span>
                       {isMe && (
                         <span className="flex items-center ml-0.5">
                           {ms.read ? (
-                            <CheckCircle size={10} className="text-primary" />
+                            <CheckCheck size={14} className="text-primary" />
                           ) : (
-                            <Check size={10} className="text-slate-500" />
+                            <Check size={12} className="text-slate-500" />
                           )}
                         </span>
                       )}

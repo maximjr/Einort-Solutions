@@ -5,7 +5,7 @@ import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { Send, CheckCircle2 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
-import { messageService } from "../../services/admin/messageService";
+// import { messageService } from "../../services/admin/messageService";
 import { auth } from "../../lib/firebase";
 import { signInAnonymously } from "firebase/auth";
 
@@ -31,6 +31,7 @@ export function ContactUs() {
       }
 
       if (currentUser) {
+        const { messageService } = await import("../../services/admin/messageService");
         const superAdminId = await messageService.getSuperAdminUid();
         const conversationId = await messageService.getOrCreateConversation(
           currentUser.uid,

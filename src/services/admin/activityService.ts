@@ -1,6 +1,6 @@
 import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
 import { db } from "../../lib/firebase";
-import { handleFirestoreError, OperationType } from "./errorHelper";
+import { handleFirestoreError, OperationType } from "./diagnosticsHelper";
 
 export interface ClientActivity {
   id: string;

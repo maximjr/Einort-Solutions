@@ -34,11 +34,11 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
     return (
       <motion.div
         ref={(node) => {
-          divRef.current = node;
+          (divRef as any).current = node;
           if (typeof ref === "function") {
             ref(node);
           } else if (ref) {
-            ref.current = node;
+            (ref as any).current = node;
           }
         }}
         onMouseMove={handleMouseMove}

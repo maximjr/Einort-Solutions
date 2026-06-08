@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, lazy } from "react";
 import {
   Menu,
   X,
@@ -16,11 +16,15 @@ import { Container } from "./Container";
 import { Button } from "../ui/Button";
 import { useAuth } from "../../hooks/useAuth";
 import { Logo } from "../ui/Logo";
+import { Loadable } from "../shared/Loadable";
 
-const AuthModal = lazy(() =>
-  import("../../features/auth/AuthModal").then((m) => ({
-    default: m.AuthModal,
-  })),
+const AuthModal = Loadable(
+  lazy(() =>
+    import("../../features/auth/AuthModal").then((m) => ({
+      default: m.AuthModal,
+    })),
+  ),
+  () => null // AuthModal should fade-in natively without a spinner
 );
 
 const navLinks = [
@@ -453,13 +457,11 @@ export function Navbar() {
 
       {/* Auth Modal Portal */}
       {isAuthOpen && (
-        <Suspense fallback={null}>
-          <AuthModal
-            isOpen={isAuthOpen}
-            onClose={() => setIsAuthOpen(false)}
-            initialMode={authMode}
-          />
-        </Suspense>
+        <AuthModal
+          isOpen={isAuthOpen}
+          onClose={() => setIsAuthOpen(false)}
+          initialMode={authMode}
+        />
       )}
     </>
   );

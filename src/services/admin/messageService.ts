@@ -16,7 +16,7 @@ import {
   where
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
-import { handleFirestoreError, OperationType } from "./errorHelper";
+import { handleFirestoreError, OperationType } from "./diagnosticsHelper";
 
 export interface Conversation {
   id: string;
@@ -110,11 +110,15 @@ export const messageService = {
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Conversation[];
-        onUpdate(data);
+        try {
+          const data = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Conversation[];
+          onUpdate(data);
+        } catch (e) {
+          console.error("Safely caught snapshot processing error", e);
+        }
       },
       (error) => {
         try {
@@ -125,7 +129,9 @@ export const messageService = {
       }
     );
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+    };
   },
 
   subscribeConversationsForAdmin(
@@ -146,11 +152,15 @@ export const messageService = {
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Conversation[];
-        onUpdate(data);
+        try {
+          const data = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Conversation[];
+          onUpdate(data);
+        } catch (e) {
+          console.error("Safely caught admin snapshot processing error", e);
+        }
       },
       (error) => {
         try {
@@ -161,7 +171,9 @@ export const messageService = {
       }
     );
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+    };
   },
 
   subscribeMessages(
@@ -183,11 +195,15 @@ export const messageService = {
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Message[];
-        onUpdate(data);
+        try {
+          const data = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Message[];
+          onUpdate(data);
+        } catch (e) {
+          console.error("Safely caught messages snapshot processing error", e);
+        }
       },
       (error) => {
         try {
@@ -198,7 +214,9 @@ export const messageService = {
       }
     );
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+    };
   },
 
   async sendMessage(
@@ -361,19 +379,26 @@ export const messageService = {
   subscribePresence(userId: string, onUpdate: (data: any) => void) {
     if (!db) return () => {};
     const docRef = doc(db, "presence", userId);
-    return onSnapshot(
+    const unsubscribe = onSnapshot(
       docRef,
       (snap) => {
-        if (snap.exists()) {
-          onUpdate(snap.data());
-        } else {
-          onUpdate(null);
+        try {
+          if (snap.exists()) {
+            onUpdate(snap.data());
+          } else {
+            onUpdate(null);
+          }
+        } catch (e) {
+          console.error("Safely caught presence processing error", e);
         }
       },
       (error) => {
         console.warn("Failed to subscribe to presence:", error);
       }
     );
+    return () => {
+      unsubscribe();
+    };
   },
 
   async setPresence(userId: string, isOnline: boolean, role: string) {

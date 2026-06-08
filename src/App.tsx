@@ -6,82 +6,61 @@ import { Footer } from "./components/layout/Footer";
 import { SEO } from "./components/seo/SEO";
 
 import { ProtectedRoute } from "./components/shared/ProtectedRoute";
+import { Loadable } from "./components/shared/Loadable";
 
 // Eagerly loaded features (Above the fold)
 import { Hero } from "./features/home/Hero";
 import { useAuth } from "./hooks/useAuth";
 
 // Lazy loaded features
-const Services = lazy(() =>
-  import("./features/home/Services").then((m) => ({ default: m.Services })),
+const Services = Loadable(
+  lazy(() => import("./features/home/Services").then((m) => ({ default: m.Services }))),
 );
-const ERP = lazy(() =>
-  import("./features/home/ERP").then((m) => ({ default: m.ERP })),
+const ERP = Loadable(
+  lazy(() => import("./features/home/ERP").then((m) => ({ default: m.ERP }))),
 );
-const WhyChooseUs = lazy(() =>
-  import("./features/home/WhyChooseUs").then((m) => ({
-    default: m.WhyChooseUs,
-  })),
+const WhyChooseUs = Loadable(
+  lazy(() => import("./features/home/WhyChooseUs").then((m) => ({ default: m.WhyChooseUs }))),
 );
-const Testimonials = lazy(() =>
-  import("./features/home/Testimonials").then((m) => ({
-    default: m.Testimonials,
-  })),
+const Testimonials = Loadable(
+  lazy(() => import("./features/home/Testimonials").then((m) => ({ default: m.Testimonials }))),
 );
-const ContactUs = lazy(() =>
-  import("./features/home/ContactUs").then((m) => ({
-    default: m.ContactUs,
-  })),
+const ContactUs = Loadable(
+  lazy(() => import("./features/home/ContactUs").then((m) => ({ default: m.ContactUs }))),
 );
-const FAQ = lazy(() =>
-  import("./features/home/FAQ").then((m) => ({
-    default: m.FAQ,
-  })),
+const FAQ = Loadable(
+  lazy(() => import("./features/home/FAQ").then((m) => ({ default: m.FAQ }))),
 );
-const CaseStudies = lazy(() =>
-  import("./features/home/CaseStudies").then((m) => ({
-    default: m.CaseStudies,
-  })),
+const CaseStudies = Loadable(
+  lazy(() => import("./features/home/CaseStudies").then((m) => ({ default: m.CaseStudies }))),
 );
-const ContactForm = lazy(() =>
-  import("./features/home/ContactForm").then((m) => ({
-    default: m.ContactForm,
-  })),
+const ContactForm = Loadable(
+  lazy(() => import("./features/home/ContactForm").then((m) => ({ default: m.ContactForm }))),
 );
-const AdminDashboard = lazy(() =>
-  import("./features/admin/AdminDashboard").then((m) => ({
-    default: m.AdminDashboard,
-  })),
+const AdminDashboard = Loadable(
+  lazy(() => import("./features/admin/AdminDashboard").then((m) => ({ default: m.AdminDashboard }))),
 );
-const ClientPortal = lazy(() =>
-  import("./features/client-portal/ClientPortal").then((m) => ({
-    default: m.ClientPortal,
-  })),
+const ClientPortal = Loadable(
+  lazy(() => import("./features/client-portal/ClientPortal").then((m) => ({ default: m.ClientPortal }))),
 );
-const ServicesPage = lazy(() =>
-  import("./features/services/ServicesPage").then((m) => ({
-    default: m.ServicesPage,
-  })),
+const ServicesPage = Loadable(
+  lazy(() => import("./features/services/ServicesPage").then((m) => ({ default: m.ServicesPage }))),
 );
-const LocationPage = lazy(() =>
-  import("./features/seo/LocationPage").then((m) => ({
-    default: m.LocationPage,
-  })),
+const LocationPage = Loadable(
+  lazy(() => import("./features/seo/LocationPage").then((m) => ({ default: m.LocationPage }))),
 );
-const IndustryPage = lazy(() =>
-  import("./features/seo/IndustryPage").then((m) => ({
-    default: m.IndustryPage,
-  })),
+const IndustryPage = Loadable(
+  lazy(() => import("./features/seo/IndustryPage").then((m) => ({ default: m.IndustryPage }))),
 );
-const CaseStudyPage = lazy(() =>
-  import("./features/case-studies/CaseStudyPage").then((m) => ({
-    default: m.CaseStudyPage,
-  })),
+const CaseStudyPage = Loadable(
+  lazy(() => import("./features/case-studies/CaseStudyPage").then((m) => ({ default: m.CaseStudyPage }))),
 );
-const GlobalFloatingMessenger = lazy(() =>
-  import("./components/layout/GlobalFloatingMessenger").then((m) => ({
-    default: m.GlobalFloatingMessenger,
-  })),
+const GlobalFloatingMessenger = Loadable(
+  lazy(() =>
+    import("./components/layout/GlobalFloatingMessenger").then((m) => ({
+      default: m.GlobalFloatingMessenger,
+    })),
+  ),
 );
 
 function HomePage() {
@@ -138,38 +117,83 @@ function Layout() {
       navigator.maxTouchPoints > 0 ||
       window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
-    if (isTouchDevice) {
+    // Detect low-end devices
+    const isLowMemory =
+      (navigator as any).deviceMemory !== undefined && (navigator as any).deviceMemory < 4;
+    const isLowProcessing =
+      navigator.hardwareConcurrency !== undefined && navigator.hardwareConcurrency <= 4;
+    const isReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobileString = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+
+    if (isTouchDevice || isLowMemory || isLowProcessing || isReducedMotion || isMobileString) {
       document.documentElement.classList.add("touch-device");
       return;
     }
 
-    let animationFrameId: number;
+    let animationFrameId: number | null = null;
     let lenisInstance: any = null;
+    let isMounted = true;
 
-    import("lenis").then(({ default: Lenis }) => {
-      lenisInstance = new Lenis({
-        duration: 1.2,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        orientation: "vertical",
-        gestureOrientation: "vertical",
-        smoothWheel: true,
-        syncTouch: false,
-        wheelMultiplier: 1,
-        touchMultiplier: 2,
+    import("lenis")
+      .then(({ default: Lenis }) => {
+        if (!isMounted) return;
+
+        try {
+          lenisInstance = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation: "vertical",
+            gestureOrientation: "vertical",
+            smoothWheel: true,
+            syncTouch: false,
+            wheelMultiplier: 1,
+            touchMultiplier: 2,
+          });
+
+          const raf = (time: number) => {
+            if (!isMounted) {
+              if (animationFrameId !== null) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+              }
+              return;
+            }
+            try {
+              if (lenisInstance) {
+                lenisInstance.raf(time);
+              }
+            } catch (e) {
+              console.error("[Lenis] RAF crash prevented:", e);
+            }
+            if (isMounted) {
+              animationFrameId = requestAnimationFrame(raf);
+            }
+          };
+
+          animationFrameId = requestAnimationFrame(raf);
+        } catch (e) {
+          console.error("[Lenis] Initialization crash prevented:", e);
+        }
+      })
+      .catch((e) => {
+        console.warn("[Lenis] Failed to load module:", e);
       });
 
-      function raf(time: number) {
-        lenisInstance.raf(time);
-        animationFrameId = requestAnimationFrame(raf);
-      }
-
-      animationFrameId = requestAnimationFrame(raf);
-    });
-
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      isMounted = false;
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
       if (lenisInstance) {
-        lenisInstance.destroy();
+        try {
+          lenisInstance.destroy();
+        } catch (e) {
+          console.error("[Lenis] Destroy crash prevented:", e);
+        }
+        lenisInstance = null;
       }
     };
   }, []);

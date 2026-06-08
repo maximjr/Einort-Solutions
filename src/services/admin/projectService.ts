@@ -1,6 +1,6 @@
 import { collection, query, orderBy, limit, onSnapshot, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
-import { handleFirestoreError, OperationType } from "./errorHelper";
+import { handleFirestoreError, OperationType } from "./diagnosticsHelper";
 import { Project, ProjectStatus } from "../../types";
 import { ProjectOrchestrator } from "../../features/services/projectOrchestrator";
 

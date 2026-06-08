@@ -1,10 +1,12 @@
 import { collection, query, orderBy, limit, onSnapshot, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
-import { handleFirestoreError, OperationType } from "./errorHelper";
+import { handleFirestoreError, OperationType } from "./diagnosticsHelper";
 
 export interface ClientUser {
   id: string;
   name?: string;
+  fullName?: string;
+  displayName?: string;
   email?: string;
   accountType?: string;
   role?: string;

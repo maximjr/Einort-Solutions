@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { ChevronDown } from "lucide-react";

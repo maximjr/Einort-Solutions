@@ -38,23 +38,32 @@ export function useMessaging() {
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        let data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Conversation[];
-        
-        // Sort in memory to avoid composite index requirement for clients
-        if (!isAdmin) {
-          data = data.sort((a, b) => {
-            const timeA = a.updatedAt?.toMillis() || 0;
-            const timeB = b.updatedAt?.toMillis() || 0;
-            return timeB - timeA;
-          });
+        try {
+          let data = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Conversation[];
+          
+          // Sort in memory to avoid composite index requirement for clients
+          if (!isAdmin) {
+            data = data.sort((a, b) => {
+              try {
+                // Safely handle missing/pending timestamps
+                const timeA = a.updatedAt?.toMillis?.() || (a.updatedAt instanceof Date ? a.updatedAt.getTime() : 0);
+                const timeB = b.updatedAt?.toMillis?.() || (b.updatedAt instanceof Date ? b.updatedAt.getTime() : 0);
+                return timeB - timeA;
+              } catch (e) {
+                return 0;
+              }
+            });
+          }
+          
+          setConversations(data);
+          setLoading(false);
+          setError(null);
+        } catch (err) {
+          console.error("Crash prevented in conversation snapshot handler:", err);
         }
-        
-        setConversations(data);
-        setLoading(false);
-        setError(null);
       },
       (err) => {
         console.error("Error subscribing to conversations:", err);
@@ -63,7 +72,9 @@ export function useMessaging() {
       }
     );
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+    };
   }, [user?.uid, userData?.role, userData?.isAdmin]);
 
   return {

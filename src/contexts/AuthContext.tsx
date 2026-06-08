@@ -38,8 +38,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let isMounted = true;
     let authTimeout: NodeJS.Timeout | null = null;
 
+    const safeClearAuthTimeout = () => {
+      if (authTimeout) {
+        clearTimeout(authTimeout);
+        authTimeout = null;
+      }
+    };
+
+    const safeSetAuthTimeout = (callback: () => void, delay: number) => {
+      safeClearAuthTimeout();
+      if (isMounted) {
+        authTimeout = setTimeout(() => {
+          if (isMounted) {
+            callback();
+          }
+        }, delay);
+      }
+    };
+
     const globalLoadingFailsafe = setTimeout(() => {
       if (isMounted) {
+        console.warn("[AuthProvider] Global failsafe timeout reached.");
         setLoading(false);
       }
     }, 15000);
@@ -47,7 +66,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Dynamically import Firebase to split bundle
     import("../lib/firebase")
       .then(({ auth, db }) => {
+        if (!isMounted) return;
         if (!auth || !db) {
+          console.warn("[AuthProvider] Firebase auth or db not found.");
           setLoading(false);
           return;
         }
@@ -62,93 +83,112 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ]) => {
             if (!isMounted) return;
 
+            console.log("[AuthProvider] Calling onAuthStateChanged.");
             unsubscribeAuth = onAuthStateChanged(auth, async (currentUser) => {
               if (!isMounted) return;
-              if (authTimeout) clearTimeout(authTimeout);
+              safeClearAuthTimeout();
 
               if (currentUser) {
+                console.log(`[AuthProvider] User logged in: ${currentUser.uid}`);
                 setUser(currentUser);
                 setLoading(true);
 
-                authTimeout = setTimeout(() => {
-                  if (isMounted) setLoading(false);
+                safeSetAuthTimeout(() => {
+                  console.warn("[AuthProvider] User data fetch timeout.");
+                  setLoading(false);
                 }, 10000);
 
-                const docRef = doc(db, "users", currentUser.uid);
+                try {
+                  const docRef = doc(db, "users", currentUser.uid);
 
-                getDoc(docRef)
-                  .then((docSnap) => {
-                    if (docSnap.exists() && isMounted) {
-                      setDoc(
-                        docRef,
-                        { lastLogin: serverTimestamp() },
-                        { merge: true },
-                      ).catch(() => {});
-                    }
-                  })
-                  .catch(() => {});
+                  getDoc(docRef)
+                    .then((docSnap) => {
+                      if (docSnap.exists() && isMounted) {
+                        setDoc(
+                          docRef,
+                          { lastLogin: serverTimestamp() },
+                          { merge: true },
+                        ).catch((err) => {
+                           console.error("[AuthProvider] Failed to set lastLogin:", err);
+                        });
+                      }
+                    })
+                    .catch((err) => {
+                       console.error("[AuthProvider] getDoc failed:", err);
+                    });
 
-                if (unsubscribeDoc) {
-                  unsubscribeDoc();
-                }
+                  if (unsubscribeDoc) {
+                    unsubscribeDoc();
+                  }
 
-                unsubscribeDoc = onSnapshot(
-                  docRef,
-                  (docSnap) => {
-                    if (!isMounted) return;
-                    if (authTimeout) clearTimeout(authTimeout);
-                    clearTimeout(globalLoadingFailsafe);
+                  console.log(`[AuthProvider] Subscribing to user doc: ${currentUser.uid}`);
+                  unsubscribeDoc = onSnapshot(
+                    docRef,
+                    (docSnap) => {
+                      if (!isMounted) return;
+                      safeClearAuthTimeout();
+                      clearTimeout(globalLoadingFailsafe);
 
-                    if (docSnap.exists()) {
-                      const data = docSnap.data();
-                      setUserData({
-                        uid: docSnap.id,
-                        email: currentUser.email || "",
-                        fullName:
-                          currentUser.displayName || data?.fullName || "User",
-                        role: data?.role || "client",
-                        accountType: data?.accountType || "enterprise",
-                        permissions: data?.permissions || [
-                          "read_own_profile",
-                          "read_own_projects",
-                        ],
-                        isAdmin:
-                          data?.role === "admin" ||
-                          data?.role === "super_admin" ||
-                          !!data?.isAdmin,
-                        createdAt: data?.createdAt,
-                        lastLogin: data?.lastLogin,
-                      } as UserData);
-                      setLoading(false);
-                    } else {
-                      const creationTime = currentUser.metadata.creationTime;
-                      const isNewlyCreated =
-                        creationTime &&
-                        Date.now() - new Date(creationTime).getTime() < 15000;
-
-                      if (isNewlyCreated) {
-                        setUserData(null);
-                        authTimeout = setTimeout(() => {
-                          if (isMounted) setLoading(false);
-                        }, 10000);
+                      if (docSnap.exists()) {
+                        console.log(`[AuthProvider] User doc fetched for: ${currentUser.uid}`);
+                        const data = docSnap.data();
+                        setUserData({
+                          uid: docSnap.id,
+                          email: currentUser.email || "",
+                          fullName:
+                            currentUser.displayName || data?.fullName || "User",
+                          role: data?.role || "client",
+                          accountType: data?.accountType || "enterprise",
+                          permissions: data?.permissions || [
+                            "read_own_profile",
+                            "read_own_projects",
+                          ],
+                          isAdmin:
+                            data?.role === "admin" ||
+                            data?.role === "super_admin" ||
+                            !!data?.isAdmin,
+                          createdAt: data?.createdAt,
+                          lastLogin: data?.lastLogin,
+                        } as UserData);
+                        setLoading(false);
                       } else {
+                        console.log(`[AuthProvider] User doc does not exist for: ${currentUser.uid}`);
+                        const creationTime = currentUser.metadata.creationTime;
+                        const isNewlyCreated =
+                          creationTime &&
+                          Date.now() - new Date(creationTime).getTime() < 15000;
+
+                        if (isNewlyCreated) {
+                          setUserData(null);
+                          safeSetAuthTimeout(() => {
+                            setLoading(false);
+                          }, 10000);
+                        } else {
+                          setUserData(null);
+                          setLoading(false);
+                        }
+                      }
+                    },
+                    (error) => {
+                      console.error("[AuthProvider] Profile sync error:", error);
+                      if (isMounted) {
+                        safeClearAuthTimeout();
+                        clearTimeout(globalLoadingFailsafe);
                         setUserData(null);
                         setLoading(false);
                       }
-                    }
-                  },
-                  (error) => {
-                    console.error("[AuthProvider] Profile sync error:", error);
-                    if (isMounted) {
-                      if (authTimeout) clearTimeout(authTimeout);
-                      clearTimeout(globalLoadingFailsafe);
-                      setUserData(null);
-                      setLoading(false);
-                    }
-                  },
-                );
+                    },
+                  );
+                } catch (error) {
+                  console.error("[AuthProvider] Failed in onAuthStateChanged block:", error);
+                  if (isMounted) {
+                    setLoading(false);
+                  }
+                }
               } else {
+                console.log("[AuthProvider] User not logged in, clearing state.");
                 clearTimeout(globalLoadingFailsafe);
+                safeClearAuthTimeout();
                 setUser(null);
                 setUserData(null);
                 setLoading(false);
@@ -160,16 +200,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               }
             });
           },
-        );
+        ).catch(err => {
+            console.error("[AuthProvider] Failed to dynamically import firebase auth/firestore", err);
+            if (isMounted) setLoading(false);
+        });
       })
       .catch((err) => {
-        console.warn("Failed to load Firebase", err);
-        setLoading(false);
+        console.warn("[AuthProvider] Failed to load Firebase", err);
+        if (isMounted) setLoading(false);
       });
 
     return () => {
+      console.log("[AuthProvider] Unmounting AuthProvider cleanup.");
       isMounted = false;
-      if (authTimeout) clearTimeout(authTimeout);
+      safeClearAuthTimeout();
       clearTimeout(globalLoadingFailsafe);
       if (unsubscribeAuth) unsubscribeAuth();
       if (unsubscribeDoc) unsubscribeDoc();
