@@ -56,7 +56,7 @@ export function Hero() {
           </div>
 
           <h1 className="text-[3.5rem] md:text-8xl lg:text-[8.5rem] font-display font-medium tracking-tighter leading-[0.9] mb-8 text-white max-w-6xl mx-auto drop-shadow-2xl opacity-0 animate-[fadeInUp_0.8s_ease-out_forwards]">
-            ENGINEER <br className="hidden md:block" />
+            ENGINEERING <br className="hidden md:block" />
             TOMORROW'S{" "}
             <span className="relative whitespace-nowrap">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-primary to-blue-600">
