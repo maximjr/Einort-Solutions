@@ -78,7 +78,7 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
       {/* Pull indicator */}
       <motion.div
         animate={{ y: isRefreshing ? threshold : pullDistance }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        transition={{ ease: "easeOut", duration: 0.15 }}
         className="fixed top-[-50px] left-0 right-0 flex justify-center items-center z-50 h-[50px] pointer-events-none"
       >
         <div className="bg-white/10 backdrop-blur-md rounded-full w-10 h-10 flex items-center justify-center border border-white/20 shadow-[0_0_20px_rgba(59,130,246,0.3)]">
@@ -95,7 +95,7 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
       {/* Content wrapper */}
       <motion.div
         animate={{ y: isRefreshing ? threshold : pullDistance }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        transition={{ ease: "easeOut", duration: 0.15 }}
         className="h-full"
       >
         {children}

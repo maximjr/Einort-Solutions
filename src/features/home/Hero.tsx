@@ -60,7 +60,7 @@ export function Hero() {
             TOMORROW'S{" "}
             <span className="relative whitespace-nowrap">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-primary to-blue-600">
-                DIGITAL REALITY.
+                DIGITAL WORLD.
               </span>
               <div className="absolute -inset-x-8 -inset-y-8 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/30 to-transparent -z-10 rounded-full"></div>
             </span>

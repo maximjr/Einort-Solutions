@@ -55,22 +55,22 @@ export function PullToRefresh({ children }: { children: React.ReactNode }) {
 
         if (pullProgress > THRESHOLD && !isRefreshing) {
           setIsRefreshing(true);
-          // Snap to loading position
+          // Snap instantly to loading position
           await controls.start({ 
-            y: 50, 
-            transition: { type: "spring", damping: 20, stiffness: 300 } 
+            y: 40, 
+            transition: { ease: "easeOut", duration: 0.15 } 
           });
           
-          // Actually trigger reload
+          // Trigger reload very quickly
           setTimeout(() => {
             window.location.reload();
-          }, 800); // Give user a short moment to see the spinner
+          }, 350);
           
         } else if (!isRefreshing) {
-          // Snap back
+          // Snap back immediately
           controls.start({ 
             y: 0, 
-            transition: { type: "spring", damping: 20, stiffness: 300 } 
+            transition: { ease: "easeOut", duration: 0.15 } 
           });
           setPullProgress(0);
         }
@@ -94,18 +94,19 @@ export function PullToRefresh({ children }: { children: React.ReactNode }) {
       {/* Visual Indicator */}
       <div className="fixed top-0 left-0 w-full flex justify-center pointer-events-none z-[100] h-0 overflow-visible">
         <motion.div
-          animate={isRefreshing ? { y: 50 } : { y: pullProgress }}
-          style={{ 
-             opacity: isRefreshing ? 1 : Math.min(pullProgress / THRESHOLD, 1),
-             y: -50 // Start offscreen above
+          animate={{ 
+            y: isRefreshing ? 50 : Math.max(0, pullProgress),
+            opacity: isRefreshing ? 1 : Math.min(pullProgress / THRESHOLD, 1)
           }}
-          className="bg-surface border border-white/10 rounded-full p-2.5 shadow-2xl flex items-center justify-center mt-[-10px]"
+          transition={{ ease: "easeOut", duration: 0.12 }}
+          style={{ y: -50 }}
+          className="bg-surface border border-white/10 rounded-full p-2.5 shadow-2xl flex items-center justify-center mt-2"
         >
           <motion.div
             animate={isRefreshing ? { rotate: 360 } : { rotate: (pullProgress / THRESHOLD) * 360 }}
-            transition={isRefreshing ? { repeat: Infinity, duration: 1, ease: "linear" } : { duration: 0 }}
+            transition={isRefreshing ? { repeat: Infinity, duration: 0.8, ease: "linear" } : { duration: 0 }}
           >
-            <RefreshCw className="w-6 h-6 text-primary" />
+            <RefreshCw className="w-5 h-5 text-primary" />
           </motion.div>
         </motion.div>
       </div>
