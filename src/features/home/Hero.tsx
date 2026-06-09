@@ -43,10 +43,10 @@ export function Hero() {
         <div className="absolute inset-x-0 bottom-0 h-[60vh] bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-none"></div>
       </motion.div>
 
-      <Container className="text-left md:text-center relative z-10 flex flex-col md:items-center">
+      <Container className="text-center relative z-10 flex flex-col items-center">
         <motion.div
           style={{ opacity: opacityText, scale: scaleText }}
-          className="flex flex-col md:items-center w-full"
+          className="flex flex-col items-center w-full"
         >
           <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-10 backdrop-blur-xl shadow-2xl hover:border-white/20 transition-all mx-auto cursor-default opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]">
             <span className="flex h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_rgba(10,102,194,0.8)] animate-pulse"></span>
@@ -55,10 +55,10 @@ export function Hero() {
             </span>
           </div>
 
-          <h1 className="text-[3.5rem] md:text-8xl lg:text-[8.5rem] font-display font-medium tracking-tighter leading-[0.9] mb-8 text-white max-w-6xl mx-auto drop-shadow-2xl opacity-0 animate-[fadeInUp_0.8s_ease-out_forwards]">
+          <h1 className="text-[2.2rem] min-[375px]:text-[2.5rem] min-[425px]:text-[3rem] sm:text-6xl md:text-8xl lg:text-[8.5rem] font-display font-medium tracking-tighter leading-[0.9] mb-8 text-white max-w-6xl mx-auto drop-shadow-2xl opacity-0 animate-[fadeInUp_0.8s_ease-out_forwards]">
             ENGINEERING <br className="hidden md:block" />
             TOMORROW'S{" "}
-            <span className="relative whitespace-nowrap">
+            <span className="relative sm:whitespace-nowrap">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-primary to-blue-600">
                 DIGITAL WORLD.
               </span>
