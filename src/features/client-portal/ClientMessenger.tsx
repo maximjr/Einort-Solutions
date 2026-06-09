@@ -223,7 +223,7 @@ export function ClientMessenger({
   return (
     <div className="flex flex-col h-full bg-transparent border-none overflow-hidden relative">
       {/* Messenger Header */}
-      <div className="px-4 py-3.5 md:px-5 md:py-4 bg-[#0a0f18]/80 border-b border-white/[0.05] flex items-center justify-between relative z-15 backdrop-blur-3xl">
+      <div className="px-4 py-3.5 md:px-5 md:py-4 bg-[#0a0f18]/80 border-b border-white/[0.05] flex items-center justify-between relative z-15 backdrop-blur-md">
         <div className="flex items-center gap-3.5">
           <div className="relative">
             <div
@@ -328,7 +328,7 @@ export function ClientMessenger({
                       className={`px-4 py-3 text-[13.5px] font-light tracking-[0.01em] shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-all ${
                         isMe
                           ? "bg-gradient-to-br from-primary to-primary-hover text-white rounded-2xl rounded-br-sm border border-primary/20"
-                          : "bg-white/[0.06] backdrop-blur-xl text-slate-100 rounded-2xl rounded-bl-sm border border-white/[0.08]"
+                          : "bg-white/[0.06] backdrop-blur-md text-slate-100 rounded-2xl rounded-bl-sm border border-white/[0.08]"
                       }`}
                     >
                       <p className="whitespace-pre-wrap leading-relaxed break-words">
@@ -388,7 +388,7 @@ export function ClientMessenger({
       {/* Message input panel */}
       <form
         onSubmit={handleSendMessage}
-        className="p-3 md:p-4 bg-[#0a0f18]/90 border-t border-white/[0.05] relative z-10 backdrop-blur-3xl pb-[max(1rem,env(safe-area-inset-bottom))]"
+        className="p-3 md:p-4 bg-[#0a0f18]/90 border-t border-white/[0.05] relative z-10 backdrop-blur-md pb-[max(1rem,env(safe-area-inset-bottom))]"
       >
         {mockAttachment && (
           <div className="flex items-center justify-between mb-3 bg-primary/10 border border-primary/20 rounded-xl px-3 py-2 text-[12px] text-primary">

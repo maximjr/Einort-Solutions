@@ -34,7 +34,7 @@ function ActiveClientMessagingManager({
       >
         <div className="hidden md:block absolute -inset-1 bg-gradient-to-b from-primary/20 to-transparent blur-xl -z-10 rounded-3xl opacity-50"></div>
         
-        <div className="flex-1 w-full h-full bg-[#0a0f18]/95 backdrop-blur-3xl flex flex-col relative z-10 border border-t-white/[0.05] md:border-white/[0.08]">
+        <div className="flex-1 w-full h-full bg-[#0a0f18]/95 backdrop-blur-md flex flex-col relative z-10 border border-t-white/[0.05] md:border-white/[0.08]">
           <div className="h-1.5 w-12 bg-white/[0.15] rounded-full mx-auto mt-3 mb-1 md:hidden shrink-0"></div>
           
           <div className="flex-1 overflow-hidden" style={{ display: 'flex', flexDirection: 'column' }}>
@@ -60,6 +60,14 @@ export default function ActiveClientFloatingMessenger({ user, userData }: { user
       setIsOpen(true);
     }
   }, [location.hash]);
+
+  useEffect(() => {
+    // Automatically close the messenger if the route path changes, 
+    // or if the hash changes to anything other than #messages
+    if (location.hash !== "#messages") {
+      setIsOpen(false);
+    }
+  }, [location.pathname, location.hash]);
 
   const handleToggle = () => {
     setIsOpen((prev) => !prev);

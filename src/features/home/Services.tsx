@@ -12,27 +12,27 @@ import { Database, Smartphone, LayoutTemplate, Code2 } from "lucide-react";
 const services = [
   {
     icon: <Code2 className="w-6 h-6 text-primary" />,
-    title: "Websites & Web App Dev",
+    title: "Websites & Web Apps",
     description:
-      "High-performance, scalable web applications built for business logic and data intensity.",
+      "Build stunning, high-performance websites and intelligent web applications engineered for growth, scalability, and premium user experience.",
   },
   {
     icon: <LayoutTemplate className="w-6 h-6 text-primary" />,
     title: "UI/UX Design",
     description:
-      "World-class interface design focused on conversion, usability, and brand authority.",
+      "Crafting intuitive, visually exceptional, and conversion-focused user experiences that elevate digital engagement.",
   },
   {
     icon: <Database className="w-6 h-6 text-primary" />,
-    title: "ERP Solutions Dev",
+    title: "ERP Solutions",
     description:
-      "End-to-end multi-tenant SaaS architecture, from database modeling to frontend execution.",
+      "Streamline operations with intelligent ERP systems built to automate workflows, centralize management, and scale business efficiency.",
   },
   {
     icon: <Smartphone className="w-6 h-6 text-primary" />,
-    title: "Mobile App Dev",
+    title: "Mobile App Development",
     description:
-      "Cross-platform mobile experiences that extend your digital ecosystem.",
+      "Deliver premium mobile experiences with high-performance applications designed for seamless functionality and modern usability.",
   },
 ];
 

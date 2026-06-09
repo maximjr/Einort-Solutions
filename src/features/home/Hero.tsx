@@ -56,11 +56,11 @@ export function Hero() {
           </div>
 
           <h1 className="text-[3.5rem] md:text-8xl lg:text-[8.5rem] font-display font-medium tracking-tighter leading-[0.9] mb-8 text-white max-w-6xl mx-auto drop-shadow-2xl opacity-0 animate-[fadeInUp_0.8s_ease-out_forwards]">
-            WE ENGINEER <br className="hidden md:block" />
+            ENGINEER <br className="hidden md:block" />
             TOMORROW'S{" "}
             <span className="relative whitespace-nowrap">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-primary to-blue-600">
-                REALITY.
+                DIGITAL REALITY.
               </span>
               <div className="absolute -inset-x-8 -inset-y-8 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/30 to-transparent -z-10 rounded-full"></div>
             </span>
@@ -71,10 +71,9 @@ export function Hero() {
             Canada, and Europe
           </h2>
           <p className="text-lg md:text-2xl text-text-muted mb-12 max-w-3xl mx-auto leading-relaxed font-light tracking-wide opacity-0 animate-[fadeInUp_0.8s_ease-out_0.2s_forwards]">
-            Partner with Einort Solutions for premium custom software
-            architecture. We engineer highly scalable SaaS platforms,
-            enterprise web applications, and world-class AI automation systems
-            for industry leaders across the US, Canada, and Europe.
+            We are committed to engineering exceptional digital experiences through
+            premium design, enterprise-grade development, and intelligent
+            innovation that transforms ideas into scalable realities.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-6 w-full md:w-auto opacity-0 animate-[fadeInUp_0.8s_ease-out_0.3s_forwards]">

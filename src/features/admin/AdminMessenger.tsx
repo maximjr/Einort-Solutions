@@ -308,7 +308,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
         {selectedClientId && activeSelectedClient ? (
           <div className="flex flex-col h-full bg-transparent flex-1">
             {/* Header / Client Info & Flags controller */}
-            <div className="px-5 py-4 border-b border-white/[0.05] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-black/10 backdrop-blur-3xl shrink-0">
+            <div className="px-5 py-4 border-b border-white/[0.05] flex flex-col md:flex-row md:items-center justify-between gap-4 bg-black/10 backdrop-blur-md shrink-0">
                <div className="flex items-center gap-3.5">
                   <div className="relative">
                     <div className="w-10 h-10 rounded-full bg-white/[0.05] border border-white/10 text-white flex items-center justify-center font-medium text-sm uppercase shrink-0">
@@ -401,8 +401,8 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                         <div className={`max-w-[75%] flex flex-col ${isMe ? "items-end" : "items-start"}`}>
                           <div className={`px-4 py-3 text-[13.5px] font-light shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-all ${
                             isMe 
-                              ? "bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl text-white rounded-2xl rounded-br-sm border border-white/[0.08]" 
-                              : "bg-white/[0.06] backdrop-blur-xl text-slate-100 rounded-2xl rounded-bl-sm border border-white/[0.08]"
+                              ? "bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md text-white rounded-2xl rounded-br-sm border border-white/[0.08]" 
+                              : "bg-white/[0.06] backdrop-blur-md text-slate-100 rounded-2xl rounded-bl-sm border border-white/[0.08]"
                           }`}>
                             <p className="whitespace-pre-wrap leading-relaxed break-words">{ms.text}</p>
                             
@@ -447,7 +447,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
             </div>
 
             {/* Admin reply composer */}
-            <form onSubmit={handleSendMessage} className="p-3 md:p-4 bg-black/20 border-t border-white/[0.05] backdrop-blur-3xl shrink-0">
+            <form onSubmit={handleSendMessage} className="p-3 md:p-4 bg-black/20 border-t border-white/[0.05] backdrop-blur-md shrink-0">
               {mockAttachment && (
                 <div className="flex items-center justify-between mb-3 bg-cyan-500/10 border border-cyan-500/20 rounded-xl px-3 py-2 text-[12px] text-cyan-400">
                   <span className="truncate flex items-center gap-2 font-medium">
