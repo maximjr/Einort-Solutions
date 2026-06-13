@@ -62,11 +62,11 @@ export function useMessaging() {
           setLoading(false);
           setError(null);
         } catch (err) {
-          console.error("Crash prevented in conversation snapshot handler:", err);
+          if (import.meta.env.DEV) console.error("[useMessaging] Snapshot handler crashed:", err);
         }
       },
       (err) => {
-        console.error("Error subscribing to conversations:", err);
+        if (import.meta.env.DEV) console.error("[useMessaging] Subscribe failed:", err);
         setError(err as Error);
         setLoading(false);
       }

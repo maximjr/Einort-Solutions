@@ -157,7 +157,7 @@ export function AuthModal({
       });
     } catch (error: any) {
       setIsLoading(false);
-      console.error(`[Firebase Login Error] Code: ${error.code}, Message: ${error.message}`, error);
+      if (import.meta.env.DEV) console.error("[Firebase Login Error]", error.code, error.message);
       
       if (
         error.code === "auth/invalid-credential" ||
@@ -220,7 +220,7 @@ export function AuthModal({
       });
     } catch (error: any) {
       setIsLoading(false);
-      console.error(`[Firebase Signup Error] Code: ${error.code}, Message: ${error.message}`, error);
+      if (import.meta.env.DEV) console.error("[Firebase Signup Error]", error.code, error.message);
       
       if (error.code === "auth/email-already-in-use") {
         setErrorStatus("Email already exists");

@@ -49,6 +49,7 @@ import { messageService } from "../../services/admin/messageService";
 import { AdminMessenger } from "./AdminMessenger";
 import { useMessaging } from "../../hooks/useMessaging";
 import { PullToRefresh } from "../../components/ui/PullToRefresh";
+import { getStatusPill } from "../../lib/statusPill";
 
 const COLORS = [
   "#3b82f6",
@@ -60,42 +61,6 @@ const COLORS = [
   "#64748b",
 ];
 
-const getDetailedStatusPill = (status: string) => {
-  const currentStatus = (status || "pending").toLowerCase();
-  
-  if (currentStatus === "cancelled") {
-    return {
-      label: "Cancelled",
-      bgClass: "bg-red-500/10 text-red-400 border-red-500/20",
-      dotClass: "bg-red-400 shadow-[0_0_8px_rgba(239,68,68,0.8)]",
-    };
-  }
-  
-  const pendingStages = ["pending", "new", "discovery"];
-  const completedStages = ["completed", "launched", "deployment"];
-  
-  if (pendingStages.includes(currentStatus)) {
-    return {
-      label: "Pending Review",
-      bgClass: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-      dotClass: "bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse",
-    };
-  }
-  
-  if (completedStages.includes(currentStatus)) {
-    return {
-      label: "Completed",
-      bgClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-      dotClass: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]",
-    };
-  }
-  
-  return {
-    label: "In Progress",
-    bgClass: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    dotClass: "bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse",
-  };
-};
 
 export function AdminDashboard() {
   const location = useLocation();
@@ -188,7 +153,7 @@ export function AdminDashboard() {
   }, []);
 
   const activeClientsCount = useMemo(
-    () => users.filter((u) => u.role === "client" || !u.role).length,
+    () => users.filter((u) => u.role === "client").length,
     [users],
   );
 
@@ -247,12 +212,12 @@ export function AdminDashboard() {
     const result = await projectService.updateStatus(projectId, newStatus as ProjectStatus);
 
     if (!result.success) {
-      console.warn("[Orchestration Deviance]", result.message);
+      if (import.meta.env.DEV) console.warn("[Orchestration] Status update rejected:", result.message);
       setSyncError(`Status state transition rejected. ${result.message}`);
       setProjects(originalProjects);
     } else {
       setSyncError(null);
-      console.log(`Successfully orchestrated project ${projectId} status change to: ${newStatus}`);
+      if (import.meta.env.DEV) console.log(`[Admin] Project ${projectId} → ${newStatus}`);
     }
 
     setTimeout(() => {
@@ -265,10 +230,7 @@ export function AdminDashboard() {
   };
 
   return (
-    <PullToRefresh onRefresh={async () => {
-      // Simulate network wait for real-time Firebase sync assurance
-      await new Promise(resolve => setTimeout(resolve, 800));
-    }}>
+    <PullToRefresh onRefresh={async () => { /* onSnapshot already reflects the latest data */ }}>
       <section className="py-24 bg-surface min-h-[80dvh] relative pt-32">
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[150px] pointer-events-none rounded-full translate-x-1/2 -translate-y-1/2"></div>
 
@@ -708,7 +670,7 @@ export function AdminDashboard() {
                   <div className="lg:hidden flex flex-col p-4 space-y-4">
                     {projects.map((proj) => {
                       const risk = getRiskLevel(proj);
-                      const detailedPill = getDetailedStatusPill(proj.status);
+                      const detailedPill = getStatusPill(proj.status);
                       const isExpanded = expandedProject === proj.id;
                       return (
                         <div key={`m-${proj.id}`} className="bg-white/[0.02] border border-white/[0.05] rounded-3xl overflow-hidden shadow-sm">
@@ -863,7 +825,7 @@ export function AdminDashboard() {
                                                 await projectService.deleteProject(proj.id);
                                                 setExpandedProject(null);
                                               } catch (err) {
-                                                console.error(err);
+                                                if (import.meta.env.DEV) console.error("[Admin] Delete failed:", err);
                                               } finally {
                                                 setIsDeleting(false);
                                                 setDeletingProjectId(null);
@@ -921,7 +883,7 @@ export function AdminDashboard() {
                       <tbody className="divide-y divide-white/5">
                       {projects.map((proj) => {
                         const risk = getRiskLevel(proj);
-                        const detailedPill = getDetailedStatusPill(proj.status);
+                        const detailedPill = getStatusPill(proj.status);
                         return (
                           <React.Fragment key={proj.id}>
                             <tr
@@ -1132,7 +1094,7 @@ export function AdminDashboard() {
                                                   await projectService.deleteProject(proj.id);
                                                   setExpandedProject(null);
                                                 } catch (err) {
-                                                  console.error(err);
+                                                  if (import.meta.env.DEV) console.error("[Admin] Delete failed:", err);
                                                 } finally {
                                                   setIsDeleting(false);
                                                   setDeletingProjectId(null);

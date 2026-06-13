@@ -1,87 +1,65 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, memo, Suspense, useEffect, useMemo } from "react";
 import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
 import { SEO } from "./components/seo/SEO";
-
+import { SkipNav } from "./components/shared/SkipNav";
 import { ProtectedRoute } from "./components/shared/ProtectedRoute";
 import { Loadable } from "./components/shared/Loadable";
-
-// Eagerly loaded features (Above the fold)
-import { Hero } from "./features/home/Hero";
+import { AuthProvider } from "./contexts/AuthContext";
+import { AuthModalProvider, useAuthModal } from "./contexts/AuthModalContext";
+import { ErrorBoundary } from "./components/shared/ErrorBoundary";
+import { PullToRefresh } from "./components/layout/PullToRefresh";
 import { useAuth } from "./hooks/useAuth";
 
-// Lazy loaded features
-const Services = Loadable(
-  lazy(() => import("./features/home/Services").then((m) => ({ default: m.Services }))),
-);
-const ERP = Loadable(
-  lazy(() => import("./features/home/ERP").then((m) => ({ default: m.ERP }))),
-);
-const WhyChooseUs = Loadable(
-  lazy(() => import("./features/home/WhyChooseUs").then((m) => ({ default: m.WhyChooseUs }))),
-);
-const Testimonials = Loadable(
-  lazy(() => import("./features/home/Testimonials").then((m) => ({ default: m.Testimonials }))),
-);
-const ContactUs = Loadable(
-  lazy(() => import("./features/home/ContactUs").then((m) => ({ default: m.ContactUs }))),
-);
-const FAQ = Loadable(
-  lazy(() => import("./features/home/FAQ").then((m) => ({ default: m.FAQ }))),
-);
-const CaseStudies = Loadable(
-  lazy(() => import("./features/home/CaseStudies").then((m) => ({ default: m.CaseStudies }))),
-);
-const ContactForm = Loadable(
-  lazy(() => import("./features/home/ContactForm").then((m) => ({ default: m.ContactForm }))),
-);
-const AdminDashboard = Loadable(
-  lazy(() => import("./features/admin/AdminDashboard").then((m) => ({ default: m.AdminDashboard }))),
-);
-const ClientPortal = Loadable(
-  lazy(() => import("./features/client-portal/ClientPortal").then((m) => ({ default: m.ClientPortal }))),
-);
-const ServicesPage = Loadable(
-  lazy(() => import("./features/services/ServicesPage").then((m) => ({ default: m.ServicesPage }))),
-);
-const LocationPage = Loadable(
-  lazy(() => import("./features/seo/LocationPage").then((m) => ({ default: m.LocationPage }))),
-);
-const IndustryPage = Loadable(
-  lazy(() => import("./features/seo/IndustryPage").then((m) => ({ default: m.IndustryPage }))),
-);
-const CaseStudyPage = Loadable(
-  lazy(() => import("./features/case-studies/CaseStudyPage").then((m) => ({ default: m.CaseStudyPage }))),
-);
+// Eagerly loaded: above-the-fold, must render immediately
+import { Hero } from "./features/home/Hero";
+
+// Lazily loaded: all page-level and below-fold components
+const Services         = Loadable(lazy(() => import("./features/home/Services").then((m)         => ({ default: m.Services }))));
+const ERP              = Loadable(lazy(() => import("./features/home/ERP").then((m)              => ({ default: m.ERP }))));
+const WhyChooseUs      = Loadable(lazy(() => import("./features/home/WhyChooseUs").then((m)      => ({ default: m.WhyChooseUs }))));
+const Testimonials     = Loadable(lazy(() => import("./features/home/Testimonials").then((m)     => ({ default: m.Testimonials }))));
+const ContactUs        = Loadable(lazy(() => import("./features/home/ContactUs").then((m)        => ({ default: m.ContactUs }))));
+const FAQ              = Loadable(lazy(() => import("./features/home/FAQ").then((m)              => ({ default: m.FAQ }))));
+const CaseStudies      = Loadable(lazy(() => import("./features/home/CaseStudies").then((m)      => ({ default: m.CaseStudies }))));
+const ContactForm      = Loadable(lazy(() => import("./features/home/ContactForm").then((m)      => ({ default: m.ContactForm }))));
+const AdminDashboard   = Loadable(lazy(() => import("./features/admin/AdminDashboard").then((m)  => ({ default: m.AdminDashboard }))));
+const ClientPortal     = Loadable(lazy(() => import("./features/client-portal/ClientPortal").then((m) => ({ default: m.ClientPortal }))));
+const ServicesPage     = Loadable(lazy(() => import("./features/services/ServicesPage").then((m) => ({ default: m.ServicesPage }))));
+const LocationPage     = Loadable(lazy(() => import("./features/seo/LocationPage").then((m)      => ({ default: m.LocationPage }))));
+const IndustryPage     = Loadable(lazy(() => import("./features/seo/IndustryPage").then((m)      => ({ default: m.IndustryPage }))));
+const CaseStudyPage    = Loadable(lazy(() => import("./features/case-studies/CaseStudyPage").then((m) => ({ default: m.CaseStudyPage }))));
 const GlobalFloatingMessenger = Loadable(
-  lazy(() =>
-    import("./components/layout/GlobalFloatingMessenger").then((m) => ({
-      default: m.GlobalFloatingMessenger,
-    })),
-  ),
+  lazy(() => import("./components/layout/GlobalFloatingMessenger").then((m) => ({ default: m.GlobalFloatingMessenger }))),
 );
+const AuthModal = Loadable(
+  lazy(() => import("./features/auth/AuthModal").then((m) => ({ default: m.AuthModal }))),
+  () => null,
+);
+
+// ─── Sub-components ────────────────────────────────────────────────────────────
 
 function HomePage() {
   return (
     <>
       <Hero />
-      <Suspense fallback={<div className="h-32"></div>}>
+      <Suspense fallback={<div className="h-32" />}>
         <Services />
       </Suspense>
-      <Suspense fallback={<div className="h-32"></div>}>
+      <Suspense fallback={<div className="h-32" />}>
         <ERP />
       </Suspense>
-      <Suspense fallback={<div className="h-32"></div>}>
+      <Suspense fallback={<div className="h-32" />}>
         <WhyChooseUs />
         <CaseStudies />
       </Suspense>
-      <Suspense fallback={<div className="h-32"></div>}>
+      <Suspense fallback={<div className="h-32" />}>
         <Testimonials />
         <ContactForm />
       </Suspense>
-      <Suspense fallback={<div className="h-32"></div>}>
+      <Suspense fallback={<div className="h-32" />}>
         <ContactUs />
         <FAQ />
       </Suspense>
@@ -89,16 +67,15 @@ function HomePage() {
   );
 }
 
-import { PullToRefresh } from "./components/layout/PullToRefresh";
-
-function MessengerWrapper() {
+// Memoised: only re-renders when the user's admin status actually changes,
+// not on every auth state tick (which would mount/unmount the messenger and
+// open extra Firestore subscriptions unnecessarily).
+const MessengerWrapper = memo(function MessengerWrapper() {
   const { user, userData } = useAuth();
-  const isClient =
-    user &&
-    userData &&
-    userData.role !== "admin" &&
-    userData.role !== "super_admin" &&
-    !userData.isAdmin;
+  const isClient = useMemo(
+    () => Boolean(user) && Boolean(userData) && !userData?.isAdmin,
+    [user, userData?.isAdmin],
+  );
 
   if (!isClient) return null;
 
@@ -107,94 +84,70 @@ function MessengerWrapper() {
       <GlobalFloatingMessenger />
     </Suspense>
   );
+});
+
+// Auth modal is now driven by AuthModalContext instead of a global window event.
+// This keeps modal state inside React and prevents third-party scripts from
+// triggering auth flows via CustomEvent dispatch.
+function AuthModalRoot() {
+  const { isOpen, mode, close } = useAuthModal();
+  if (!isOpen) return null;
+  return <AuthModal isOpen={isOpen} onClose={close} initialMode={mode} />;
 }
 
 function Layout() {
   useEffect(() => {
-    // Disable Lenis on touch devices for native iOS/Android scrolling performance
     const isTouchDevice =
       "ontouchstart" in window ||
       navigator.maxTouchPoints > 0 ||
       window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
-    // Detect low-end devices
-    const isLowMemory =
-      (navigator as any).deviceMemory !== undefined && (navigator as any).deviceMemory < 4;
-    const isLowProcessing =
-      navigator.hardwareConcurrency !== undefined && navigator.hardwareConcurrency <= 4;
-    const isReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isMobileString = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
+    const isLowMemory      = (navigator as { deviceMemory?: number }).deviceMemory !== undefined &&
+                             (navigator as { deviceMemory?: number }).deviceMemory! < 4;
+    const isLowProcessing  = navigator.hardwareConcurrency !== undefined &&
+                             navigator.hardwareConcurrency <= 4;
+    const isReducedMotion  = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const isMobileUA       = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-    if (isTouchDevice || isLowMemory || isLowProcessing || isReducedMotion || isMobileString) {
+    if (isTouchDevice || isLowMemory || isLowProcessing || isReducedMotion || isMobileUA) {
       document.documentElement.classList.add("touch-device");
       return;
     }
 
     let animationFrameId: number | null = null;
-    let lenisInstance: any = null;
+    let lenisInstance: { raf: (t: number) => void; destroy: () => void } | null = null;
     let isMounted = true;
 
     import("lenis")
       .then(({ default: Lenis }) => {
         if (!isMounted) return;
-
         try {
           lenisInstance = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-            orientation: "vertical",
+            duration:           1.2,
+            easing:             (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            orientation:        "vertical",
             gestureOrientation: "vertical",
-            smoothWheel: true,
-            syncTouch: false,
-            wheelMultiplier: 1,
-            touchMultiplier: 2,
+            smoothWheel:        true,
+            syncTouch:          false,
+            wheelMultiplier:    1,
+            touchMultiplier:    2,
           });
 
           const raf = (time: number) => {
-            if (!isMounted) {
-              if (animationFrameId !== null) {
-                cancelAnimationFrame(animationFrameId);
-                animationFrameId = null;
-              }
-              return;
-            }
-            try {
-              if (lenisInstance) {
-                lenisInstance.raf(time);
-              }
-            } catch (e) {
-              console.error("[Lenis] RAF crash prevented:", e);
-            }
-            if (isMounted) {
-              animationFrameId = requestAnimationFrame(raf);
-            }
+            if (!isMounted) { if (animationFrameId) cancelAnimationFrame(animationFrameId); return; }
+            try { lenisInstance?.raf(time); } catch { /* prevent RAF crash */ }
+            if (isMounted) animationFrameId = requestAnimationFrame(raf);
           };
-
           animationFrameId = requestAnimationFrame(raf);
-        } catch (e) {
-          console.error("[Lenis] Initialization crash prevented:", e);
-        }
+        } catch { /* Lenis init failed — fall back to native scroll */ }
       })
-      .catch((e) => {
-        console.warn("[Lenis] Failed to load module:", e);
-      });
+      .catch(() => { /* Lenis module load failed — fall back to native scroll */ });
 
     return () => {
       isMounted = false;
-      if (animationFrameId !== null) {
-        cancelAnimationFrame(animationFrameId);
-        animationFrameId = null;
-      }
-      if (lenisInstance) {
-        try {
-          lenisInstance.destroy();
-        } catch (e) {
-          console.error("[Lenis] Destroy crash prevented:", e);
-        }
-        lenisInstance = null;
-      }
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      try { lenisInstance?.destroy(); } catch { /* ignore */ }
+      lenisInstance = null;
     };
   }, []);
 
@@ -202,16 +155,8 @@ function Layout() {
     <PullToRefresh>
       <div className="bg-background min-h-[100dvh] text-text-main font-sans selection:bg-primary selection:text-white flex flex-col">
         <Navbar />
-        <main className="flex-grow">
-          <Suspense
-            fallback={
-              <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            }
-          >
-            <Outlet />
-          </Suspense>
+        <main id="main-content" className="flex-grow" tabIndex={-1}>
+          <Outlet />
         </main>
         <Footer />
         <MessengerWrapper />
@@ -220,124 +165,39 @@ function Layout() {
   );
 }
 
-import { AuthProvider } from "./contexts/AuthContext";
-import { ErrorBoundary } from "./components/shared/ErrorBoundary";
+// ─── Root ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
   return (
     <HelmetProvider>
       <AuthProvider>
-        <BrowserRouter>
-          <SEO />
-          <ErrorBoundary>
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route
-                  index
-                  element={
-                    <Suspense
-                      fallback={
-                        <div className="min-h-screen bg-background flex items-center justify-center">
-                          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                      }
-                    >
-                      <HomePage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="services/:serviceId"
-                  element={
-                    <Suspense
-                      fallback={
-                        <div className="min-h-screen bg-background flex items-center justify-center">
-                          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                      }
-                    >
-                      <ServicesPage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="locations/:region"
-                  element={
-                    <Suspense
-                      fallback={
-                        <div className="min-h-screen bg-background flex items-center justify-center">
-                          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                      }
-                    >
-                      <LocationPage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="industries/:industry"
-                  element={
-                    <Suspense
-                      fallback={
-                        <div className="min-h-screen bg-background flex items-center justify-center">
-                          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                      }
-                    >
-                      <IndustryPage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="case-studies/:caseId"
-                  element={
-                    <Suspense
-                      fallback={
-                        <div className="min-h-screen bg-background flex items-center justify-center">
-                          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                      }
-                    >
-                      <CaseStudyPage />
-                    </Suspense>
-                  }
-                />
-                <Route element={<ProtectedRoute requireAdmin={true} />}>
-                  <Route
-                    path="admin"
-                    element={
-                      <Suspense
-                        fallback={
-                          <div className="min-h-screen bg-background flex items-center justify-center">
-                            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                          </div>
-                        }
-                      >
-                        <AdminDashboard />
-                      </Suspense>
-                    }
-                  />
+        <AuthModalProvider>
+          <BrowserRouter>
+            <SEO />
+            <SkipNav />
+            {/* Auth modal lives at root so it's not recreated on route changes */}
+            <AuthModalRoot />
+            <ErrorBoundary>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index                      element={<HomePage />} />
+                  <Route path="services/:serviceId" element={<ServicesPage />} />
+                  <Route path="locations/:region"   element={<LocationPage />} />
+                  <Route path="industries/:industry" element={<IndustryPage />} />
+                  <Route path="case-studies/:caseId" element={<CaseStudyPage />} />
+
+                  <Route element={<ProtectedRoute requireAdmin={true} />}>
+                    <Route path="admin"         element={<AdminDashboard />} />
+                  </Route>
+
+                  <Route element={<ProtectedRoute />}>
+                    <Route path="client-portal" element={<ClientPortal />} />
+                  </Route>
                 </Route>
-                <Route element={<ProtectedRoute />}>
-                  <Route
-                    path="client-portal"
-                    element={
-                      <Suspense
-                        fallback={
-                          <div className="min-h-screen bg-background flex items-center justify-center">
-                            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                          </div>
-                        }
-                      >
-                        <ClientPortal />
-                      </Suspense>
-                    }
-                  />
-                </Route>
-              </Route>
-            </Routes>
-          </ErrorBoundary>
-        </BrowserRouter>
+              </Routes>
+            </ErrorBoundary>
+          </BrowserRouter>
+        </AuthModalProvider>
       </AuthProvider>
     </HelmetProvider>
   );

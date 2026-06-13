@@ -114,7 +114,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
           // Auto clear admin unread counts on fresh incoming payload
           messageService.markAsRead(id, currentAdminId);
         }, (err) => {
-          console.warn("Messages loading failed for conversation:", id, err);
+          if (import.meta.env.DEV) console.warn("[AdminMessenger] Messages load failed:", err);
           if (active) {
             setSyncError("Messages link broken.");
             setLoadingMessages(false);
@@ -125,7 +125,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
           unsubMsgs();
         };
       } catch (err) {
-        console.error("Error setting up dynamic chat pipeline:", err);
+        if (import.meta.env.DEV) console.error("[AdminMessenger] Chat init failed:", err);
         if (active) setLoadingMessages(false);
       }
     }
@@ -178,7 +178,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
         attachments
       );
     } catch (err) {
-      console.error("Administrative send action blocked:", err);
+      if (import.meta.env.DEV) console.error("[AdminMessenger] Send failed:", err);
     } finally {
       setSending(false);
     }
@@ -196,7 +196,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
     try {
       await messageService.updateConversationPriority(selectedConversation.id, priority);
     } catch (err) {
-      console.error(err);
+      if (import.meta.env.DEV) console.error("[AdminMessenger] Priority update failed:", err);
     }
   };
 
@@ -205,7 +205,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
     try {
       await messageService.updateConversationStatus(selectedConversation.id, status);
     } catch (err) {
-      console.error(err);
+      if (import.meta.env.DEV) console.error("[AdminMessenger] Status update failed:", err);
     }
   };
 

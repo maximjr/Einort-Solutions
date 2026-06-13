@@ -57,7 +57,7 @@ export function ContactUs() {
         setIsSuccess(false);
       }, 5000);
     } catch (error) {
-      console.error("Error sending contact message:", error);
+      if (import.meta.env.DEV) console.error("[ContactUs] Send failed:", error);
       // fallback if anonymous auth fails (e.g., if it's disabled in Firebase)
       alert("There was an error sending your message. Please try again.");
     } finally {

@@ -4,35 +4,43 @@ import { getFirestore, Firestore } from "firebase/firestore";
 import { getAnalytics, Analytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBgZkkDSUz-_bPpCA7t2UAd3Qrw1TeY6js",
-  authDomain: "new-einort-web.firebaseapp.com",
-  projectId: "new-einort-web",
-  storageBucket: "new-einort-web.firebasestorage.app",
-  messagingSenderId: "80255620883",
-  appId: "1:80255620883:web:b422bd14ad45842eedace6",
-  measurementId: "G-SCP4L95TFC"
+  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-let app: FirebaseApp | null = null;
-let auth: Auth | null = null;
-let db: Firestore | null = null;
-let analytics: Analytics | null = null;
-const isFirebaseConfigured = true;
+let app:       FirebaseApp | null = null;
+let auth:      Auth        | null = null;
+let db:        Firestore   | null = null;
+let analytics: Analytics   | null = null;
 
-try {
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  auth = getAuth(app);
-  db = getFirestore(app);
-  
-  isSupported().then(yes => {
-    if (yes && app) {
-      analytics = getAnalytics(app);
-    }
-  }).catch(() => {
-    console.warn("Firebase Analytics not supported in this environment");
-  });
-} catch (error) {
-  console.error("Firebase initialization failed:", error);
+const allEnvVarsPresent = Object.values(firebaseConfig).every(Boolean);
+
+if (!allEnvVarsPresent) {
+  console.error(
+    "[Firebase] Missing environment variables. " +
+    "Copy .env.example to .env.local and fill in all VITE_FIREBASE_* values."
+  );
 }
 
-export { app, auth, db, analytics, isFirebaseConfigured };
+try {
+  app  = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  auth = getAuth(app);
+  db   = getFirestore(app);
+
+  isSupported()
+    .then((yes) => { if (yes && app) analytics = getAnalytics(app!); })
+    .catch(() => { /* Analytics unavailable in this environment */ });
+} catch (error) {
+  console.error("[Firebase] Initialization failed:", error);
+}
+
+// True only when all env vars are present AND the SDK initialised successfully.
+// Previously hardcoded `= true` regardless of actual init state.
+export const isFirebaseConfigured = allEnvVarsPresent && app !== null;
+
+export { app, auth, db, analytics };

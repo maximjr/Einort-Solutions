@@ -117,7 +117,7 @@ export const messageService = {
           })) as Conversation[];
           onUpdate(data);
         } catch (e) {
-          console.error("Safely caught snapshot processing error", e);
+          if (import.meta.env.DEV) console.error("[messageService] Conversations snapshot error:", e);
         }
       },
       (error) => {
@@ -159,7 +159,7 @@ export const messageService = {
           })) as Conversation[];
           onUpdate(data);
         } catch (e) {
-          console.error("Safely caught admin snapshot processing error", e);
+          if (import.meta.env.DEV) console.error("[messageService] Admin conversations snapshot error:", e);
         }
       },
       (error) => {
@@ -202,7 +202,7 @@ export const messageService = {
           })) as Message[];
           onUpdate(data);
         } catch (e) {
-          console.error("Safely caught messages snapshot processing error", e);
+          if (import.meta.env.DEV) console.error("[messageService] Messages snapshot error:", e);
         }
       },
       (error) => {
@@ -369,7 +369,7 @@ export const messageService = {
           await deleteDoc(doc(legacyMessagesCol, messageDoc.id));
         }
         await deleteDoc(legacyRef);
-        console.log(`[Migration] Legacy conversation migrated successfully from ${legacyId} to ${newId}`);
+        if (import.meta.env.DEV) console.log(`[Migration] ${legacyId} → ${newId}`);
       }
     } catch (err) {
       console.warn("[Migration] Failed migrating legacy conversation:", err);
@@ -389,7 +389,7 @@ export const messageService = {
             onUpdate(null);
           }
         } catch (e) {
-          console.error("Safely caught presence processing error", e);
+          if (import.meta.env.DEV) console.error("[messageService] Presence snapshot error:", e);
         }
       },
       (error) => {
@@ -401,14 +401,17 @@ export const messageService = {
     };
   },
 
-  async setPresence(userId: string, isOnline: boolean, role: string) {
+  // `role` is deliberately not stored in presence documents — it is a client-
+  // writable field, so any authenticated user could set role: "admin" on their
+  // own presence doc and spoof admin status to other clients reading that field.
+  // Role is authoritative in users/{uid}.role and Firebase Auth custom claims only.
+  async setPresence(userId: string, isOnline: boolean) {
     if (!db) return;
     const docRef = doc(db, "presence", userId);
     try {
       await setDoc(docRef, {
         isOnline,
-        role,
-        lastSeen: serverTimestamp()
+        lastSeen: serverTimestamp(),
       }, { merge: true });
     } catch (error) {
       console.warn("Failed to set presence:", error);

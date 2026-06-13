@@ -8,91 +8,65 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "../../lib/firebase";
 import { Project, ProjectStatus, OrchestratorResult } from "../../types";
-
-export enum OperationType {
-  CREATE = "create",
-  UPDATE = "update",
-  DELETE = "delete",
-  LIST = "list",
-  GET = "get",
-  WRITE = "write",
-}
-
-interface FirestoreErrorInfo {
-  error: string;
-  operationType: OperationType;
-  path: string | null;
-  authInfo: {
-    userId?: string | null;
-    email?: string | null;
-  };
-}
-
-/**
- * Standardized Firestore error interceptor conforming to enterprise specifications.
- */
-function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null): never {
-  const errMessage = error instanceof Error ? error.message : String(error);
-  const errInfo: FirestoreErrorInfo = {
-    error: errMessage,
-    authInfo: {
-      userId: auth?.currentUser?.uid || "anonymous",
-      email: auth?.currentUser?.email || "anonymous",
-    },
-    operationType,
-    path,
-  };
-  console.error("[Firestore Integrity Error]", JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
-}
+import { handleFirestoreError, OperationType } from "../../services/admin/diagnosticsHelper";
+import { calculateLeadScore, calculateComplexityScore } from "../../lib/scoring";
 
 export const ProjectOrchestrator = {
-  /**
-   * Submits a new project proposal (from Home Contact Form or Dashboard).
-   * Automatically calculates heuristic scores and prepares workspace state.
-   */
   async submitProject(projectInput: Partial<Project>): Promise<OrchestratorResult<Project>> {
     if (!db) {
       return {
         success: false,
-        message: "Offline Bypass: Project synchronization in progress.",
-        error: "No active database connection.",
+        message: "Unable to connect. Please check your connection and try again.",
+        error:   "Firestore unavailable",
       };
     }
 
     if (!projectInput.email || !projectInput.clientName || !projectInput.projectType) {
       return {
         success: false,
-        message: "Incomplete requirements. Please fill in all required fields.",
-        error: "Missing fields (email, clientName, or projectType).",
+        message: "Please fill in all required fields.",
+        error:   "Missing required fields",
+      };
+    }
+
+    // Require authentication — userId must be the current user's UID.
+    // The "anonymous" fallback is removed: Firestore rules already reject it,
+    // and accepting it client-side misleads the caller about what happened.
+    const uid = auth?.currentUser?.uid;
+    if (!uid) {
+      return {
+        success: false,
+        message: "Please sign in before submitting a project.",
+        error:   "Unauthenticated",
       };
     }
 
     try {
       const projectsCol = collection(db, "projects");
-      const docRef = doc(projectsCol);
+      const docRef      = doc(projectsCol);
 
-      // Generate realistic indicators if not explicitly set
-      const leadScore = projectInput.leadScore ?? (Math.floor(Math.random() * 41) + 60); // 60-100
-      const complexityScore = projectInput.complexityScore ?? (Math.floor(Math.random() * 6) + 5); // 5-10
-      
+      // Deterministic scores derived from the submission data.
+      // Previously Math.random() — making every dashboard metric meaningless.
+      const leadScore       = projectInput.leadScore       ?? calculateLeadScore(projectInput);
+      const complexityScore = projectInput.complexityScore ?? calculateComplexityScore(projectInput);
+
       const newProject: Project = {
-        id: docRef.id,
-        projectId: docRef.id,
-        userId: auth?.currentUser?.uid || projectInput.userId || "anonymous",
-        email: projectInput.email,
-        clientName: projectInput.clientName,
-        company: projectInput.company || "",
-        industry: projectInput.industry || "",
-        projectType: projectInput.projectType,
+        id:               docRef.id,
+        projectId:        docRef.id,
+        userId:           uid,
+        email:            projectInput.email,
+        clientName:       projectInput.clientName,
+        company:          projectInput.company          || "",
+        industry:         projectInput.industry         || "",
+        projectType:      projectInput.projectType,
         selectedFeatures: projectInput.selectedFeatures || [],
-        requirements: projectInput.requirements || "No additional requirements provided.",
-        budget: projectInput.budget || "TBD",
-        timeline: projectInput.timeline || "TBD",
-        urgency: projectInput.urgency || "standard",
+        requirements:     projectInput.requirements     || "No additional requirements provided.",
+        budget:           projectInput.budget           || "TBD",
+        timeline:         projectInput.timeline         || "TBD",
+        urgency:          projectInput.urgency          || "standard",
         leadScore,
         complexityScore,
-        status: (projectInput.status as ProjectStatus) || "pending",
+        status:    (projectInput.status as ProjectStatus) || "pending",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
@@ -101,167 +75,146 @@ export const ProjectOrchestrator = {
 
       return {
         success: true,
-        message: "Your project was successfully submitted. Your project workspace is being prepared.",
-        data: newProject,
+        message: "Your project was successfully submitted. Your workspace is being prepared.",
+        data:    newProject,
       };
     } catch (err) {
       try {
         handleFirestoreError(err, OperationType.CREATE, "projects");
-      } catch (formattedErr: any) {
+      } catch (formatted: unknown) {
         return {
           success: false,
-          message: "Unable to establish pipeline connection deep sync. Retrying in background.",
-          error: formattedErr.message,
+          message: "Unable to submit your project. Please try again.",
+          error:   formatted instanceof Error ? formatted.message : String(formatted),
         };
       }
     }
   },
 
-  /**
-   * Updates an existing project metadata block.
-   */
   async updateProject(projectId: string, updateData: Partial<Project>): Promise<OrchestratorResult<void>> {
     if (!db) {
       return {
         success: false,
-        message: "Offline Mode: Changes preserved locally.",
-        error: "Firestore is offline.",
+        message: "Unable to connect. Please try again.",
+        error:   "Firestore unavailable",
       };
     }
 
     try {
-      const docRef = doc(db, "projects", projectId);
-      const cleanedData = {
-        ...updateData,
-        updatedAt: serverTimestamp(),
-      };
+      const cleanedData = { ...updateData, updatedAt: serverTimestamp() };
 
-      // Ensure primary immutable keys are never modified on update
-      delete (cleanedData as any).id;
-      delete (cleanedData as any).projectId;
-      delete (cleanedData as any).createdAt;
+      // Immutable fields — never allow overwrite via update
+      delete (cleanedData as Partial<Project & { id?: string }>).id;
+      delete (cleanedData as Partial<Project & { projectId?: string }>).projectId;
+      delete (cleanedData as Partial<Project & { createdAt?: unknown }>).createdAt;
 
-      await updateDoc(docRef, cleanedData);
-
-      return {
-        success: true,
-        message: "Project details synchronized successfully.",
-      };
+      await updateDoc(doc(db, "projects", projectId), cleanedData);
+      return { success: true, message: "Project updated successfully." };
     } catch (err) {
       try {
         handleFirestoreError(err, OperationType.UPDATE, `projects/${projectId}`);
-      } catch (formattedErr: any) {
+      } catch (formatted: unknown) {
         return {
           success: false,
-          message: "Internal system error updating project ledger. Permission check failed.",
-          error: formattedErr.message,
+          message: "Unable to update this project. Please try again.",
+          error:   formatted instanceof Error ? formatted.message : String(formatted),
         };
       }
     }
   },
 
-  /**
-   * Facilitates canonical project lifecycle state transitions (with status audit trail).
-   */
   async changeProjectStatus(projectId: string, newStatus: ProjectStatus): Promise<OrchestratorResult<void>> {
     if (!db) {
       return {
         success: false,
-        message: "Offline Mode: Offline state update staged.",
-        error: "Firestore is offline.",
+        message: "Unable to connect. Please try again.",
+        error:   "Firestore unavailable",
       };
     }
 
     try {
-      const docRef = doc(db, "projects", projectId);
-      await updateDoc(docRef, {
-        status: newStatus,
+      await updateDoc(doc(db, "projects", projectId), {
+        status:    newStatus,
         updatedAt: serverTimestamp(),
       });
-
-      return {
-        success: true,
-        message: `Project status successfully updated to: ${newStatus}`,
-      };
+      return { success: true, message: `Project status updated to: ${newStatus}` };
     } catch (err) {
       try {
         handleFirestoreError(err, OperationType.UPDATE, `projects/${projectId}/status`);
-      } catch (formattedErr: any) {
+      } catch (formatted: unknown) {
         return {
           success: false,
-          message: "Verification failed. State transition disallowed by access controls.",
-          error: formattedErr.message,
+          message: "Unable to update project status. You may not have permission.",
+          error:   formatted instanceof Error ? formatted.message : String(formatted),
         };
       }
     }
   },
 
-  /**
-   * Assigns a client workspace to a primary managing engineer or supervisor.
-   */
   async assignProject(projectId: string, adminId: string): Promise<OrchestratorResult<void>> {
     if (!db) {
       return {
         success: false,
-        message: "Offline Mode",
-        error: "Firestore is offline.",
+        message: "Unable to connect. Please try again.",
+        error:   "Firestore unavailable",
       };
     }
 
     try {
-      const docRef = doc(db, "projects", projectId);
-      await updateDoc(docRef, {
+      await updateDoc(doc(db, "projects", projectId), {
         assignedAdminId: adminId,
-        updatedAt: serverTimestamp(),
+        updatedAt:       serverTimestamp(),
       });
-
-      return {
-        success: true,
-        message: "Workspace allocation completed.",
-      };
+      return { success: true, message: "Project assigned successfully." };
     } catch (err) {
       try {
         handleFirestoreError(err, OperationType.UPDATE, `projects/${projectId}/assignment`);
-      } catch (formattedErr: any) {
+      } catch (formatted: unknown) {
         return {
           success: false,
-          message: "Workflow assignment rejected by database rules.",
-          error: formattedErr.message,
+          message: "Unable to assign this project. Please try again.",
+          error:   formatted instanceof Error ? formatted.message : String(formatted),
         };
       }
     }
   },
 
-  /**
-   * Deletes a project from the pipeline registry.
-   */
   async deleteProject(projectId: string): Promise<OrchestratorResult<void>> {
     if (!db) {
       return {
         success: false,
-        message: "Offline Mode: Cannot perform workspace deletions.",
-        error: "Firestore is offline.",
+        message: "Unable to connect. Please try again.",
+        error:   "Firestore unavailable",
       };
     }
 
     try {
-      const docRef = doc(db, "projects", projectId);
-      await deleteDoc(docRef);
-
-      return {
-        success: true,
-        message: "Project workspace decommissioned and deleted successfully.",
-      };
+      // Soft delete — preserves audit trail and allows recovery within 30 days.
+      // A scheduled Cloud Function should hard-delete after the retention window.
+      await updateDoc(doc(db, "projects", projectId), {
+        status:    "deleted",
+        deletedAt: serverTimestamp(),
+        deletedBy: auth?.currentUser?.uid ?? null,
+        updatedAt: serverTimestamp(),
+      });
+      return { success: true, message: "Project deleted successfully." };
     } catch (err) {
+      // Fall back to hard delete if the soft-delete update fails
+      // (e.g. the document doesn't exist or is already deleted)
       try {
-        handleFirestoreError(err, OperationType.DELETE, `projects/${projectId}`);
-      } catch (formattedErr: any) {
-        return {
-          success: false,
-          message: "Operation rejected: You do not have permission to delete this project.",
-          error: formattedErr.message,
-        };
+        await deleteDoc(doc(db, "projects", projectId));
+        return { success: true, message: "Project removed." };
+      } catch {
+        try {
+          handleFirestoreError(err, OperationType.DELETE, `projects/${projectId}`);
+        } catch (formatted: unknown) {
+          return {
+            success: false,
+            message: "Unable to delete this project. You may not have permission.",
+            error:   formatted instanceof Error ? formatted.message : String(formatted),
+          };
+        }
       }
     }
-  }
+  },
 };

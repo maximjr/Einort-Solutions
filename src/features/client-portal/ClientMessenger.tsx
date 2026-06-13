@@ -67,12 +67,7 @@ export function ClientMessenger({
   useEffect(() => {
     let active = true;
 
-    console.log(
-      `SECURE MESSENGER: Establishing secure conduit for ${userName} (${userEmail})`,
-    );
-
-    // Register offline presence cleanup inside this viewport
-    messageService.setPresence(userId, true, "client");
+    messageService.setPresence(userId, true);
 
     async function initConversation() {
       try {
@@ -93,10 +88,11 @@ export function ClientMessenger({
         }
       } catch (err: any) {
         if (
+          import.meta.env.DEV &&
           err?.code !== "permission-denied" &&
           !err?.message?.includes("Missing or insufficient permissions")
         ) {
-          console.error("Failed to establish secure conduit:", err);
+          console.error("[Messenger] Init failed:", err);
         }
         if (active) {
           setSyncError("Communication channel initializing...");
@@ -109,7 +105,7 @@ export function ClientMessenger({
 
     return () => {
       active = false;
-      messageService.setPresence(userId, false, "client");
+      messageService.setPresence(userId, false);
     };
   }, [userId, userEmail, userName]);
 
@@ -129,7 +125,7 @@ export function ClientMessenger({
         messageService.markAsRead(conversationId, userId);
       },
       (err) => {
-        console.warn("Messages stream subscription failure:", err);
+        if (import.meta.env.DEV) console.warn("[Messenger] Message stream failed:", err);
         setSyncError("Messages streams read authorization denied.");
         setLoading(false);
       },
@@ -194,7 +190,7 @@ export function ClientMessenger({
         attachments,
       );
     } catch (err) {
-      console.error("Error sending enterprise payload:", err);
+      if (import.meta.env.DEV) console.error("[Messenger] Send failed:", err);
     } finally {
       setSending(false);
     }
