@@ -28,11 +28,36 @@
 @layer base {
   html, body {
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none; /* Prevents native iOS elastic bounce, letting our custom pull-to-refresh work pure */
     overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Premium Mobile Tap Feedback */
+  button, 
+  a.btn, 
+  [role="button"] {
+    @apply transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)];
+  }
+
+  button:active, 
+  a.btn:active, 
+  [role="button"]:active {
+    @apply scale-[0.97] opacity-80;
+    transition-duration: 0.1s;
+    transition-timing-function: ease-out;
   }
 
   html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto; /* Revert to auto to avoid Safari rubberband bugs */
+  }
+
+  @keyframes progress-marquee {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(300%); }
+  }
+  .animate-progress {
+    animation: progress-marquee 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 
   body {

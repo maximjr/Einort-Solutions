@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import {
   Send,
-  MessageSquare,
   Loader2,
   X,
   Check,
   CheckCheck,
   Paperclip,
   Activity,
+  ChevronLeft,
+  Circle,
+  MoreVertical
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -62,16 +64,11 @@ export function ClientMessenger({
   const [mockAttachment, setMockAttachment] = useState<string | null>(null);
 
   const messageEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // 1. Establish/Fetch conversation-record on mount
   useEffect(() => {
     let active = true;
 
-    console.log(
-      `SECURE MESSENGER: Establishing secure conduit for ${userName} (${userEmail})`,
-    );
-
-    // Register offline presence cleanup inside this viewport
     messageService.setPresence(userId, true, "client");
 
     async function initConversation() {
@@ -81,7 +78,6 @@ export function ClientMessenger({
           setAdminIdResolved(superAdminId);
         }
 
-        // Ensure legacy conversations get migrated gracefully to prevent message loss
         await messageService.migrateLegacyConversation(userId, superAdminId);
 
         const id = await messageService.getOrCreateConversation(
@@ -113,11 +109,9 @@ export function ClientMessenger({
     };
   }, [userId, userEmail, userName]);
 
-  // 2. Subscribe to conversation info & message streams
   useEffect(() => {
     if (!conversationId) return;
 
-    // Reset unread count for the client on open or new incoming
     messageService.markAsRead(conversationId, userId);
 
     const unsubMessages = messageService.subscribeMessages(
@@ -125,7 +119,6 @@ export function ClientMessenger({
       (newMessages) => {
         setMessages(newMessages);
         setLoading(false);
-        // Clear unread counts whenever messages list updates / we are actively looking at it
         messageService.markAsRead(conversationId, userId);
       },
       (err) => {
@@ -135,7 +128,6 @@ export function ClientMessenger({
       },
     );
 
-    // Subscribe to Super Admin online status
     const unsubAdminPresence = messageService.subscribePresence(
       adminIdResolved,
       (presenceData) => {
@@ -153,7 +145,6 @@ export function ClientMessenger({
     };
   }, [conversationId, userId, adminIdResolved]);
 
-  // Keep local conversation state updated from hook
   useEffect(() => {
     if (conversationId && conversations) {
       const found = conversations.find((c) => c.id === conversationId);
@@ -163,12 +154,13 @@ export function ClientMessenger({
     }
   }, [conversations, conversationId]);
 
-  // 3. Scroll to bottom
   useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Smooth, unforced scrolling to bottom
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages, loading]);
 
-  // 4. Send action
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!inputText.trim() && !mockAttachment) return;
@@ -193,6 +185,11 @@ export function ClientMessenger({
         attachments.length > 0 ? "file" : "text",
         attachments,
       );
+      
+      // Auto-focus input after send (desktop mainly, skip on mobile to prevent keyboard bounce)
+      if (window.innerWidth > 768) {
+         inputRef.current?.focus();
+      }
     } catch (err) {
       console.error("Error sending enterprise payload:", err);
     } finally {
@@ -221,166 +218,180 @@ export function ClientMessenger({
   };
 
   return (
-    <div className="flex flex-col h-full bg-transparent border-none overflow-hidden relative">
-      {/* Messenger Header */}
-      <div className="px-4 py-3.5 md:px-5 md:py-4 bg-[#0a0f18]/80 border-b border-white/[0.05] flex items-center justify-between relative z-15 backdrop-blur-md">
-        <div className="flex items-center gap-3.5">
-          <div className="relative">
-            <div
-              className={`w-10 h-10 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 hover:from-primary/30 hover:to-primary/10 border border-primary/20 flex items-center justify-center font-medium text-sm text-primary uppercase shadow-inner transition-colors`}
+    <div className="flex flex-col h-full bg-[#FAFAFA] dark:bg-[#09090b] md:bg-transparent md:dark:bg-transparent overflow-hidden relative">
+      {/* 
+        Header: iOS style clean header on mobile, elegant slate on desktop 
+      */}
+      <div className="h-16 md:h-[72px] px-2 md:px-5 bg-white/80 dark:bg-[#0a0f18]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/[0.05] flex items-center justify-between relative z-20 shrink-0">
+        <div className="flex items-center gap-2 md:gap-3">
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="md:hidden w-10 h-10 flex items-center justify-center text-primary transition-colors cursor-pointer active:opacity-70"
             >
-              DT
-            </div>
-            {/* Realtime Admin Position Glow */}
-            <span
-              className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#0a0f18] shadow-[0_0_8px_rgba(52,211,153,0.4)] ${adminOnline ? "bg-emerald-400" : "bg-slate-600 shadow-none"}`}
-            ></span>
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h4 className="text-[13px] font-semibold tracking-wide text-white">
-                Dev Team
-              </h4>
+              <ChevronLeft size={28} strokeWidth={2.5} />
+            </button>
+          )}
+          
+          <div className="relative flex items-center gap-3">
+            <div className="relative">
+              <div className="w-9 h-9 md:w-11 md:h-11 rounded-full bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center border border-black/5 dark:border-white/10 shadow-sm overflow-hidden">
+                <img src="/favicon.png" alt="Einort" className="w-5 h-5 md:w-6 md:h-6 object-contain" onError={(e) => { e.currentTarget.style.display='none'; }}/>
+                {/* Fallback pattern if image fails */}
+                <div className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-slate-500 dark:text-slate-400 -z-10">
+                  ES
+                </div>
+              </div>
               <span
-                className={`text-[9px] px-2 py-0.5 rounded-full uppercase font-bold tracking-widest ${adminOnline ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-slate-400"}`}
-              >
-                {adminOnline ? "Online" : "Away"}
-              </span>
+                className={`absolute bottom-0 right-0 w-2.5 h-2.5 md:w-3 md:h-3 rounded-full border-2 border-white dark:border-[#0a0f18] ${adminOnline ? "bg-emerald-500" : "bg-slate-400 dark:bg-slate-600"}`}
+              ></span>
             </div>
-            <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5 font-light">
-              <span className="opacity-70">Dedicated Enterprise Lead</span>
-              {conversation?.priority && conversation.priority !== "none" && (
-                <>
-                  <span className="opacity-40">•</span>
-                  <span className="text-[9px] text-amber-500/90 bg-amber-500/10 px-1.5 py-0.5 rounded-md uppercase font-semibold tracking-wider">
-                    {conversation.priority} Priority
-                  </span>
-                </>
-              )}
-            </p>
+            <div className="flex flex-col justify-center">
+              <h4 className="text-[15px] md:text-[16px] font-semibold tracking-tight text-slate-900 dark:text-white leading-tight">
+                Einort Support
+              </h4>
+              <p className="text-[12px] md:text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-none mt-1 flex items-center gap-1.5">
+                {adminOnline ? "Always active" : "Typically replies in 5m"}
+              </p>
+            </div>
           </div>
         </div>
 
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
-          >
-            <X size={16} />
-          </button>
-        )}
+        <div className="flex items-center">
+           <button className="w-10 h-10 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer active:opacity-70">
+              <MoreVertical size={20} />
+            </button>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="hidden md:flex w-9 h-9 rounded-full items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <X size={18} />
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Connection Indicator Notice */}
       {syncError && (
-        <div className="bg-red-500/10 border-b border-red-500/20 py-2.5 px-5 text-[11px] text-red-400 flex items-center gap-2">
-          <Activity size={12} className="text-red-400 animate-pulse" />
-          <span>{syncError}</span>
+        <div className="bg-red-50 dark:bg-red-500/10 border-b border-red-100 dark:border-red-500/20 py-2.5 px-5 text-[12px] text-red-600 dark:text-red-400 flex items-center justify-center gap-2 shrink-0">
+          <Activity size={14} className="animate-pulse" />
+          <span className="font-medium">{syncError}</span>
         </div>
       )}
 
       {/* Message Timeline */}
-      <div className="flex-1 overflow-y-auto px-5 py-6 space-y-6 bg-gradient-to-b from-transparent to-black/10">
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 md:space-y-8 bg-black/[0.02] dark:bg-black/20 overscroll-contain">
         {loading ? (
-          <div className="h-full flex flex-col items-center justify-center gap-4 text-slate-400">
-            <Loader2 className="w-5 h-5 text-primary animate-spin" />
-            <p className="text-[11px] font-medium tracking-wide">
-              Connecting secure tunnel...
-            </p>
+          <div className="h-full flex flex-col items-center justify-center gap-6">
+            <div className="relative flex items-center justify-center">
+              <div className="absolute w-20 h-20 bg-primary/10 rounded-full blur-[30px] animate-pulse"></div>
+              <div className="w-8 h-8 border-[1.5px] border-black/5 dark:border-white/5 border-t-[#007AFF] dark:border-t-primary rounded-full animate-spin"></div>
+            </div>
+            <div className="h-[2px] w-20 flex overflow-hidden rounded-full bg-black/5 dark:bg-white/5 relative">
+               <div className="absolute inset-y-0 left-0 bg-[#007AFF] dark:bg-primary w-1/3 rounded-full animate-progress z-10"></div>
+            </div>
           </div>
         ) : messages.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-5">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center text-primary shadow-2xl relative">
-              <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl"></div>
-              <MessageSquare size={24} className="relative z-10" />
+          <div className="h-full flex flex-col items-center justify-center text-center px-6 pb-12 space-y-6">
+            <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 border border-black/5 dark:border-white/5 flex items-center justify-center text-slate-300 dark:text-slate-600 shadow-xl relative overflow-hidden">
+               <img src="/favicon.png" alt="Einort" className="w-10 h-10 md:w-12 md:h-12 object-contain opacity-50" onError={(e) => { e.currentTarget.style.display='none'; }}/>
             </div>
-            <div className="space-y-2">
-              <h5 className="text-[15px] font-semibold text-white tracking-wide">
-                Communication Pipeline Ready
+            <div className="space-y-2 max-w-[280px] md:max-w-sm">
+              <h5 className="text-[17px] md:text-[20px] font-semibold text-slate-900 dark:text-white tracking-tight">
+                How can we help?
               </h5>
-              <p className="text-slate-400 font-light text-[13px] leading-relaxed max-w-sm mx-auto">
-                Your dedicated architect is ready to assist. Send deliverables,
-                request audits, or start a new priority thread.
+              <p className="text-slate-500 dark:text-slate-400 text-[14px] md:text-[15px] leading-relaxed">
+                Send us a message and our engineering team will get back to you shortly.
               </p>
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-6 md:space-y-8 pb-4">
             {messages.map((ms, idx) => {
               const isMe = ms.senderId === userId;
-              return (
-                <motion.div
-                  layout
-                  initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  key={ms.id || idx}
-                  className={`flex ${isMe ? "justify-end" : "justify-start"} items-end gap-2.5 group`}
-                >
-                  {!isMe && (
-                    <div className="w-7 h-7 rounded-full bg-white/[0.05] border border-white/10 text-white flex items-center justify-center text-[10px] font-medium uppercase shrink-0 shadow-sm mb-5">
-                      DT
-                    </div>
-                  )}
-                  <div
-                    className={`max-w-[75%] flex flex-col ${isMe ? "items-end" : "items-start"}`}
-                  >
-                    <div
-                      className={`px-4 py-3 text-[13.5px] font-light tracking-[0.01em] shadow-[0_4px_24px_rgba(0,0,0,0.2)] transition-all ${
-                        isMe
-                          ? "bg-gradient-to-br from-primary to-primary-hover text-white rounded-2xl rounded-br-sm border border-primary/20"
-                          : "bg-white/[0.06] backdrop-blur-md text-slate-100 rounded-2xl rounded-bl-sm border border-white/[0.08]"
-                      }`}
-                    >
-                      <p className="whitespace-pre-wrap leading-relaxed break-words">
-                        {ms.text}
-                      </p>
+              
+              // Grouping logic based on time
+              let showTimestamp = true;
+              if (idx > 0) {
+                 const prevMs = messages[idx - 1];
+                 const timeDiff = Math.abs((ms.timestamp?.toMillis?.() || Date.now()) - (prevMs.timestamp?.toMillis?.() || Date.now()));
+                 // If less than 5 minutes, don't show giant timestamp unless it's a new sender
+                 if (timeDiff < 300000 && ms.senderId === prevMs.senderId) {
+                    showTimestamp = false;
+                 }
+              }
 
-                      {/* Attachments rendering */}
-                      {ms.attachments && ms.attachments.length > 0 && (
-                        <div
-                          className={`mt-3 pt-3 border-t space-y-2 ${isMe ? "border-white/20" : "border-white/10"}`}
-                        >
-                          {ms.attachments.map((attach, aIdx) => (
-                            <a
-                              key={aIdx}
-                              href={attach.url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className={`flex items-center gap-2 text-[12px] font-medium hover:underline transition-colors ${
-                                isMe
-                                  ? "text-white/90 hover:text-white"
-                                  : "text-primary/90 hover:text-primary"
-                              }`}
-                            >
-                              <Paperclip size={12} className="shrink-0" />
-                              <span>{attach.name || "Attachment"}</span>
-                            </a>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    {/* Timestamp & Read ticks */}
-                    <div
-                      className={`flex items-center gap-1.5 mt-1.5 px-1 text-[10px] text-slate-500 font-medium ${isMe ? "justify-end" : "justify-start"} transition-opacity`}
-                    >
-                      <span>
-                        {safelyFormatTime(ms.timestamp)}
-                      </span>
-                      {isMe && (
-                        <span className="flex items-center ml-0.5">
-                          {ms.read ? (
-                            <CheckCheck size={14} className="text-primary" />
-                          ) : (
-                            <Check size={12} className="text-slate-500" />
-                          )}
+              return (
+                <div key={ms.id || idx} className="flex flex-col">
+                  {showTimestamp && (
+                     <div className="flex justify-center mb-5 md:mb-6 mt-2">
+                        <span className="text-[11px] md:text-[12px] font-semibold text-slate-400 dark:text-slate-500 tracking-wide">
+                          {ms.timestamp ? new Date(ms.timestamp?.toDate ? ms.timestamp.toDate() : ms.timestamp).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : "Just now"}
                         </span>
+                     </div>
+                  )}
+                  
+                  <motion.div
+                    layout="position"
+                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    className={`flex ${isMe ? "justify-end" : "justify-start"} items-end gap-2.5 group`}
+                  >
+                    {!isMe && (
+                      <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-slate-200 dark:bg-slate-800 border border-black/5 dark:border-white/5 flex items-center justify-center shrink-0 shadow-sm mb-1 overflow-hidden">
+                        <img src="/favicon.png" alt="ES" className="w-4 h-4 object-contain brightness-0 opacity-40 dark:brightness-200" onError={(e) => { e.currentTarget.style.display='none'; }}/>
+                      </div>
+                    )}
+                    <div className={`max-w-[85%] md:max-w-[75%] flex flex-col ${isMe ? "items-end" : "items-start"}`}>
+                      <div
+                        className={`px-4 py-2.5 md:py-3 text-[15px] leading-[1.4] tracking-[-0.01em] shadow-sm transition-all ${
+                          isMe
+                            ? "bg-[#007AFF] text-white rounded-[20px] rounded-br-[4px]" // iMessage Blue
+                            : "bg-white dark:bg-[#1a2133] text-slate-900 dark:text-slate-100 rounded-[20px] rounded-bl-[4px] border border-black/5 dark:border-white/[0.05]"
+                        }`}
+                      >
+                        <p className="whitespace-pre-wrap break-words">
+                          {ms.text}
+                        </p>
+
+                        {/* Attachments rendering */}
+                        {ms.attachments && ms.attachments.length > 0 && (
+                          <div
+                            className={`mt-3 pt-3 border-t space-y-2 ${isMe ? "border-white/20" : "border-black/10 dark:border-white/10"}`}
+                          >
+                            {ms.attachments.map((attach, aIdx) => (
+                              <a
+                                key={aIdx}
+                                href={attach.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`flex items-center gap-2 text-[13px] font-medium hover:opacity-80 transition-opacity ${
+                                  isMe ? "text-white" : "text-primary"
+                                }`}
+                              >
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isMe ? 'bg-white/20' : 'bg-primary/10'}`}>
+                                   <Paperclip size={14} />
+                                </div>
+                                <span className="truncate max-w-[150px] md:max-w-[200px]">{attach.name || "Attachment"}</span>
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Sub-bubble Status */}
+                      {isMe && (
+                         <div className={`flex items-center gap-1 mt-1 text-[11px] font-medium transition-opacity opacity-0 group-hover:opacity-100 ${ms.read ? 'text-[#007AFF] dark:text-primary' : 'text-slate-400 dark:text-slate-500'}`}>
+                            {ms.read ? "Read" : "Delivered"}
+                         </div>
                       )}
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </div>
               );
             })}
-            <div ref={messageEndRef} className="h-2" />
+            <div ref={messageEndRef} className="h-4" />
           </div>
         )}
       </div>
@@ -388,32 +399,36 @@ export function ClientMessenger({
       {/* Message input panel */}
       <form
         onSubmit={handleSendMessage}
-        className="p-3 md:p-4 bg-[#0a0f18]/90 border-t border-white/[0.05] relative z-10 backdrop-blur-md pb-[max(1rem,env(safe-area-inset-bottom))]"
+        className="bg-white/90 dark:bg-[#0a0f18]/90 backdrop-blur-xl border-t border-black/5 dark:border-white/[0.05] shrink-0
+                   pb-[max(12px,env(safe-area-inset-bottom))] px-3 pt-3 md:px-5 md:pt-4 md:pb-5 relative z-30"
       >
         {mockAttachment && (
-          <div className="flex items-center justify-between mb-3 bg-primary/10 border border-primary/20 rounded-xl px-3 py-2 text-[12px] text-primary">
+          <div className="flex items-center justify-between mb-3 bg-slate-50 dark:bg-primary/10 border border-slate-200 dark:border-primary/20 rounded-xl px-4 py-2.5 text-[13px] text-slate-700 dark:text-primary mx-1">
             <span className="truncate flex items-center gap-2 font-medium">
-              <Paperclip size={14} /> Attachment Ready
+              <div className="w-6 h-6 rounded bg-black/5 dark:bg-primary/20 flex items-center justify-center">
+                 <Paperclip size={14} /> 
+              </div>
+              Attachment Ready
             </span>
             <button
               type="button"
               onClick={() => setMockAttachment(null)}
-              className="text-primary/70 hover:text-primary p-0.5 cursor-pointer rounded-full hover:bg-primary/10 transition-colors"
+              className="text-slate-400 hover:text-slate-600 dark:text-primary/70 dark:hover:text-primary p-1 cursor-pointer rounded-full hover:bg-black/5 dark:hover:bg-primary/10 transition-colors"
             >
-              <X size={14} />
+              <X size={16} />
             </button>
           </div>
         )}
 
-        <div className="flex items-end gap-2.5">
-          {/* Quick Mock attachment */}
-          <div className="relative shrink-0 mb-1">
+        <div className="flex items-end gap-2.5 md:gap-3 max-w-4xl mx-auto">
+          {/* Attachment Button */}
+          <div className="relative shrink-0 mb-1 pl-1 md:pl-0">
             <button
               type="button"
               onClick={() => setShowAttachMock(!showAttachMock)}
-              className="w-10 h-10 md:w-9 md:h-9 rounded-full bg-white/[0.04] border border-white/[0.1] hover:bg-white/[0.1] flex items-center justify-center text-slate-400 hover:text-white transition-all cursor-pointer shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-100 dark:bg-white/[0.04] text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/[0.08] hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer active:scale-95"
             >
-              <Paperclip size={18} className="md:w-[15px] md:h-[15px]" />
+              <Paperclip size={20} strokeWidth={2} />
             </button>
             <AnimatePresence>
               {showAttachMock && (
@@ -421,28 +436,28 @@ export function ClientMessenger({
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute bottom-14 left-0 w-56 bg-[#1a2133] border border-white/[0.08] rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] p-2 space-y-0.5 z-30 backdrop-blur-xl"
+                  className="absolute bottom-14 left-0 w-56 bg-white dark:bg-[#1a2133] border border-black/10 dark:border-white/[0.08] rounded-2xl shadow-2xl p-2 space-y-1 z-50 backdrop-blur-xl"
                 >
-                  <p className="text-[10.5px] uppercase font-bold text-slate-400/80 tracking-wider px-3 py-2 border-b border-white/5 mb-1.5 flex items-center gap-1.5">
-                    Assets
+                  <p className="text-[11px] uppercase font-bold text-slate-400 tracking-wider px-3 py-2 border-b border-black/5 dark:border-white/5 mb-1 flex items-center gap-1.5">
+                    Attach File
                   </p>
                   <button
                     type="button"
                     onClick={() => simulateAttachment("blueprint")}
-                    className="w-full text-left font-medium text-[12.5px] text-slate-200 hover:text-white hover:bg-white/10 py-2.5 px-3 rounded-xl transition-colors cursor-pointer flex items-center gap-2.5"
+                    className="w-full text-left font-medium text-[14px] text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 py-3 px-3 rounded-xl transition-colors cursor-pointer flex items-center gap-3"
                   >
-                    <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-                       <Paperclip size={13} className="text-primary" />
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-primary/10 flex items-center justify-center shrink-0">
+                       <Paperclip size={16} className="text-[#007AFF] dark:text-primary" />
                     </div>
                     Blueprint Document
                   </button>
                   <button
                     type="button"
                     onClick={() => simulateAttachment("audit")}
-                    className="w-full text-left font-medium text-[12.5px] text-slate-200 hover:text-white hover:bg-white/10 py-2.5 px-3 rounded-xl transition-colors cursor-pointer flex items-center gap-2.5"
+                    className="w-full text-left font-medium text-[14px] text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 py-3 px-3 rounded-xl transition-colors cursor-pointer flex items-center gap-3"
                   >
-                     <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-                       <Paperclip size={13} className="text-primary" />
+                     <div className="w-8 h-8 rounded-lg bg-blue-50 dark:bg-primary/10 flex items-center justify-center shrink-0">
+                       <Paperclip size={16} className="text-[#007AFF] dark:text-primary" />
                     </div>
                     Deliverable Audit
                   </button>
@@ -453,29 +468,42 @@ export function ClientMessenger({
 
           <div className="flex-1 relative">
             <textarea
+              ref={inputRef}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder={sending ? "Sending..." : "Message Dev Team..."}
+              placeholder={sending ? "Sending..." : "Message Support..."}
               disabled={sending}
               rows={1}
-              className="w-full min-h-[46px] max-h-32 bg-[#141a26]/80 backdrop-blur-md border border-white/[0.1] focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-2xl px-4 py-3.5 text-[14px] text-white placeholder-slate-400 font-light focus:outline-none resize-none transition-all scrollbar-none shadow-inner md:text-[13px] md:py-3"
+              className="w-full min-h-[42px] md:min-h-[46px] max-h-32 bg-slate-100/80 dark:bg-[#141a26]/80 backdrop-blur-md border border-transparent focus:border-black/10 dark:focus:border-primary/30 rounded-[24px] px-4 py-2.5 md:py-3 text-[15px] md:text-[14px] text-slate-900 dark:text-white placeholder-slate-500 font-normal focus:outline-none resize-none transition-colors scrollbar-none disabled:opacity-50"
+              style={{
+                // Prevent iOS zoom on focus
+                fontSize: '16px' 
+              }}
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={sending || (!inputText.trim() && !mockAttachment)}
-            className="w-11 h-11 md:mb-0.5 rounded-full bg-primary hover:bg-primary-hover disabled:bg-primary/50 disabled:cursor-not-allowed text-white flex items-center justify-center shrink-0 shadow-[0_4px_14px_rgba(59,130,246,0.4)] hover:shadow-[0_6px_20px_rgba(59,130,246,0.6)] hover:scale-105 active:scale-95 transition-all cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/30"
-          >
-            {sending ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : (
-              <Send size={18} className="ml-0.5" />
-            )}
-          </button>
+          {/* Send Button: iMessage native style */}
+          <div className="shrink-0 mb-0.5 md:mb-1 pr-1 md:pr-0">
+            <button
+              type="submit"
+              disabled={sending || (!inputText.trim() && !mockAttachment)}
+              className={`w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
+                 (inputText.trim() || mockAttachment) && !sending
+                   ? "bg-[#007AFF] dark:bg-primary hover:bg-[#005bb5] dark:hover:bg-primary-hover text-white shadow-md active:scale-95 cursor-pointer"
+                   : "bg-slate-200 dark:bg-white/5 text-slate-400 dark:text-slate-600 cursor-default"
+              }`}
+            >
+              {sending ? (
+                <Loader2 size={18} className="animate-spin text-white" />
+              ) : (
+                <Send size={16} className="ml-0.5" strokeWidth={2.5} />
+              )}
+            </button>
+          </div>
         </div>
       </form>
     </div>
   );
 }
+

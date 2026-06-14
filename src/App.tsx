@@ -111,24 +111,32 @@ function MessengerWrapper() {
 
 function Layout() {
   useEffect(() => {
-    // Disable Lenis on touch devices for native iOS/Android scrolling performance
+    // 1. Detect touch devices strictly
     const isTouchDevice =
       "ontouchstart" in window ||
       navigator.maxTouchPoints > 0 ||
       window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
-    // Detect low-end devices
+    // 2. Detect Safari strictly (often has rubber-banding issues with custom scroll)
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+
+    // 3. Detect low-end devices
     const isLowMemory =
       (navigator as any).deviceMemory !== undefined && (navigator as any).deviceMemory < 4;
     const isLowProcessing =
       navigator.hardwareConcurrency !== undefined && navigator.hardwareConcurrency <= 4;
+    
+    // 4. Detect reduced motion and specific mobile strings
     const isReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const isMobileString = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
       navigator.userAgent
     );
 
-    if (isTouchDevice || isLowMemory || isLowProcessing || isReducedMotion || isMobileString) {
-      document.documentElement.classList.add("touch-device");
+    // Disable completely and fallback to native scrolling
+    if (isTouchDevice || isSafari || isLowMemory || isLowProcessing || isReducedMotion || isMobileString) {
+      document.documentElement.classList.add("native-scroll");
+      // Add native scroll styles dynamically just to be sure
+      document.documentElement.style.scrollBehavior = "auto";
       return;
     }
 
@@ -142,14 +150,15 @@ function Layout() {
 
         try {
           lenisInstance = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            duration: 1.0,               // slightly faster for crispness
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
             orientation: "vertical",
             gestureOrientation: "vertical",
             smoothWheel: true,
+            // Strictly disable all touch/mobile interventions
             syncTouch: false,
+            touchMultiplier: 1,
             wheelMultiplier: 1,
-            touchMultiplier: 2,
           });
 
           const raf = (time: number) => {

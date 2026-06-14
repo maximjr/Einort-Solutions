@@ -1,20 +1,29 @@
-import { useState, useEffect, useRef } from "react";
-import { motion, useAnimation } from "motion/react";
-import { RefreshCw } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useMotionValue, useTransform, animate } from "motion/react";
+import { Loader2 } from "lucide-react";
 
 export function PullToRefresh({ children }: { children: React.ReactNode }) {
-  const [startY, setStartY] = useState(0);
-  const [isPulling, setIsPulling] = useState(false);
-  const [pullProgress, setPullProgress] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const controls = useAnimation();
   const containerRef = useRef<HTMLDivElement>(null);
   
-  const MAX_PULL = 120;
+  // High-performance motion value (no re-renders during drag)
+  const pullDistance = useMotionValue(0);
+  
   const THRESHOLD = 80;
+  const HEADER_OFFSET = 55; // Resting offset while reloading
+  
+  // Transform values for premium indicator effect
+  const indicatorOpacity = useTransform(pullDistance, [10, 60], [0, 1]);
+  const indicatorRotate = useTransform(pullDistance, [0, THRESHOLD * 1.5], [0, 360]);
+  const indicatorScale = useTransform(pullDistance, [0, THRESHOLD, THRESHOLD + 40], [0.8, 1, 1.05]);
+
+  const triggerHaptic = () => {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate(10);
+    }
+  };
 
   useEffect(() => {
-    // Only apply on touch devices for mobile view
     const isTouchDevice =
       "ontouchstart" in window ||
       navigator.maxTouchPoints > 0 ||
@@ -22,63 +31,92 @@ export function PullToRefresh({ children }: { children: React.ReactNode }) {
 
     if (!isTouchDevice) return;
 
+    let startY = 0;
+    let isPulling = false;
+    let hasTriggeredHaptic = false;
+
     const handleTouchStart = (e: TouchEvent) => {
-      if (window.scrollY === 0) {
-        setStartY(e.touches[0].clientY);
+      if (window.scrollY <= 0 && !isRefreshing) {
+        startY = e.touches[0].clientY;
+        isPulling = true;
+        hasTriggeredHaptic = false;
+      } else {
+        isPulling = false;
       }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (window.scrollY === 0 && startY > 0 && !isRefreshing) {
-        const currentY = e.touches[0].clientY;
-        const diff = currentY - startY;
+      if (!isPulling || isRefreshing) return;
 
-        if (diff > 0) {
-          // If we drag down at the top of the page
-          // prevent native scroll
-          if (e.cancelable) {
-            e.preventDefault();
-          }
-          setIsPulling(true);
-          const rawProgress = diff * 0.5; // slow down factor
-          const boundedProgress = Math.min(rawProgress, MAX_PULL);
-          setPullProgress(boundedProgress);
-          controls.set({ y: boundedProgress });
+      const currentY = e.touches[0].clientY;
+      const diff = currentY - startY;
+
+      if (diff > 0 && window.scrollY <= 0) {
+        if (e.cancelable) {
+          e.preventDefault();
         }
+
+        // Phase 1 + 2: Light Resistance & Elastic Drag
+        let visualY = 0;
+        const basePull = diff * 0.45; // Subdued friction
+        
+        if (basePull <= THRESHOLD) {
+          visualY = basePull;
+        } else {
+          // Elastic curve when pulled past threshold
+          const overpull = basePull - THRESHOLD;
+          visualY = THRESHOLD + (50 * Math.log10(1 + overpull / 20));
+        }
+
+        pullDistance.set(visualY);
+
+        // Phase 3: Trigger Point Haptic
+        if (visualY >= THRESHOLD && !hasTriggeredHaptic) {
+          hasTriggeredHaptic = true;
+          triggerHaptic();
+        } else if (visualY < THRESHOLD && hasTriggeredHaptic) {
+          hasTriggeredHaptic = false;
+        }
+      } else if (diff < 0) {
+        pullDistance.set(0);
+        isPulling = false;
       }
     };
 
-    const handleTouchEnd = async () => {
-      if (isPulling) {
-        setIsPulling(false);
-        setStartY(0);
+    const handleTouchEnd = () => {
+      if (!isPulling) return;
+      isPulling = false;
+      
+      const distance = pullDistance.get();
 
-        if (pullProgress > THRESHOLD && !isRefreshing) {
-          setIsRefreshing(true);
-          // Snap instantly to loading position
-          await controls.start({ 
-            y: 40, 
-            transition: { ease: "easeOut", duration: 0.15 } 
-          });
-          
-          // Trigger reload very quickly
-          setTimeout(() => {
-            window.location.reload();
-          }, 350);
-          
-        } else if (!isRefreshing) {
-          // Snap back immediately
-          controls.start({ 
-            y: 0, 
-            transition: { ease: "easeOut", duration: 0.15 } 
-          });
-          setPullProgress(0);
-        }
+      if (distance >= THRESHOLD && !isRefreshing) {
+        setIsRefreshing(true);
+        triggerHaptic();
+        
+        // Bounce into refreshing position
+        animate(pullDistance, HEADER_OFFSET, {
+          type: "spring",
+          stiffness: 300,
+          damping: 20,
+          mass: 0.8
+        });
+        
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+
+      } else if (!isRefreshing) {
+        // Phase 4: Smooth elastic snap-back
+        animate(pullDistance, 0, {
+          type: "spring",
+          stiffness: 400,
+          damping: 26,
+          mass: 0.7
+        });
       }
     };
 
     window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    // Important: non-passive for touchmove to be able to preventDefault
     window.addEventListener("touchmove", handleTouchMove, { passive: false });
     window.addEventListener("touchend", handleTouchEnd, { passive: true });
 
@@ -87,32 +125,44 @@ export function PullToRefresh({ children }: { children: React.ReactNode }) {
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [startY, isPulling, pullProgress, isRefreshing, controls]);
+  }, [isRefreshing, pullDistance]);
 
   return (
-    <div ref={containerRef} className="w-full relative">
-      {/* Visual Indicator */}
-      <div className="fixed top-0 left-0 w-full flex justify-center pointer-events-none z-[100] h-0 overflow-visible">
+    <div ref={containerRef} className="w-full relative touch-pan-y">
+      {/* Floating Premium Indicator */}
+      <div className="absolute top-0 left-0 w-full flex justify-center pointer-events-none z-[100] h-0 overflow-visible">
         <motion.div
-          animate={{ 
-            y: isRefreshing ? 50 : Math.max(0, pullProgress),
-            opacity: isRefreshing ? 1 : Math.min(pullProgress / THRESHOLD, 1)
-          }}
-          transition={{ ease: "easeOut", duration: 0.12 }}
-          style={{ y: -50 }}
-          className="bg-surface border border-white/10 rounded-full p-2.5 shadow-2xl flex items-center justify-center mt-2"
+           style={{ 
+             y: pullDistance,
+             opacity: isRefreshing ? 1 : indicatorOpacity,
+             scale: isRefreshing ? 1 : indicatorScale
+           }}
+           className="absolute -top-14 bg-white/90 dark:bg-[#1a2133]/90 backdrop-blur-xl border border-black/5 dark:border-white/[0.08] rounded-full shadow-[0_8px_24px_rgba(0,0,0,0.12)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] flex items-center justify-center w-10 h-10"
         >
-          <motion.div
-            animate={isRefreshing ? { rotate: 360 } : { rotate: (pullProgress / THRESHOLD) * 360 }}
-            transition={isRefreshing ? { repeat: Infinity, duration: 0.8, ease: "linear" } : { duration: 0 }}
-          >
-            <RefreshCw className="w-5 h-5 text-primary" />
-          </motion.div>
+          {isRefreshing ? (
+             <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
+                className="w-full h-full flex items-center justify-center text-[#007AFF] dark:text-primary"
+             >
+                <Loader2 className="w-5 h-5" />
+             </motion.div>
+          ) : (
+            <motion.div 
+              style={{ rotate: indicatorRotate }}
+              className="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500"
+            >
+              <Loader2 className="w-5 h-5 opacity-90" />
+            </motion.div>
+          )}
         </motion.div>
       </div>
 
-      {/* Content wrapper pushed down slightly while pulling */}
-      <motion.div animate={controls} style={{ y: 0 }}>
+      {/* Content wrapper pushed down elastically */}
+      <motion.div 
+        style={{ y: pullDistance }}
+        className="w-full min-h-screen relative z-10 bg-background"
+      >
         {children}
       </motion.div>
     </div>

@@ -246,7 +246,7 @@ export function Navbar() {
       <>
         {/* Overlay / Backdrop */}
         <div
-          className={`fixed inset-0 z-50 bg-black/60 lg:hidden transition-opacity duration-300 ease-out ${
+          className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-[4px] lg:hidden transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
             mobileMenuOpen
               ? "opacity-100 pointer-events-auto"
               : "opacity-0 pointer-events-none"
@@ -258,9 +258,9 @@ export function Navbar() {
 
         {/* Drawer Sheet */}
         <div
-          className={`fixed inset-x-0 bottom-0 z-[55] h-[92dvh] bg-[#0b0f19] border-t border-white/10 rounded-t-[2.5rem] lg:hidden flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] ${
+          className={`fixed inset-x-0 bottom-0 z-[55] h-[92dvh] bg-[#090b10] border-t border-white/5 rounded-t-[2.5rem] lg:hidden flex flex-col transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
             mobileMenuOpen
-              ? "shadow-[0_-20px_80px_rgba(0,0,0,0.6)] pointer-events-auto"
+              ? "shadow-[0_-30px_100px_rgba(0,0,0,0.8)] pointer-events-auto"
               : "shadow-none pointer-events-none"
           }`}
           style={{ 
@@ -324,7 +324,7 @@ export function Navbar() {
                           : "/client-portal",
                       )
                     }
-                    className="w-full flex items-center justify-between p-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] rounded-2xl transition-colors active:scale-[0.98]"
+                    className="w-full flex items-center justify-between p-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] active:bg-white/[0.1] active:opacity-80"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
@@ -347,7 +347,7 @@ export function Navbar() {
                             : "/client-portal#projects",
                         )
                       }
-                      className="flex flex-col items-start p-4 bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.05] rounded-2xl transition-colors active:scale-[0.98] gap-3"
+                      className="flex flex-col items-start p-4 bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.05] rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] active:bg-white/[0.1] active:opacity-80 gap-3"
                     >
                       <FolderGit2 size={18} className="text-emerald-400" />
                       <span className="font-medium text-white text-sm tracking-wide">
@@ -364,7 +364,7 @@ export function Navbar() {
                             : "/client-portal#messages",
                         )
                       }
-                      className="flex flex-col items-start p-4 bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.05] rounded-2xl transition-colors active:scale-[0.98] gap-3 relative"
+                      className="flex flex-col items-start p-4 bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.05] rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] active:bg-white/[0.1] active:opacity-80 gap-3 relative"
                     >
                       <MessageSquare size={18} className="text-cyan-400" />
                       <span className="font-medium text-white text-sm tracking-wide">
@@ -414,7 +414,7 @@ export function Navbar() {
                   <button
                     key={link.name}
                     onClick={() => handleNavClick(link.href)}
-                    className="w-full flex items-center justify-between p-3.5 rounded-2xl hover:bg-white/[0.04] transition-colors active:scale-[0.98]"
+                    className="w-full flex items-center justify-between p-3.5 rounded-2xl hover:bg-white/[0.04] transition-all duration-300 ease-out active:scale-[0.96] active:bg-white/[0.1] active:opacity-80"
                   >
                     <span className="font-medium text-white text-[15px] tracking-wide">
                       {link.name}
@@ -429,7 +429,7 @@ export function Navbar() {
             <div className="mt-auto space-y-3 pt-6 pb-6 border-t border-white/[0.05]">
               <button
                 onClick={() => handleNavClick("/support")}
-                className="w-full flex items-center justify-between px-4 py-3 font-medium bg-white/[0.02] hover:bg-white/[0.05] rounded-2xl transition-colors border border-white/5 active:scale-[0.98]"
+                className="w-full flex items-center justify-between px-4 py-3 font-medium bg-white/[0.02] hover:bg-white/[0.05] rounded-2xl transition-all duration-300 ease-out border border-white/5 active:scale-[0.96] active:bg-white/[0.08]"
               >
                 <span className="text-sm text-slate-300 flex items-center gap-3">
                   <LifeBuoy size={16} className="text-slate-400" /> Professional
@@ -444,7 +444,7 @@ export function Navbar() {
                     handleSignOut();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full flex justify-center items-center gap-2 h-14 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold tracking-widest text-[11px] uppercase rounded-2xl transition-colors border border-red-500/10 active:scale-[0.98]"
+                  className="w-full flex justify-center items-center gap-2 h-14 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold tracking-widest text-[11px] uppercase rounded-2xl transition-all duration-300 ease-out border border-red-500/10 active:scale-[0.96] active:bg-red-500/20 active:opacity-80"
                 >
                   <LogOut size={14} />
                   Sign Out

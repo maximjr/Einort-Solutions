@@ -35,11 +35,11 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <motion.button
         ref={ref}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        whileHover={{ scale: 1.015 }}
+        whileTap={{ scale: 0.96, opacity: 0.85 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25, mass: 0.8 }}
         className={cn(
-          "inline-flex items-center justify-center rounded-md transition-shadow duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:pointer-events-none relative overflow-hidden group",
+          "inline-flex items-center justify-center rounded-[12px] transition-shadow duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:pointer-events-none relative overflow-hidden group",
           variants[variant],
           sizes[size],
           className,

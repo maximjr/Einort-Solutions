@@ -44,8 +44,10 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        whileTap={{ scale: 0.98, opacity: 0.95 }}
+        transition={{ type: "spring", stiffness: 400, damping: 30, mass: 0.8 }}
         className={cn(
-          "rounded-xl border border-white/5 bg-surface/50 backdrop-blur-sm shadow-xl transition-all duration-300 hover:border-white/10 hover:shadow-2xl hover:-translate-y-1 relative overflow-hidden group",
+          "rounded-[24px] border border-white/5 bg-surface/50 backdrop-blur-sm shadow-xl transition-shadow duration-500 hover:border-white/10 hover:shadow-[0_20px_40px_rgba(0,0,0,0.4)] relative overflow-hidden group",
           className,
         )}
         {...props}

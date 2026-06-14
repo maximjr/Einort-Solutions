@@ -16,16 +16,14 @@ function DefaultLoadingFallback() {
   if (!show) return null;
 
   return (
-    <div className="min-h-[60vh] w-full bg-background flex flex-col items-center justify-center p-6 text-center animate-fade-in">
-      <div className="relative flex items-center justify-center mb-4">
-        {/* Decorative ambient background blur */}
-        <div className="absolute w-16 h-16 bg-primary/20 rounded-full blur-xl animate-pulse"></div>
-        {/* Sleek modern continuous spinner */}
-        <div className="w-10 h-10 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+    <div className="min-h-[60vh] w-full bg-background flex flex-col items-center justify-center p-6 text-center animate-fade-in relative overflow-hidden">
+      <div className="relative flex items-center justify-center mb-6">
+        <div className="absolute w-24 h-24 bg-primary/10 rounded-full blur-[40px] animate-pulse"></div>
+        <div className="w-8 h-8 md:w-10 md:h-10 border-[1.5px] border-black/5 dark:border-white/5 border-t-[#007AFF] dark:border-t-primary rounded-full animate-spin"></div>
       </div>
-      <p className="text-xs font-mono text-text-muted/60 tracking-widest uppercase animate-pulse">
-        Initializing Module...
-      </p>
+      <div className="h-[2px] w-24 overflow-hidden rounded-full bg-black/5 dark:bg-white/5 relative">
+         <div className="absolute inset-y-0 left-0 bg-[#007AFF] dark:bg-primary w-1/3 rounded-full animate-progress z-10"></div>
+      </div>
     </div>
   );
 }
