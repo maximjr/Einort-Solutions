@@ -115,12 +115,10 @@ export function ClientPortal() {
         handleMerge(projectsByUid, projectsByEmail);
       },
       (error: any) => {
-        if (import.meta.env.DEV) {
-          if (error.code === "permission-denied") {
-            console.warn("[ClientPortal] UID query permission denied");
-          } else {
-            console.error("[ClientPortal] UID query failed:", error);
-          }
+        if (error.code === "permission-denied") {
+          console.warn("UID projects restricted");
+        } else {
+          console.error("Error fetching projects by UID:", error);
         }
       }
     );
@@ -139,8 +137,10 @@ export function ClientPortal() {
           handleMerge(projectsByUid, projectsByEmail);
         },
         (error: any) => {
-          if (import.meta.env.DEV && error.code !== "permission-denied") {
-            console.error("[ClientPortal] Email query failed:", error);
+          if (error.code === "permission-denied" && projectsByUid.length === 0) {
+            console.warn("Email projects restricted, falling back gracefully.");
+          } else if (error.code !== "permission-denied") {
+            console.error("Error fetching projects by Email:", error);
           }
         }
       );
@@ -471,7 +471,7 @@ export function ClientPortal() {
                                           try {
                                             await projectService.deleteProject(proj.id);
                                           } catch (e) {
-                                            if (import.meta.env.DEV) console.error("[ClientPortal] Delete failed:", e);
+                                            console.error(e);
                                           } finally {
                                             setIsDeleting(false);
                                             setDeletingId(null);

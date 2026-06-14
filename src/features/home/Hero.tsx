@@ -55,7 +55,7 @@ export function Hero() {
             </span>
           </div>
 
-          <h1 className="text-[2.2rem] min-[375px]:text-[2.5rem] min-[425px]:text-[3rem] sm:text-6xl md:text-8xl lg:text-[8.5rem] font-display font-medium tracking-tighter leading-[0.9] mb-8 text-white max-w-6xl mx-auto drop-shadow-2xl opacity-0 animate-[fadeInUp_0.8s_ease-out_forwards]">
+          <h1 className="text-[2.2rem] min-[375px]:text-[2.5rem] min-[425px]:text-[3rem] sm:text-6xl md:text-7xl lg:text-8xl xl:text-[8.5rem] font-display font-medium tracking-tighter leading-[0.9] mb-8 text-white max-w-6xl mx-auto drop-shadow-2xl opacity-0 animate-[fadeInUp_0.8s_ease-out_forwards]">
             ENGINEERING <br className="hidden md:block" />
             TOMORROW'S{" "}
             <span className="relative sm:whitespace-nowrap">

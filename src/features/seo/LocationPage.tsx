@@ -5,7 +5,6 @@ import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { SEO } from "../../components/seo/SEO";
 import { Globe, ArrowRight, ShieldCheck, Zap } from "lucide-react";
-import { safeJsonLd } from "../../lib/jsonld";
 
 export function LocationPage() {
   const { region } = useParams<{ region: string }>();
@@ -13,29 +12,19 @@ export function LocationPage() {
     ? region.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
     : "Global";
 
-  const schema = safeJsonLd({
+  const schema = JSON.stringify({
     "@context": "https://schema.org",
-    "@type":    "ProfessionalService",
-    "@id":      `https://einort.com/locations/${region ?? ""}#service`,
-    name:       `Einort Solutions — ${formattedRegion}`,
-    url:        `https://einort.com/locations/${region ?? ""}`,
-    serviceType: [
-      "Custom Web Development",
-      "Enterprise Software Architecture",
-      "ERP Development",
-      "UI/UX Design",
-    ],
+    "@type": "Service",
+    serviceType: `${formattedRegion} Web Development`,
     provider: {
       "@type": "Organization",
-      name:    "Einort Solutions",
-      "@id":   "https://einort.com/#org",
+      name: "Einort Solutions",
     },
     areaServed: {
       "@type": "Place",
-      name:    formattedRegion,
+      name: formattedRegion,
     },
     description: `Premium enterprise software engineering, AI automation, and custom web development services for businesses in ${formattedRegion}.`,
-    priceRange: "$$$",
   });
 
   return (

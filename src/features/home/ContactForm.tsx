@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -65,16 +65,11 @@ const timelines = [
 import { useAuth } from "../../hooks/useAuth";
 import { ProjectOrchestrator } from "../services/projectOrchestrator";
 
-// Minimum milliseconds between submissions — prevents accidental double-submit
-// and gives Firestore writes a chance to settle before a retry.
-const SUBMIT_COOLDOWN_MS = 10_000;
-
 export function ContactForm() {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const lastSubmitRef = useRef<number>(0);
   const { user } = useAuth();
 
   const {
@@ -118,18 +113,11 @@ export function ContactForm() {
   };
 
   const onSubmit = async (data: FormData) => {
-    const now = Date.now();
-    if (now - lastSubmitRef.current < SUBMIT_COOLDOWN_MS) {
-      setSubmitError("Please wait a moment before submitting again.");
-      return;
-    }
-    lastSubmitRef.current = now;
-
     setIsSubmitting(true);
     setSubmitError(null);
     try {
       const result = await ProjectOrchestrator.submitProject({
-        userId: user?.uid,
+        userId: user?.uid || "anonymous",
         email: data.email,
         clientName: data.clientName,
         company: data.company,

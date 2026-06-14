@@ -5,7 +5,6 @@ import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { SEO } from "../../components/seo/SEO";
 import { Building2, ArrowRight, Cog, LayoutGrid } from "lucide-react";
-import { safeJsonLd } from "../../lib/jsonld";
 
 export function IndustryPage() {
   const { industry } = useParams<{ industry: string }>();
@@ -13,24 +12,15 @@ export function IndustryPage() {
     ? industry.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
     : "Enterprise";
 
-  const schema = safeJsonLd({
+  const schema = JSON.stringify({
     "@context": "https://schema.org",
-    "@type":    "ProfessionalService",
-    "@id":      `https://einort.com/industries/${industry ?? ""}#service`,
-    name:       `Einort Solutions — ${formattedIndustry} Software`,
-    url:        `https://einort.com/industries/${industry ?? ""}`,
-    serviceType: [
-      "Custom Software Development",
-      "Enterprise ERP",
-      "Web Application Architecture",
-    ],
+    "@type": "Service",
+    serviceType: `${formattedIndustry} Software Development`,
     provider: {
       "@type": "Organization",
-      name:    "Einort Solutions",
-      "@id":   "https://einort.com/#org",
+      name: "Einort Solutions",
     },
-    description: `Specialised enterprise software architecture, custom ERPs, and premium web platforms tailored for the ${formattedIndustry} industry.`,
-    priceRange: "$$$",
+    description: `Specialized enterprise software architecture, custom ERPs, and premium web platforms tailored for the ${formattedIndustry} industry.`,
   });
 
   return (

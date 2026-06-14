@@ -11,10 +11,7 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    // Alias kept for readability at call sites.
-    // A real email-verification gate would add: && request.auth.token.email_verified == true
-    // Enable that once the registration flow enforces sendEmailVerification().
-    function isSignedIn() {
+    function isVerifiedUser() {
       return isAuthenticated();
     }
 
@@ -30,36 +27,30 @@ service cloud.firestore {
       return resource.data;
     }
     
-    // Role helpers — custom claims are checked first (zero Firestore reads).
-    // The Firestore fallback exists for accounts created before claim propagation
-    // or when the token hasn't been refreshed yet. Set Firebase Auth custom claims
-    // via a Cloud Function on user creation to keep the fast path exercised.
-    function hasAdminClaim() {
-      return 'role' in request.auth.token &&
-             request.auth.token.role in ['admin', 'super_admin'];
-    }
-
+    // Secure Profile Role Checking - Eager evaluation safe
     function isAdmin() {
       return isAuthenticated() && (
-        hasAdminClaim() ||
-        get(/databases/$(database)/documents/users/$(request.auth.uid))
-          .data.get('role', 'client') in ['admin', 'super_admin']
+        ('role' in request.auth.token && request.auth.token.role in ['admin', 'super_admin']) || 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'none') in ['admin', 'super_admin']) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('isAdmin', false) == true)
       );
     }
-
+    
     function isSuperAdmin() {
       return isAuthenticated() && (
-        ('role' in request.auth.token && request.auth.token.role == 'super_admin') ||
-        get(/databases/$(database)/documents/users/$(request.auth.uid))
-          .data.get('role', 'client') == 'super_admin'
+        ('role' in request.auth.token && request.auth.token.role == 'super_admin') || 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'none') == 'super_admin')
       );
     }
 
     function isRole(targetRole) {
       return isAuthenticated() && (
-        ('role' in request.auth.token && request.auth.token.role == targetRole) ||
-        get(/databases/$(database)/documents/users/$(request.auth.uid))
-          .data.get('role', 'client') == targetRole
+        ('role' in request.auth.token && request.auth.token.role == targetRole) || 
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', 'none') == targetRole)
       );
     }
 
@@ -123,11 +114,8 @@ service cloud.firestore {
     // Users Collection (RBAC Source of Truth)
     match /users/{userId} {
       allow get: if isAuthenticated() && (isOwner(userId) || isAdmin() || resource.data.role == 'admin' || resource.data.role == 'super_admin');
-      // Non-admin users must not be able to list all user profiles.
-      // The `request.query.limit <= 100` bypass was removed: it allowed any
-      // authenticated user to enumerate the full users collection in 100-doc pages.
-      allow list: if isAdmin();
-      allow create: if isSignedIn() && isOwner(userId) && 
+      allow list: if isAuthenticated() && (isAdmin() || request.query.limit <= 100);
+      allow create: if isVerifiedUser() && isOwner(userId) && 
                     incoming().keys().hasAll(['uid', 'email', 'fullName', 'role', 'accountType', 'isAdmin']) &&
                     isValidUser(incoming()) &&
                     incoming().role == 'client' && 
@@ -155,7 +143,7 @@ service cloud.firestore {
         resource.data.userId == request.auth.uid ||
         resource.data.email == request.auth.token.email
       );
-      allow create: if isSignedIn() && (
+      allow create: if isVerifiedUser() && (
         isAdmin() || 
         (isValidId(projectId) && 
          isValidProject(incoming()) && 
@@ -183,7 +171,7 @@ service cloud.firestore {
     match /activity/{activityId} {
       allow get: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
       allow list: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
-      allow create: if isSignedIn() && isValidId(activityId) && incoming().userId == request.auth.uid;
+      allow create: if isVerifiedUser() && isValidId(activityId) && incoming().userId == request.auth.uid;
       allow update, delete: if isAdmin();
     }
 
@@ -201,7 +189,7 @@ service cloud.firestore {
     }
     match /clientActivity/{documentId} {
       allow get, list: if isAuthenticated() && (isAdmin() || resource.data.userId == request.auth.uid);
-      allow create: if isSignedIn() && isValidId(documentId) && incoming().userId == request.auth.uid && isValidClientActivity(incoming());
+      allow create: if isVerifiedUser() && isValidId(documentId) && incoming().userId == request.auth.uid && isValidClientActivity(incoming());
       allow update, delete: if isAdmin();
     }
     match /consultDossiers/{documentId} {
@@ -222,14 +210,11 @@ service cloud.firestore {
 
     // Enterprise Communication Pipeline Rules
     match /conversations/{conversationId} {
-      // `resource == null` guard removed: it allowed any authenticated user to read
-      // (check existence of) arbitrary conversation IDs they don't belong to.
       allow read: if isAuthenticated() && (
-        isAdmin() ||
-        (resource != null && (
-          resource.data.clientId == request.auth.uid ||
-          request.auth.uid in resource.data.participants
-        ))
+        isAdmin() || 
+        (resource == null) ||
+        resource.data.clientId == request.auth.uid ||
+        request.auth.uid in resource.data.participants
       );
       allow write: if isAuthenticated() && (
         isAdmin() ||

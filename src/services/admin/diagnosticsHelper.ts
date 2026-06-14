@@ -1,41 +1,58 @@
+import { auth } from "../../lib/firebase";
+
 export enum OperationType {
   CREATE = "create",
   UPDATE = "update",
   DELETE = "delete",
-  LIST   = "list",
-  GET    = "get",
-  WRITE  = "write",
+  LIST = "list",
+  GET = "get",
+  WRITE = "write",
 }
 
-/**
- * Standardised Firestore error handler.
- *
- * In production, logs only the operation context — never the requesting user's
- * PII (UID, email, provider data). The previous version logged a full
- * FirestoreErrorInfo object that included uid, email, emailVerified, tenantId,
- * and providerData on every Firestore error, violating GDPR Article 32.
- *
- * In development (import.meta.env.DEV), the full error is logged for
- * debugging convenience.
- */
+export interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId?: string | null;
+    email?: string | null;
+    emailVerified?: boolean | null;
+    isAnonymous?: boolean | null;
+    tenantId?: string | null;
+    providerInfo?: {
+      providerId?: string | null;
+      email?: string | null;
+    }[];
+  };
+}
+
 export function handleFirestoreError(
-  error:         unknown,
+  error: unknown,
   operationType: OperationType,
-  path:          string | null,
+  path: string | null
 ): never {
-  const message = error instanceof Error ? error.message : String(error);
-  const isPermissionError = message.includes("Missing or insufficient permissions");
+  const errMessage = error instanceof Error ? error.message : String(error);
+  const errInfo: FirestoreErrorInfo = {
+    error: errMessage,
+    authInfo: {
+      userId: auth?.currentUser?.uid || null,
+      email: auth?.currentUser?.email || null,
+      emailVerified: auth?.currentUser?.emailVerified || null,
+      isAnonymous: auth?.currentUser?.isAnonymous || null,
+      tenantId: auth?.currentUser?.tenantId || null,
+      providerInfo: auth?.currentUser?.providerData?.map((provider) => ({
+        providerId: provider.providerId,
+        email: provider.email,
+      })) || [],
+    },
+    operationType,
+    path,
+  };
+  const isExpectedPermissionError =
+    errMessage.includes("Missing or insufficient permissions");
 
-  if (!isPermissionError) {
-    if (import.meta.env.DEV) {
-      // Dev: full context — never reaches production users
-      console.error("[Firestore Error]", { operationType, path, message });
-    } else {
-      // Prod: operation context only, no PII
-      console.error(`[Firestore Error] ${operationType} on ${path ?? "unknown"}: ${message}`);
-    }
+  if (!isExpectedPermissionError) {
+    console.error("[Firestore Integrity Error]", JSON.stringify(errInfo));
   }
-
-  // Throw a clean message — do not embed PII in the error string
-  throw new Error(`Firestore ${operationType} failed${path ? ` on ${path}` : ""}: ${message}`);
+  throw new Error(JSON.stringify(errInfo));
 }

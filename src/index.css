@@ -28,6 +28,7 @@
 @layer base {
   html, body {
     -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
   }
 
   html {
