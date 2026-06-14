@@ -411,9 +411,9 @@ export function ClientMessenger({
             <button
               type="button"
               onClick={() => setShowAttachMock(!showAttachMock)}
-              className="w-9 h-9 rounded-full bg-white/[0.03] border border-white/[0.08] hover:bg-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all cursor-pointer shadow-sm"
+              className="w-10 h-10 md:w-9 md:h-9 rounded-full bg-white/[0.04] border border-white/[0.1] hover:bg-white/[0.1] flex items-center justify-center text-slate-400 hover:text-white transition-all cursor-pointer shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
             >
-              <Paperclip size={15} />
+              <Paperclip size={18} className="md:w-[15px] md:h-[15px]" />
             </button>
             <AnimatePresence>
               {showAttachMock && (
@@ -421,26 +421,30 @@ export function ClientMessenger({
                   initial={{ opacity: 0, y: 10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  className="absolute bottom-12 left-0 w-56 bg-[#1a2133] border border-white/[0.08] rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] p-2 space-y-0.5 z-30"
+                  className="absolute bottom-14 left-0 w-56 bg-[#1a2133] border border-white/[0.08] rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] p-2 space-y-0.5 z-30 backdrop-blur-xl"
                 >
-                  <p className="text-[10px] uppercase font-semibold text-slate-400 px-3 py-2 border-b border-white/5 mb-1.5">
-                    Project Assets
+                  <p className="text-[10.5px] uppercase font-bold text-slate-400/80 tracking-wider px-3 py-2 border-b border-white/5 mb-1.5 flex items-center gap-1.5">
+                    Assets
                   </p>
                   <button
                     type="button"
                     onClick={() => simulateAttachment("blueprint")}
-                    className="w-full text-left font-medium text-[12px] text-slate-200 hover:text-white hover:bg-white/5 py-2 px-3 rounded-lg transition-colors cursor-pointer flex items-center gap-2"
+                    className="w-full text-left font-medium text-[12.5px] text-slate-200 hover:text-white hover:bg-white/10 py-2.5 px-3 rounded-xl transition-colors cursor-pointer flex items-center gap-2.5"
                   >
-                    <Paperclip size={12} className="text-primary" /> Blueprint
-                    Document
+                    <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                       <Paperclip size={13} className="text-primary" />
+                    </div>
+                    Blueprint Document
                   </button>
                   <button
                     type="button"
                     onClick={() => simulateAttachment("audit")}
-                    className="w-full text-left font-medium text-[12px] text-slate-200 hover:text-white hover:bg-white/5 py-2 px-3 rounded-lg transition-colors cursor-pointer flex items-center gap-2"
+                    className="w-full text-left font-medium text-[12.5px] text-slate-200 hover:text-white hover:bg-white/10 py-2.5 px-3 rounded-xl transition-colors cursor-pointer flex items-center gap-2.5"
                   >
-                    <Paperclip size={12} className="text-primary" /> Deliverable
-                    Audit
+                     <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                       <Paperclip size={13} className="text-primary" />
+                    </div>
+                    Deliverable Audit
                   </button>
                 </motion.div>
               )}
@@ -455,19 +459,19 @@ export function ClientMessenger({
               placeholder={sending ? "Sending..." : "Message Dev Team..."}
               disabled={sending}
               rows={1}
-              className="w-full min-h-[44px] max-h-32 bg-white/[0.04] border border-white/[0.08] focus:border-primary/40 focus:ring-1 focus:ring-primary/20 rounded-2xl px-4 py-3 text-[14px] text-white placeholder-slate-400 font-light focus:outline-none resize-none transition-all scrollbar-none shadow-inner"
+              className="w-full min-h-[46px] max-h-32 bg-[#141a26]/80 backdrop-blur-md border border-white/[0.1] focus:border-primary/50 focus:ring-4 focus:ring-primary/10 rounded-2xl px-4 py-3.5 text-[14px] text-white placeholder-slate-400 font-light focus:outline-none resize-none transition-all scrollbar-none shadow-inner md:text-[13px] md:py-3"
             />
           </div>
 
           <button
             type="submit"
             disabled={sending || (!inputText.trim() && !mockAttachment)}
-            className="w-11 h-11 mb-0.5 rounded-full bg-primary hover:bg-primary-hover disabled:bg-primary/50 disabled:cursor-not-allowed text-white flex items-center justify-center shrink-0 shadow-[0_4px_14px_rgba(59,130,246,0.4)] hover:shadow-[0_6px_20px_rgba(59,130,246,0.6)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            className="w-11 h-11 md:mb-0.5 rounded-full bg-primary hover:bg-primary-hover disabled:bg-primary/50 disabled:cursor-not-allowed text-white flex items-center justify-center shrink-0 shadow-[0_4px_14px_rgba(59,130,246,0.4)] hover:shadow-[0_6px_20px_rgba(59,130,246,0.6)] hover:scale-105 active:scale-95 transition-all cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary/30"
           >
             {sending ? (
-              <Loader2 size={16} className="animate-spin" />
+              <Loader2 size={18} className="animate-spin" />
             ) : (
-              <Send size={16} className="ml-0.5" />
+              <Send size={18} className="ml-0.5" />
             )}
           </button>
         </div>
