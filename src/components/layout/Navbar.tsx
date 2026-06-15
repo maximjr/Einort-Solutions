@@ -277,7 +277,7 @@ export function Navbar() {
             <div className="w-12 h-1.5 bg-white/[0.15] rounded-full"></div>
           </div>
 
-          <div className="flex flex-col flex-1 overflow-y-auto px-6 pb-[max(3rem,env(safe-area-inset-bottom,3rem))] pt-2 scrollbar-none overscroll-contain z-10 relative">
+          <div className="flex flex-col flex-1 overflow-y-auto px-6 pb-[max(3rem,env(safe-area-inset-bottom,3rem))] pt-2 scrollbar-none overscroll-contain z-10 relative" data-lenis-prevent="true">
             {user ? (
               <>
                 {/* TOP: Profile Section */}

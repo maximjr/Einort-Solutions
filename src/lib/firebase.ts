@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { getAuth, Auth } from "firebase/auth";
-import { getFirestore, Firestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore, Firestore, setLogLevel } from "firebase/firestore";
 import { getAnalytics, Analytics, isSupported } from "firebase/analytics";
 
 const firebaseConfig = {
@@ -20,9 +20,18 @@ let analytics: Analytics | null = null;
 const isFirebaseConfigured = true;
 
 try {
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  auth = getAuth(app);
-  db = getFirestore(app);
+  // Set Firestore log level to silent to prevent internal network errors from being intercepted as critical app errors
+  setLogLevel('silent');
+
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+  } else {
+    app = getApp();
+    auth = getAuth(app);
+    db = getFirestore(app);
+  }
   
   isSupported().then(yes => {
     if (yes && app) {

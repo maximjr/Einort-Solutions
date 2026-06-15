@@ -12,7 +12,8 @@ import {
   Archive,
   CheckCircle2,
   FolderLock,
-  Globe
+  Globe,
+  ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { messageService, Conversation, Message } from "../../services/admin/messageService";
@@ -56,6 +57,14 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
   const [showAttachMock, setShowAttachMock] = useState(false);
 
   const messageEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const isInitialScrollRef = useRef(true);
+
+  // Reset scroll behavior on client change
+  useEffect(() => {
+    isInitialScrollRef.current = true;
+    prevMessagesLengthRef.current = 0;
+  }, [selectedClientId]);
 
   // 1. Register Admin Presence on mount
   useEffect(() => {
@@ -150,9 +159,42 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
   }, [conversations, selectedClientId, currentAdminId]);
 
   // 5. Scroll to bottom of message panel
-  useEffect(() => {
+  const prevMessagesLengthRef = useRef(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isNearBottom, setIsNearBottom] = useState(true);
+
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+    const isAtBottom = scrollHeight - scrollTop - clientHeight < 150;
+    setIsNearBottom(isAtBottom);
+  };
+
+  const scrollToBottom = () => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loadingMessages]);
+  };
+
+  useEffect(() => {
+    if (messageEndRef.current) {
+      if (isInitialScrollRef.current) {
+         messageEndRef.current.scrollIntoView({ behavior: "auto" });
+         if (!loadingMessages) {
+            isInitialScrollRef.current = false;
+         }
+      } else if (messages.length > prevMessagesLengthRef.current) {
+         if (isNearBottom) {
+           messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+         }
+      }
+    }
+    prevMessagesLengthRef.current = messages.length;
+  }, [messages, loadingMessages, isNearBottom]);
+
+  useEffect(() => {
+    if (inputText === '' && inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
+  }, [inputText]);
 
   // 6. Send payload
   const handleSendMessage = async (e?: React.FormEvent) => {
@@ -177,6 +219,12 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
         attachments.length > 0 ? "file" : "text",
         attachments
       );
+      
+      scrollToBottom();
+      
+      if (window.innerWidth > 768) {
+         inputRef.current?.focus();
+      }
     } catch (err) {
       console.error("Administrative send action blocked:", err);
     } finally {
@@ -231,7 +279,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
           <p className="text-[11px] text-slate-500 font-light mt-1 w-full truncate">Select a client to manage communications</p>
         </div>
 
-        <div className="flex-1 overflow-y-auto w-full scrollbar-none pb-4">
+        <div className="flex-1 overflow-y-auto w-full scrollbar-premium pb-4" data-lenis-prevent="true">
           {clients.length === 0 ? (
             <div className="p-8 text-center text-slate-500 text-[13px] font-light">
               No registered clients.
@@ -362,8 +410,14 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
             </div>
 
             {/* Timeline Stream Scroll */}
-            <div className="flex-1 overflow-y-auto px-5 py-6 bg-gradient-to-b from-transparent to-black/10">
-              {loadingMessages ? (
+            <div className="relative flex-1 flex flex-col overflow-hidden">
+              <div 
+                ref={scrollContainerRef}
+                onScroll={handleScroll}
+                data-lenis-prevent="true"
+                className="flex-1 overflow-y-auto px-5 py-6 bg-gradient-to-b from-transparent to-black/10 scrollbar-premium"
+              >
+                {loadingMessages ? (
                 <div className="h-full flex flex-col items-center justify-center gap-4 py-12 text-slate-400">
                   <Loader2 className="w-5 h-5 text-primary animate-spin" />
                   <p className="text-[11px] font-medium tracking-wide">Retrieving channel history...</p>
@@ -444,6 +498,22 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                   <div ref={messageEndRef} className="h-2" />
                 </div>
               )}
+              
+              <AnimatePresence>
+                {!isNearBottom && (
+                  <motion.button
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.15 } }}
+                    onClick={scrollToBottom}
+                    className="absolute bottom-4 right-6 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white shadow-lg flex items-center justify-center backdrop-blur transition-all border border-white/10 z-[100]"
+                    aria-label="Scroll to bottom"
+                  >
+                    <ChevronDown size={20} />
+                  </motion.button>
+                )}
+              </AnimatePresence>
+            </div>
             </div>
 
             {/* Admin reply composer */}
@@ -494,13 +564,18 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
 
                 <div className="w-full sm:flex-1 relative">
                   <textarea
+                    ref={inputRef}
                     value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
+                    onChange={(e) => {
+                      setInputText(e.target.value);
+                      e.target.style.height = "auto";
+                      e.target.style.height = e.target.scrollHeight + "px";
+                    }}
                     onKeyDown={handleKeyPress}
                     placeholder={`Reply to ${activeSelectedClient.fullName || activeSelectedClient.displayName || activeSelectedClient.name || "Client User"}...`}
                     disabled={sending}
                     rows={1}
-                    className="w-full min-h-[44px] max-h-32 bg-white/[0.04] border border-white/[0.08] focus:border-white/20 focus:ring-1 focus:ring-white/10 rounded-2xl px-4 py-3 text-[14px] text-white placeholder-slate-400 font-light focus:outline-none resize-none transition-all scrollbar-none shadow-inner"
+                    className="w-full min-h-[44px] max-h-32 bg-white/[0.04] border border-white/[0.08] focus:border-white/20 focus:ring-1 focus:ring-white/10 rounded-2xl px-4 py-[13.5px] text-[14px] text-white placeholder-slate-400 font-light focus:outline-none resize-none transition-all scrollbar-premium shadow-inner"
                   />
                 </div>
 

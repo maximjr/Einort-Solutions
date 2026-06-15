@@ -9,7 +9,8 @@ import {
   Activity,
   ChevronLeft,
   Circle,
-  MoreVertical
+  MoreVertical,
+  ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -154,12 +155,45 @@ export function ClientMessenger({
     }
   }, [conversations, conversationId]);
 
+  const isInitialScrollRef = useRef(true);
+  const prevMessagesLengthRef = useRef(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isNearBottom, setIsNearBottom] = useState(true);
+
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+    const isAtBottom = scrollHeight - scrollTop - clientHeight < 150;
+    setIsNearBottom(isAtBottom);
+  };
+
+  const scrollToBottom = () => {
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   useEffect(() => {
-    // Smooth, unforced scrolling to bottom
+    // Premium optimized scrolling: snap to bottom on load, smooth only on new messages
     if (messageEndRef.current) {
-      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+      if (isInitialScrollRef.current) {
+         messageEndRef.current.scrollIntoView({ behavior: "auto" });
+         if (!loading) {
+            isInitialScrollRef.current = false;
+         }
+      } else if (messages.length > prevMessagesLengthRef.current) {
+        // Only auto-scroll if user is already near bottom (or if it's the current user sending a message - but we can just rely on near bottom)
+        if (isNearBottom) {
+          messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+      }
     }
-  }, [messages, loading]);
+    prevMessagesLengthRef.current = messages.length;
+  }, [messages, loading, isNearBottom]);
+
+  useEffect(() => {
+    if (inputText === '' && inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
+  }, [inputText]);
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -185,6 +219,8 @@ export function ClientMessenger({
         attachments.length > 0 ? "file" : "text",
         attachments,
       );
+      
+      scrollToBottom();
       
       // Auto-focus input after send (desktop mainly, skip on mobile to prevent keyboard bounce)
       if (window.innerWidth > 768) {
@@ -280,8 +316,14 @@ export function ClientMessenger({
       )}
 
       {/* Message Timeline */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6 md:space-y-8 bg-black/[0.02] dark:bg-black/20 overscroll-contain">
-        {loading ? (
+      <div className="relative flex-1 flex flex-col overflow-hidden">
+        <div 
+          ref={scrollContainerRef}
+          onScroll={handleScroll}
+          data-lenis-prevent="true"
+          className="flex-1 overflow-y-auto px-4 py-6 space-y-6 md:space-y-8 bg-black/[0.02] dark:bg-black/20 scrollbar-premium"
+        >
+          {loading ? (
           <div className="h-full flex flex-col items-center justify-center gap-6">
             <div className="relative flex items-center justify-center">
               <div className="absolute w-20 h-20 bg-primary/10 rounded-full blur-[30px] animate-pulse"></div>
@@ -394,6 +436,22 @@ export function ClientMessenger({
             <div ref={messageEndRef} className="h-4" />
           </div>
         )}
+        
+        <AnimatePresence>
+          {!isNearBottom && (
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.15 } }}
+              onClick={scrollToBottom}
+              className="absolute bottom-4 right-6 w-10 h-10 rounded-full bg-black/80 dark:bg-white/80 hover:bg-black dark:hover:bg-white text-white dark:text-black shadow-lg flex items-center justify-center backdrop-blur transition-all border border-black/10 dark:border-white/10 z-[100]"
+              aria-label="Scroll to bottom"
+            >
+              <ChevronDown size={20} />
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </div>
       </div>
 
       {/* Message input panel */}
@@ -470,12 +528,16 @@ export function ClientMessenger({
             <textarea
               ref={inputRef}
               value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
+              onChange={(e) => {
+                setInputText(e.target.value);
+                e.target.style.height = "auto";
+                e.target.style.height = e.target.scrollHeight + "px";
+              }}
               onKeyDown={handleKeyPress}
               placeholder={sending ? "Sending..." : "Message Support..."}
               disabled={sending}
               rows={1}
-              className="w-full min-h-[42px] md:min-h-[46px] max-h-32 bg-slate-100/80 dark:bg-[#141a26]/80 backdrop-blur-md border border-transparent focus:border-black/10 dark:focus:border-primary/30 rounded-[24px] px-4 py-2.5 md:py-3 text-[15px] md:text-[14px] text-slate-900 dark:text-white placeholder-slate-500 font-normal focus:outline-none resize-none transition-colors scrollbar-none disabled:opacity-50"
+              className="w-full min-h-[42px] md:min-h-[46px] max-h-32 bg-slate-100/80 dark:bg-[#141a26]/80 backdrop-blur-md border border-transparent focus:border-black/10 dark:focus:border-primary/30 rounded-[24px] px-4 py-2.5 md:py-[13px] text-[15px] md:text-[14px] text-slate-900 dark:text-white placeholder-slate-500 font-normal focus:outline-none resize-none transition-colors scrollbar-premium disabled:opacity-50"
               style={{
                 // Prevent iOS zoom on focus
                 fontSize: '16px' 

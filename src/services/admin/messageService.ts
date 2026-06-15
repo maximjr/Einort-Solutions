@@ -188,7 +188,7 @@ export const messageService = {
 
     const q = query(
       collection(db, "conversations", conversationId, "messages"),
-      orderBy("timestamp", "asc"),
+      orderBy("timestamp", "desc"),
       limit(200)
     );
 
@@ -200,7 +200,7 @@ export const messageService = {
             id: doc.id,
             ...doc.data(),
           })) as Message[];
-          onUpdate(data);
+          onUpdate(data.reverse());
         } catch (e) {
           console.error("Safely caught messages snapshot processing error", e);
         }

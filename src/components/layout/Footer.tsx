@@ -6,7 +6,7 @@ export function Footer() {
   return (
     <footer className="bg-background pt-24 pb-12 border-t border-white/5 relative z-10">
       <Container>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-12 lg:gap-8 border-b border-white/5 pb-20 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-8 border-b border-white/5 pb-20 mb-12">
           <div className="md:col-span-1 border-r border-white/5 pr-8">
             <Link to="/" className="flex items-center gap-3 group mb-8">
               <Logo className="w-10 h-10 group-hover:drop-shadow-[0_0_15px_rgba(59,130,246,0.6)] transition-all duration-500" />
@@ -33,82 +33,34 @@ export function Footer() {
             <ul className="space-y-4 text-sm text-text-muted font-light">
               <li>
                 <Link
-                  to="/services/enterprise-web"
+                  to="/#services"
                   className="hover:text-primary transition-colors"
                 >
-                  Enterprise Web Apps
+                  Websites & Web Apps
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/services/custom-software"
+                  to="/#services"
                   className="hover:text-primary transition-colors"
                 >
-                  Custom Software
+                  UI/UX Design
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/services/saas"
+                  to="/#services"
                   className="hover:text-primary transition-colors"
                 >
-                  SaaS Architecture
+                  ERP Solutions
                 </Link>
               </li>
               <li>
                 <Link
-                  to="/services/crm-erp"
+                  to="/#services"
                   className="hover:text-primary transition-colors"
                 >
-                  CRM & ERP Systems
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/services/ai-automation"
-                  className="hover:text-primary transition-colors"
-                >
-                  AI Automation
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-white mb-6">
-              Locations
-            </h4>
-            <ul className="space-y-4 text-sm text-text-muted font-light">
-              <li>
-                <Link
-                  to="/locations/usa"
-                  className="hover:text-primary transition-colors"
-                >
-                  United States
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/locations/canada"
-                  className="hover:text-primary transition-colors"
-                >
-                  Canada
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/locations/europe"
-                  className="hover:text-primary transition-colors"
-                >
-                  Europe
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/locations/united-kingdom"
-                  className="hover:text-primary transition-colors"
-                >
-                  United Kingdom
+                  Mobile App Development
                 </Link>
               </li>
             </ul>

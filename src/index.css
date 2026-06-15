@@ -79,6 +79,29 @@
   .pulse-glow {
     animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
+
+  .scrollbar-premium::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  .scrollbar-premium::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-premium::-webkit-scrollbar-thumb {
+    background-color: rgba(150, 150, 150, 0.3);
+    border-radius: 10px;
+  }
+  .scrollbar-premium:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(150, 150, 150, 0.5);
+  }
+  @media (prefers-color-scheme: dark) {
+    .scrollbar-premium::-webkit-scrollbar-thumb {
+      background-color: rgba(200, 200, 200, 0.2);
+    }
+    .scrollbar-premium:hover::-webkit-scrollbar-thumb {
+      background-color: rgba(200, 200, 200, 0.4);
+    }
+  }
 }
 
 @keyframes pulse-glow {

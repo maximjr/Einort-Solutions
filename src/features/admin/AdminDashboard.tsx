@@ -902,7 +902,7 @@ export function AdminDashboard() {
                   </div>
 
                   {/* Desktop Table View */}
-                  <div className="hidden lg:block overflow-x-auto">
+                  <div className="hidden lg:block overflow-x-auto" data-lenis-prevent="true">
                     <table className="w-full text-sm text-left whitespace-nowrap">
                       <thead className="bg-white/[0.01] text-[10px] uppercase tracking-widest text-slate-500 border-b border-white/[0.05]">
                         <tr>
@@ -1293,7 +1293,7 @@ export function AdminDashboard() {
                     })}
                   </div>
 
-                  <div className="hidden lg:block overflow-x-auto">
+                  <div className="hidden lg:block overflow-x-auto" data-lenis-prevent="true">
                     <table className="w-full text-sm text-left whitespace-nowrap">
                     <thead className="bg-white/[0.01] text-[10px] uppercase tracking-widest text-slate-500 border-b border-white/[0.05]">
                       <tr>

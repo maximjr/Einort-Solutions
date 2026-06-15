@@ -49,8 +49,8 @@ const projectTypes = [
 ];
 
 const budgetRanges = [
-  { id: "10k-25k", label: "$10k - $25k" },
-  { id: "25k-50k", label: "$25k - $50k" },
+  { id: "5k-20k", label: "$5k - $20k" },
+  { id: "20k-50k", label: "$20k - $50k" },
   { id: "50k-100k", label: "$50k - $100k" },
   { id: "100k+", label: "$100k+" },
 ];
