@@ -25,6 +25,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
+import { Helmet } from "react-helmet-async";
 
 const getDetailedStatusPill = (status: string) => {
   const currentStatus = (status || "pending").toLowerCase();
@@ -189,6 +190,10 @@ export function ClientPortal() {
       // Simulate network wait for real-time Firebase sync assurance
       await new Promise(resolve => setTimeout(resolve, 800));
     }}>
+      <Helmet>
+        <title>Client Portal | Einort Solutions</title>
+        <meta name="description" content="Manage your ongoing projects, billing, and consultations." />
+      </Helmet>
       <section className="py-24 bg-[#030712] min-h-screen relative pt-32 overflow-hidden">
         {/* Premium Background Ambience */}
         <div className="absolute top-0 left-1/2 w-[800px] h-[600px] bg-primary/5 blur-[150px] pointer-events-none rounded-full -translate-x-1/2 -translate-y-1/2"></div>

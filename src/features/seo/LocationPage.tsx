@@ -3,6 +3,7 @@ import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
+import { Helmet } from "react-helmet-async";
 import { SEO } from "../../components/seo/SEO";
 import { Globe, ArrowRight, ShieldCheck, Zap } from "lucide-react";
 
@@ -29,6 +30,10 @@ export function LocationPage() {
 
   return (
     <>
+      <Helmet>
+        <title>Enterprise Web Development in {formattedRegion} | Einort Solutions</title>
+        <meta name="description" content={`Einort Solutions delivers world-class custom software development and enterprise AI automation to businesses in ${formattedRegion}.`} />
+      </Helmet>
       <SEO schema={schema} />
       <section className="pt-32 pb-24 bg-surface min-h-[80dvh] relative overflow-hidden">
         {/* Ambient background */}

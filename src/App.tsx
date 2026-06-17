@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
-import { HelmetProvider } from "react-helmet-async";
+import { HelmetProvider, Helmet } from "react-helmet-async";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
@@ -66,6 +66,10 @@ const GlobalFloatingMessenger = Loadable(
 function HomePage() {
   return (
     <>
+      <Helmet>
+        <title>Einort Solutions | Elite Custom Software & Enterprise Web Architecture</title>
+        <meta name="description" content="Einort Solutions provides world-class enterprise software architecture, full-stack systems engineering, and scalable cloud infrastructure for modern businesses globally." />
+      </Helmet>
       <Hero />
       <Suspense fallback={<div className="h-32"></div>}>
         <Services />

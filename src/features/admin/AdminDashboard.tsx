@@ -9,6 +9,7 @@ import { FadeUp } from "../../components/animations/FadeUp";
 import React, { useEffect, useState, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
+import { Helmet } from "react-helmet-async";
 import { ProjectStatus } from "../../types";
 import {
   Users,
@@ -269,6 +270,10 @@ export function AdminDashboard() {
       // Simulate network wait for real-time Firebase sync assurance
       await new Promise(resolve => setTimeout(resolve, 800));
     }}>
+      <Helmet>
+        <title>Admin Intelligence | Einort Solutions</title>
+        <meta name="description" content="Enterprise command center and project pipeline." />
+      </Helmet>
       <section className="py-24 bg-surface min-h-[80dvh] relative pt-32">
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[150px] pointer-events-none rounded-full translate-x-1/2 -translate-y-1/2"></div>
 

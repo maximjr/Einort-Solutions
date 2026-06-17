@@ -23,7 +23,7 @@ export const SEO_CONFIG = {
     "@type": "Organization",
     name: "Einort Solutions",
     url: "https://einort.com",
-    logo: "https://einort.com/icon.svg",
+    logo: "https://einort.com/icon.png",
     description:
       "Premium software engineering, custom CRM & ERP solutions, and full-stack enterprise web development.",
     sameAs: [

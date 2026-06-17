@@ -5,6 +5,7 @@ import { FadeUp } from "../../components/animations/FadeUp";
 import { Card } from "../../components/ui/Card";
 import { Layers, Zap, Shield, ArrowRight } from "lucide-react";
 import { Button } from "../../components/ui/Button";
+import { Helmet } from "react-helmet-async";
 import { SEO } from "../../components/seo/SEO";
 import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
 
@@ -130,9 +131,11 @@ export function ServicesPage() {
 
   return (
     <>
+      <Helmet>
+        <title>{service.title} | EINORT Solutions</title>
+        <meta name="description" content={service.description} />
+      </Helmet>
       <SEO
-        title={`${service.title} | EINORT Solutions`}
-        description={service.description}
         schema={jsonLdSchema}
       />
       <section className="pt-32 pb-24 bg-surface min-h-[80dvh] relative overflow-hidden">

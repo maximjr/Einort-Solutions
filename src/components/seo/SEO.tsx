@@ -85,6 +85,39 @@ export function SEO({
   const metaDescription = description || routeConfig.description;
   const url = canonical || `https://einort.com${location.pathname}`;
 
+  const breadcrumbs = useMemo(() => {
+    const paths = location.pathname.split("/").filter(Boolean);
+    const itemListElement = [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://einort.com/",
+      },
+    ];
+
+    let currentPath = "";
+    paths.forEach((path, index) => {
+      currentPath += `/${path}`;
+      const name = path
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+
+      itemListElement.push({
+        "@type": "ListItem",
+        "position": index + 2,
+        "name": name,
+        "item": `https://einort.com${currentPath}`,
+      });
+    });
+
+    return {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: itemListElement,
+    };
+  }, [location.pathname]);
+
   const defaultSchema = JSON.stringify([
     SEO_CONFIG.organizationSchema,
     {
@@ -94,6 +127,7 @@ export function SEO({
       description: metaDescription,
       url: url,
     },
+    breadcrumbs,
   ]);
 
   return (

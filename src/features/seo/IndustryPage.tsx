@@ -3,6 +3,7 @@ import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
+import { Helmet } from "react-helmet-async";
 import { SEO } from "../../components/seo/SEO";
 import { Building2, ArrowRight, Cog, LayoutGrid } from "lucide-react";
 
@@ -25,6 +26,10 @@ export function IndustryPage() {
 
   return (
     <>
+      <Helmet>
+        <title>{formattedIndustry} Web Development & Custom Software | Einort Solutions</title>
+        <meta name="description" content={`Specialized cutting-edge web design and enterprise software solutions for the ${formattedIndustry} sector by Einort Solutions.`} />
+      </Helmet>
       <SEO schema={schema} />
       <section className="pt-32 pb-24 bg-surface min-h-[80dvh] relative overflow-hidden">
         {/* Ambient background */}
