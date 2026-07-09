@@ -3,8 +3,9 @@ import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { ChevronDown } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { SEO } from "../../components/seo/SEO";
 
-const faqs = [
+export const faqs = [
   {
     question: "What is your typical project timeline?",
     answer:
@@ -40,8 +41,22 @@ export function FAQ() {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  const faqSchema = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map(faq => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer
+      }
+    }))
+  });
+
   return (
     <section className="py-24 bg-background z-10 relative border-t border-white/5">
+      <SEO schema={faqSchema} />
       <Container>
         <div className="max-w-4xl mx-auto">
           <FadeUp>

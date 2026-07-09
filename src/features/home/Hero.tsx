@@ -90,17 +90,10 @@ export function Hero() {
               Initiate Project Dev
             </Button>
             <Button
-              variant="outline"
-              size="lg"
-              onClick={() => {
-                const el = document.getElementById("case-studies");
-                if (el) {
-                  el.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
-              className="w-full sm:w-auto uppercase tracking-[0.2em] text-[11px] px-12 h-14 font-bold backdrop-blur-md"
+              onClick={() => window.open("https://wa.me/message/52SRSBT3VZXQB1", "_blank")}
+              className="w-full sm:w-auto uppercase tracking-[0.2em] text-[11px] px-12 h-14 font-bold bg-[#00e676]/10 text-[#00e676] border border-[#00e676]/20 hover:bg-[#00e676]/20 hover:border-[#00e676]/50 transition-colors backdrop-blur-md"
             >
-              View Our Work
+              Chat Via WhatsApp
             </Button>
           </div>
         </motion.div>

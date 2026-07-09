@@ -32,6 +32,7 @@ const navLinks = [
   { name: "Architecture", href: "/#architecture" },
   { name: "Why Us", href: "/#why-us" },
   { name: "Testimonials", href: "/#testimonials" },
+  { name: "Contact", href: "/contact" },
 ];
 
 export function Navbar() {

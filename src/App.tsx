@@ -37,6 +37,9 @@ const CaseStudies = Loadable(
 const ContactForm = Loadable(
   lazy(() => import("./features/home/ContactForm").then((m) => ({ default: m.ContactForm }))),
 );
+const ContactPage = Loadable(
+  lazy(() => import("./features/contact/ContactPage").then((m) => ({ default: m.ContactPage }))),
+);
 const AdminDashboard = Loadable(
   lazy(() => import("./features/admin/AdminDashboard").then((m) => ({ default: m.AdminDashboard }))),
 );
@@ -66,10 +69,6 @@ const GlobalFloatingMessenger = Loadable(
 function HomePage() {
   return (
     <>
-      <Helmet>
-        <title>Einort Solutions | Elite Custom Software & Enterprise Web Architecture</title>
-        <meta name="description" content="Einort Solutions provides world-class enterprise software architecture, full-stack systems engineering, and scalable cloud infrastructure for modern businesses globally." />
-      </Helmet>
       <Hero />
       <Suspense fallback={<div className="h-32"></div>}>
         <Services />
@@ -256,6 +255,20 @@ export default function App() {
                       }
                     >
                       <HomePage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="contact"
+                  element={
+                    <Suspense
+                      fallback={
+                        <div className="min-h-screen bg-background flex items-center justify-center">
+                          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      }
+                    >
+                      <ContactPage />
                     </Suspense>
                   }
                 />

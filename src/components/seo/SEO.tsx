@@ -118,8 +118,10 @@ export function SEO({
     };
   }, [location.pathname]);
 
-  const defaultSchema = JSON.stringify([
+  const defaultSchemaArray = useMemo(() => [
     SEO_CONFIG.organizationSchema,
+    SEO_CONFIG.localBusinessSchema,
+    SEO_CONFIG.websiteSchema,
     {
       "@context": "https://schema.org",
       "@type": "WebPage",
@@ -128,7 +130,22 @@ export function SEO({
       url: url,
     },
     breadcrumbs,
-  ]);
+  ], [metaTitle, metaDescription, url, breadcrumbs]);
+
+  const finalSchema = useMemo(() => {
+    if (schema) {
+      try {
+        const parsedSchema = JSON.parse(schema);
+        if (Array.isArray(parsedSchema)) {
+          return JSON.stringify([...defaultSchemaArray, ...parsedSchema]);
+        }
+        return JSON.stringify([...defaultSchemaArray, parsedSchema]);
+      } catch (e) {
+        return JSON.stringify(defaultSchemaArray);
+      }
+    }
+    return JSON.stringify(defaultSchemaArray);
+  }, [schema, defaultSchemaArray]);
 
   return (
     <Helmet>
@@ -156,7 +173,7 @@ export function SEO({
       <link rel="alternate" hrefLang="en-GB" href={url} />
 
       {/* JSON-LD Schema */}
-      <script type="application/ld+json">{schema || defaultSchema}</script>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: finalSchema }} />
     </Helmet>
   );
 }

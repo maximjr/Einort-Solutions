@@ -55,4 +55,52 @@ export const SEO_CONFIG = {
       "UI/UX",
     ],
   },
+  localBusinessSchema: {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    name: "Einort Solutions",
+    image: "https://einort.com/icon.png",
+    "@id": "https://einort.com",
+    url: "https://einort.com",
+    telephone: "+237686661578",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "Douala",
+      addressLocality: "Douala",
+      addressRegion: "Littoral Region",
+      addressCountry: "CM"
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: 4.0511,
+      longitude: 9.7085
+    },
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      opens: "09:00",
+      closes: "18:00"
+    },
+    sameAs: [
+      "https://twitter.com/einortsolutions",
+      "https://linkedin.com/company/einortsolutions"
+    ]
+  },
+  websiteSchema: {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Einort Solutions",
+    url: "https://einort.com/",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "{search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  },
 };
