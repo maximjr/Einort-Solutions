@@ -2,6 +2,7 @@ import React from "react";
 import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Card,
   CardContent,
@@ -70,6 +71,9 @@ const services = [
 ];
 
 export function Services() {
+  const { i18n } = useTranslation();
+  const langPrefix = `/${i18n.resolvedLanguage || 'en'}`;
+
   return (
     <section
       id="services"
@@ -98,7 +102,7 @@ export function Services() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {services.map((service, index) => (
             <FadeUp key={index} delay={0.1 * index}>
-              <Link to={`/services/${service.id}`} className="block h-full cursor-pointer">
+              <Link to={`${langPrefix}/services/${service.id}`} className="block h-full cursor-pointer">
                 <Card className="h-full bg-background/50 border-white/5 hover:border-white/10 hover:bg-background/80 transition-all duration-500 group">
                   <CardHeader className="pb-4">
                     <div className="w-14 h-14 rounded-2xl bg-surface/50 border border-white/5 flex items-center justify-center mb-6 group-hover:scale-[1.05] group-hover:border-primary/30 group-hover:bg-primary/5 transition-all duration-500 shadow-xl relative overflow-hidden">

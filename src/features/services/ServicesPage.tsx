@@ -3,9 +3,9 @@ import { useState, useEffect } from "react";
 import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Card } from "../../components/ui/Card";
-import { ArrowRight, Code2, LayoutTemplate, Database, Smartphone, PenTool, Share2, Target, Search, ShieldCheck } from "lucide-react";
+import { Code2, LayoutTemplate, Database, Smartphone, PenTool, Share2, Target, Search, ShieldCheck } from "lucide-react";
 import { Button } from "../../components/ui/Button";
-import { Helmet } from "react-helmet-async";
+
 import { SEO } from "../../components/seo/SEO";
 import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
 
@@ -303,14 +303,10 @@ export function ServicesPage() {
                   <div className="mt-8 pt-8 border-t border-white/5">
                      <p className="text-sm text-text-muted mb-4 font-light">Ready to elevate your enterprise?</p>
                      <Button
-                        onClick={() =>
-                          document
-                            .getElementById("contact")
-                            ?.scrollIntoView({ behavior: "smooth" })
-                        }
-                        className="w-full flex items-center justify-center gap-2 uppercase font-bold tracking-[0.15em] text-[11px] h-12"
+                        onClick={() => window.open("https://wa.me/message/52SRSBT3VZXQB1", "_blank")}
+                        className="w-full flex items-center justify-center gap-2 uppercase font-bold tracking-[0.15em] text-[11px] h-12 bg-[#00e676]/10 text-[#00e676] border border-[#00e676]/20 hover:bg-[#00e676]/20 hover:border-[#00e676]/50 transition-colors"
                       >
-                        Request a Consultation
+                        Chat Via WhatsApp
                       </Button>
                   </div>
                 </Card>

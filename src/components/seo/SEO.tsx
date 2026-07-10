@@ -2,6 +2,7 @@ import { useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { SEO_CONFIG } from "../../constants/seo";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 interface SEOProps {
   title?: string;
@@ -81,9 +82,17 @@ export function SEO({
     }
   }, [location.pathname]);
 
+  const { i18n } = useTranslation();
+  const currentLang = i18n.resolvedLanguage || lang;
+  
+  const basePath = location.pathname.replace(/^\/fr/, '');
+  const urlEn = `https://einort.com${basePath === '' ? '/' : basePath}`;
+  const urlFr = `https://einort.com/fr${basePath === '' ? '' : basePath}`;
+  
+  const url = canonical || (currentLang === 'fr' ? urlFr : urlEn);
+  
   const metaTitle = title || routeConfig.title;
   const metaDescription = description || routeConfig.description;
-  const url = canonical || `https://einort.com${location.pathname}`;
 
   const breadcrumbs = useMemo(() => {
     const paths = location.pathname.split("/").filter(Boolean);
@@ -149,7 +158,7 @@ export function SEO({
 
   return (
     <Helmet>
-      <html lang={lang} />
+      <html lang={currentLang} />
       <title>{metaTitle}</title>
       <meta name="description" content={metaDescription} />
 
@@ -167,10 +176,9 @@ export function SEO({
 
       {/* Canonical and Multilingual SEO */}
       <link rel="canonical" href={url} />
-      <link rel="alternate" hrefLang="x-default" href={url} />
-      <link rel="alternate" hrefLang="en-US" href={url} />
-      <link rel="alternate" hrefLang="en-CA" href={url} />
-      <link rel="alternate" hrefLang="en-GB" href={url} />
+      <link rel="alternate" hrefLang="x-default" href={urlEn} />
+      <link rel="alternate" hrefLang="en" href={urlEn} />
+      <link rel="alternate" hrefLang="fr" href={urlFr} />
 
       {/* JSON-LD Schema */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: finalSchema }} />

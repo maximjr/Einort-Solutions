@@ -3,19 +3,15 @@ import {
   Send,
   Loader2,
   X,
-  Check,
-  CheckCheck,
   Paperclip,
   Activity,
   ChevronLeft,
-  Circle,
   MoreVertical,
   ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   messageService,
-  Conversation,
   Message,
 } from "../../services/admin/messageService";
 import { useMessaging } from "../../hooks/useMessaging";
@@ -27,23 +23,7 @@ interface ClientMessengerProps {
   onClose?: () => void;
 }
 
-function safelyFormatTime(timestamp: any): string {
-  try {
-    if (!timestamp) return "Now";
-    if (typeof timestamp.toDate === "function") {
-      return timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-    if (timestamp instanceof Date) {
-      return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-    if (typeof timestamp === 'number') {
-      return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-  } catch (err) {
-    console.debug("Failed parsing timestamp:", err);
-  }
-  return "Sent";
-}
+
 
 export function ClientMessenger({
   userId,
@@ -52,8 +32,7 @@ export function ClientMessenger({
   onClose,
 }: ClientMessengerProps) {
   const { conversations } = useMessaging();
-  const [conversation, setConversation] = useState<Conversation | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [adminIdResolved, setAdminIdResolved] = useState<string>("super_admin");
   const [inputText, setInputText] = useState("");
@@ -150,7 +129,6 @@ export function ClientMessenger({
     if (conversationId && conversations) {
       const found = conversations.find((c) => c.id === conversationId);
       if (found) {
-        setConversation(found);
       }
     }
   }, [conversations, conversationId]);

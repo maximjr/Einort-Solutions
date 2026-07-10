@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
-import { HelmetProvider, Helmet } from "react-helmet-async";
+import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
@@ -234,6 +234,27 @@ function Layout() {
 
 import { AuthProvider } from "./contexts/AuthContext";
 import { ErrorBoundary } from "./components/shared/ErrorBoundary";
+import { useParams, Navigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
+function LangWrapper() {
+  const { lang } = useParams();
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    if (lang && ['en', 'fr'].includes(lang)) {
+      if (i18n.resolvedLanguage !== lang) {
+        i18n.changeLanguage(lang);
+      }
+    }
+  }, [lang, i18n]);
+
+  if (lang && !['en', 'fr'].includes(lang)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Layout />;
+}
 
 export default function App() {
   return (
@@ -243,7 +264,7 @@ export default function App() {
           <SEO />
           <ErrorBoundary>
             <Routes>
-              <Route path="/" element={<Layout />}>
+              <Route path="/:lang" element={<LangWrapper />}>
                 <Route
                   index
                   element={
@@ -361,10 +382,28 @@ export default function App() {
                   />
                 </Route>
               </Route>
+
+              {/* Redirect any routes without lang prefix to preferred language */}
+              <Route path="*" element={<RootRedirect />} />
             </Routes>
           </ErrorBoundary>
         </BrowserRouter>
       </AuthProvider>
     </HelmetProvider>
   );
+}
+
+function RootRedirect() {
+  const { i18n } = useTranslation();
+  const lang = i18n.resolvedLanguage || 'en';
+  const location = useLocation();
+  const { pathname, search, hash } = location;
+  
+  // Prevent infinite loops if pathname already has a valid lang prefix but wasn't matched
+  if (pathname.startsWith('/en/') || pathname === '/en' || pathname.startsWith('/fr/') || pathname === '/fr') {
+     return <Navigate to={`/${lang}`} replace />;
+  }
+
+  const newPath = pathname === '/' ? `/${lang}` : `/${lang}${pathname}`;
+  return <Navigate to={`${newPath}${search}${hash}`} replace />;
 }

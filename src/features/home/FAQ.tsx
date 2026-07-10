@@ -4,42 +4,38 @@ import { FadeUp } from "../../components/animations/FadeUp";
 import { ChevronDown } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { SEO } from "../../components/seo/SEO";
-
-export const faqs = [
-  {
-    question: "What is your typical project timeline?",
-    answer:
-      "Our timelines vary depending on the scope and complexity of the project. A standard web application MVP might take 6 to 10 weeks, while large-scale enterprise solutions and ERP systems can take 3 to 6 months. We break development into agile sprints to ensure continuous delivery and feedback.",
-  },
-  {
-    question: "Do you offer post-launch support and maintenance?",
-    answer:
-      "Yes, we provide ongoing support, maintenance, and optimization services. We monitor system performance, perform security patches, and can continuously iterate on features based on user feedback and business growth.",
-  },
-  {
-    question: "What technologies do you specialize in?",
-    answer:
-      "We focus on modern, scalable technology stacks including React, TypeScript, Node.js, Next.js, and Firebase or Cloud SQL for databases. For mobile, we leverage cross-platform frameworks to ensure high performance on both iOS and Android.",
-  },
-  {
-    question: "How do you handle project communication?",
-    answer:
-      "We believe in total transparency. Our clients have access to a dedicated Client Portal where they can track project milestones, view staging links, and directly chat with the Development Team in real-time.",
-  },
-  {
-    question:
-      "Can you integrate with our existing backend or third-party APIs?",
-    answer:
-      "Absolutely. We have extensive experience in seamless API integrations, migrating legacy databases, and connecting modern applications with established enterprise software (CRMs, payment gateways, etc.).",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 export function FAQ() {
+  const { t } = useTranslation("faq");
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
   };
+
+  const faqs = [
+    {
+      question: t("questions.q1.question"),
+      answer: t("questions.q1.answer"),
+    },
+    {
+      question: t("questions.q2.question"),
+      answer: t("questions.q2.answer"),
+    },
+    {
+      question: t("questions.q3.question"),
+      answer: t("questions.q3.answer"),
+    },
+    {
+      question: t("questions.q4.question"),
+      answer: t("questions.q4.answer"),
+    },
+    {
+      question: t("questions.q5.question"),
+      answer: t("questions.q5.answer"),
+    },
+  ];
 
   const faqSchema = JSON.stringify({
     "@context": "https://schema.org",
@@ -62,10 +58,10 @@ export function FAQ() {
           <FadeUp>
             <div className="flex flex-col gap-4 text-center mb-16">
               <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
-                F.A.Q
+                {t("title")}
               </h2>
               <h3 className="text-4xl md:text-5xl font-display font-medium tracking-tight text-white leading-[1.1]">
-                FREQUENTLY ASKED <br /> QUESTIONS
+                {t("subtitle_1")} <br /> {t("subtitle_2")}
               </h3>
             </div>
           </FadeUp>
