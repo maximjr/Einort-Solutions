@@ -2,28 +2,13 @@ import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Card, CardContent } from "../../components/ui/Card";
 
-const testimonials = [
-  {
-    quote:
-      "EINORT didn't just build our platform; they architected a foundation that allowed us to scale from 1,000 to 100,000 users without a single hiccup. Their engineering quality is unparalleled.",
-    author: "Sarah Jenkins",
-    role: "CTO, Finova Tech",
-  },
-  {
-    quote:
-      "Working with EINORT is like having an elite, in-house product team. They understand business objectives and translate them into flawless digital experiences. A truly premium agency.",
-    author: "Marcus Chen",
-    role: "Director of Product, LogisticsPro",
-  },
-  {
-    quote:
-      "The ERP system EINORT developed for us completely transformed our operational efficiency. We cut manual processes by 60% and gained real-time visibility into our supply chain.",
-    author: "David Ross",
-    role: "Operations Lead, Apex Global",
-  },
-];
+import { useTranslation } from "react-i18next";
+
+const testimonialKeys = ["t1", "t2", "t3"];
 
 export function Testimonials() {
+  const { t } = useTranslation('home');
+
   return (
     <section
       id="testimonials"
@@ -35,17 +20,17 @@ export function Testimonials() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
             <div>
               <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-4">
-                Client Reality
+                {t("testimonials.badge")}
               </h2>
               <h3 className="text-4xl md:text-5xl lg:text-6xl font-display font-medium tracking-tight text-white max-w-2xl leading-[1.1]">
-                PROVEN RESULTS FROM <br /> ENTERPRISE PARTNERS.
+                {t("testimonials.title_part_1")} <br /> {t("testimonials.title_part_2")}
               </h3>
             </div>
           </div>
         </FadeUp>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((t, i) => (
+          {testimonialKeys.map((key, i) => (
             <FadeUp key={i} delay={0.15 * i} className="h-full">
               <Card className="h-full bg-surface/50 border-white/5 p-8 flex flex-col justify-between hover:border-white/10 hover:bg-surface/80 transition-all duration-500 group">
                 <CardContent className="p-0">
@@ -64,15 +49,15 @@ export function Testimonials() {
                     </svg>
                   </div>
                   <p className="text-text-main text-[17px] font-light leading-relaxed mb-10">
-                    "{t.quote}"
+                    "{t(`testimonials.items.${key}.quote`)}"
                   </p>
                 </CardContent>
                 <div className="pt-6 border-t border-white/5 group-hover:border-white/10 transition-colors">
                   <p className="text-white font-medium text-sm tracking-wide mb-1">
-                    {t.author}
+                    {t(`testimonials.items.${key}.author`)}
                   </p>
                   <p className="text-text-muted text-[11px] font-mono tracking-widest uppercase">
-                    {t.role}
+                    {t(`testimonials.items.${key}.role`)}
                   </p>
                 </div>
               </Card>

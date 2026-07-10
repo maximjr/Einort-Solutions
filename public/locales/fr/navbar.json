@@ -14,5 +14,11 @@
   "professional_support": "Support Professionnel",
   "command_center": "Centre de Commande",
   "projects": "Projets",
-  "messages": "Messages"
+  "messages": "Messages",
+  "authenticated_user": "Utilisateur Authentifié",
+  "roles": {
+    "super_admin": "Super Administrateur",
+    "admin": "Administrateur",
+    "client": "Client Entreprise"
+  }
 }

@@ -6,7 +6,7 @@ import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 
 export function Hero() {
-  const { t } = useTranslation('home');
+  const { t } = useTranslation('hero');
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -53,27 +53,26 @@ export function Hero() {
           <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-10 backdrop-blur-xl shadow-2xl hover:border-white/20 transition-all mx-auto cursor-default opacity-0 animate-[fadeIn_0.5s_ease-out_forwards]">
             <span className="flex h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_rgba(10,102,194,0.8)] animate-pulse"></span>
             <span className="text-[11px] font-bold tracking-[0.2em] uppercase text-slate-300">
-              {t("hero.badge")}
+              {t("badge")}
             </span>
           </div>
 
           <h1 className="text-[2.2rem] min-[375px]:text-[2.5rem] min-[425px]:text-[3rem] sm:text-6xl md:text-7xl lg:text-8xl xl:text-[8.5rem] font-display font-medium tracking-tighter leading-[0.9] mb-8 text-white max-w-6xl mx-auto drop-shadow-2xl opacity-0 animate-[fadeInUp_0.8s_ease-out_forwards]">
-            {t("hero.title_part_1")} <br className="hidden md:block" />
-            {t("hero.title_part_2")}{" "}
+            {t("title_part_1")} <br className="hidden md:block" />
+            {t("title_part_2")}{" "}
             <span className="relative sm:whitespace-nowrap">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 via-primary to-blue-600">
-                {t("hero.title_part_3")}
+                {t("title_part_3")}
               </span>
               <div className="absolute -inset-x-8 -inset-y-8 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/30 to-transparent -z-10 rounded-full"></div>
             </span>
           </h1>
 
           <h2 className="sr-only">
-            Custom Web Development & Enterprise Software Engineering in USA,
-            Canada, and Europe
+            {t("sr_description")}
           </h2>
           <p className="text-lg md:text-2xl text-text-muted mb-12 max-w-3xl mx-auto leading-relaxed font-light tracking-wide opacity-0 animate-[fadeInUp_0.8s_ease-out_0.2s_forwards]">
-            {t("hero.description")}
+            {t("description")}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-6 w-full md:w-auto opacity-0 animate-[fadeInUp_0.8s_ease-out_0.3s_forwards]">
@@ -87,13 +86,13 @@ export function Hero() {
               }}
               className="w-full sm:w-auto uppercase tracking-[0.2em] text-[11px] px-12 h-14 font-bold shadow-2xl"
             >
-              {t("hero.button_primary")}
+              {t("button_primary")}
             </Button>
             <Button
               onClick={() => window.open("https://wa.me/message/52SRSBT3VZXQB1", "_blank")}
               className="w-full sm:w-auto uppercase tracking-[0.2em] text-[11px] px-12 h-14 font-bold bg-[#00e676]/10 text-[#00e676] border border-[#00e676]/20 hover:bg-[#00e676]/20 hover:border-[#00e676]/50 transition-colors backdrop-blur-md"
             >
-              {t("hero.button_whatsapp")}
+              {t("button_whatsapp")}
             </Button>
           </div>
         </motion.div>

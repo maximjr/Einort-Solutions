@@ -1,1 +1,170 @@
-{}
+{
+  "badge": "Expertise Fondamentale",
+  "title_part_1": "L'INGÉNIERIE AU",
+  "title_part_2": "PLUS HAUT NIVEAU.",
+  "description": "Nous ne construisons pas seulement des sites web ; nous concevons des produits numériques qui servent de fondation aux entreprises modernes.",
+  "ui": {
+    "loading": "Chargement du service...",
+    "not_found": "Service non trouvé",
+    "enterprise_overview": "Présentation de l'Entreprise",
+    "execution_process": "Processus d'Exécution & Valeur",
+    "core_capabilities": "Capacités Fondamentales",
+    "ready_to_elevate": "Prêt à élever votre entreprise ?",
+    "chat_whatsapp": "Discuter via WhatsApp",
+    "home": "Accueil",
+    "services": "Services"
+  },
+  "erp": {
+    "badge": "Architecture d'Entreprise",
+    "title_part_1": "ERP SUR MESURE &",
+    "title_part_2": "SYSTÈMES CENTRAUX.",
+    "description": "Les logiciels standard vous obligent à changer votre entreprise pour s'adapter à l'outil. Nous construisons des systèmes de planification des ressources d'entreprise (ERP) personnalisés qui correspondent exactement à vos flux opérationnels uniques.",
+    "status": "État du système opérationnel et entièrement distribué.",
+    "features": {
+      "f1": "Gestion de l'Inventaire & de la Chaîne d'Approvisionnement",
+      "f2": "Ressources Humaines & Paie",
+      "f3": "Comptabilité Financière & Rapports",
+      "f4": "CRM & Pipeline de Ventes",
+      "f5": "Automatisation des Flux de Travail Personnalisés",
+      "f6": "Visualisation des Données en Temps Réel"
+    }
+  },
+  "items": {
+    "websites-web-apps": {
+      "title": "Sites Web & Apps Web",
+      "description": "Créez des sites web époustouflants, performants et des applications web intelligentes conçues pour la croissance, l'évolutivité et une expérience utilisateur premium.",
+      "longDescription": "Dans le paysage numérique africain en pleine mutation, un site web générique ne suffit plus. Votre plateforme web doit servir de vitrine numérique 24h/24 et 7j/7, de moteur de génération de prospects et de gage de crédibilité ultime. Nous concevons des applications web hautement performantes, sécurisées et optimisées pour le mobile, adaptées au marché camerounais et africain. Qu'il s'agisse d'environnements à faible bande passante ou d'intégrations avec des passerelles de paiement locales (comme Mobile Money et Orange Money), nous garantissons que votre plateforme reste ultra-rapide et compétitive.",
+      "cameroonContext": "Avec une pénétration d'internet en forte croissance au Cameroun, les entreprises offrant des expériences web robustes, rapides et mobiles se démarquent instantanément. Nous construisons des systèmes qui surmontent les défis infrastructurels locaux, garantissant que votre entreprise reste en ligne et accessible.",
+      "features": [
+        "Architecture Logicielle Personnalisée",
+        "React & Next.js Full-stack",
+        "Applications Web Progressives (PWA)",
+        "Pages de Destination à Haute Conversion"
+      ],
+      "benefits": [
+        "Processus : Nous commençons par une planification architecturale approfondie et créons des interfaces parfaites au pixel près.",
+        "Impact Business : Augmentez le trafic organique, réduisez les taux de rebond et transformez votre site en un actif puissant.",
+        "Niveau Supérieur : Passez d'une présence en ligne générique à une plateforme numérique de classe entreprise."
+      ]
+    },
+    "ui-ux-design": {
+      "title": "Design UI/UX",
+      "description": "Concevoir des expériences utilisateur intuitives, visuellement exceptionnelles et axées sur la conversion qui élèvent l'engagement numérique.",
+      "longDescription": "La première impression est numérique. Une interface mal conçue érode immédiatement la confiance. Notre méthodologie de design UI/UX va au-delà de l'esthétique ; nous nous concentrons sur la psychologie de l'utilisateur, la charge cognitive et la navigation fluide. Nous créons des interfaces polies, de niveau Apple, qui non seulement sont spectaculaires mais guident vos clients sans effort vers l'action.",
+      "cameroonContext": "De nombreuses applications locales souffrent d'interfaces encombrées et confuses. Nous élevons les entreprises camerounaises aux standards de design internationaux, renforçant la confiance et véhiculant une qualité premium.",
+      "features": [
+        "Wireframing & Prototypage",
+        "Systèmes de Design Interactifs",
+        "Cartographie du Parcours Utilisateur",
+        "Optimisation du Taux de Conversion"
+      ],
+      "benefits": [
+        "Processus : Nous cartographions les parcours utilisateurs, identifions les points de friction et concevons de belles interfaces.",
+        "Impact Business : Boostez les taux de conversion, améliorez la rétention et offrez une expérience fluide.",
+        "Niveau Supérieur : Élevez la perception de votre marque avec un poli cinématographique qui inspire confiance."
+      ]
+    },
+    "erp-solutions": {
+      "title": "Solutions ERP",
+      "description": "Optimisez vos opérations avec des systèmes ERP intelligents conçus pour automatiser les flux de travail et centraliser la gestion.",
+      "longDescription": "À mesure que votre entreprise grandit, s'appuyer sur des feuilles de calcul fragmentées crée des goulots d'étranglement massifs. Nos solutions ERP personnalisées centralisent vos données, automatisent les tâches répétitives et offrent une visibilité en temps réel. De la gestion des stocks aux RH en passant par les finances, nous construisons des systèmes évolutifs qui donnent un contrôle absolu.",
+      "cameroonContext": "De nombreuses entreprises camerounaises perdent des revenus à cause d'inefficacités opérationnelles. Un ERP personnalisé remplace le chaos par la clarté, numérisant vos opérations en toute sécurité pour que vous puissiez gérer votre entreprise à distance.",
+      "features": [
+        "Logique Métier Personnalisée",
+        "Automatisation des Flux de Travail",
+        "Hubs de Données Centralisés",
+        "Infrastructure Cloud Évolutive"
+      ],
+      "benefits": [
+        "Processus : Nous analysons vos opérations internes pour construire un système sur mesure qui élimine les silos de données.",
+        "Impact Business : Réduisez considérablement les coûts opérationnels et éliminez les erreurs humaines.",
+        "Niveau Supérieur : Transformez votre entreprise en une organisation agile capable de croître sans obstacles administratifs."
+      ]
+    },
+    "mobile-app-development": {
+      "title": "Développement d'Apps Mobiles",
+      "description": "Offrez des expériences mobiles premium avec des applications performantes conçues pour une fonctionnalité fluide.",
+      "longDescription": "L'Afrique est un continent mobile-first. Pour captiver votre public, vous avez besoin d'une application mobile rapide, intuitive et fonctionnelle même en zones de faible connectivité. Nous développons des applications mobiles natives et cross-plateformes pour iOS et Android qui stimulent l'engagement et fidélisent la marque.",
+      "cameroonContext": "Avec l'explosion de l'usage des smartphones au Cameroun, une application vous donne un accès direct à vos clients. Nous optimisons nos applications pour qu'elles soient légères, économes en données et intégrées aux écosystèmes locaux.",
+      "features": [
+        "Natif & Cross-Plateforme",
+        "Animations Fluides",
+        "Architecture Hors-ligne",
+        "Optimisation pour les App Stores (ASO)"
+      ],
+      "benefits": [
+        "Processus : Du concept au déploiement, nous concevons des applications mobiles réactives et engageantes.",
+        "Impact Business : Capturez l'audience mobile, augmentez l'engagement et créez un canal marketing direct.",
+        "Niveau Supérieur : Établissez une présence mobile dominante qui favorise la fidélité et les revenus récurrents."
+      ]
+    },
+    "branding-graphic-design": {
+      "title": "Branding & Design Graphique",
+      "description": "Développez une identité visuelle convaincante avec une stratégie de marque professionnelle qui résonne avec votre public.",
+      "longDescription": "Votre marque est votre actif le plus précieux. Nous ne concevons pas seulement des logos ; nous architecturons des identités visuelles complètes qui communiquent autorité et confiance. Des palettes de couleurs à la typographie, nous veillons à ce que votre marque se démarque instantanément.",
+      "cameroonContext": "Dans un marché saturé d'entreprises génériques, une identité de marque forte est le moyen le plus rapide de bâtir une crédibilité instantanée. Nous vous aidons à transcender l'esthétique 'boutique locale' en une entité corporative respectée.",
+      "features": [
+        "Identité Visuelle & Logos",
+        "Chartes Graphiques",
+        "Supports Marketing",
+        "Typographie Premium & Théorie des Couleurs"
+      ],
+      "benefits": [
+        "Processus : Nous distillons vos valeurs fondamentales dans un langage visuel frappant.",
+        "Impact Business : Créez une reconnaissance instantanée et différenciez-vous sur un marché encombré.",
+        "Niveau Supérieur : Passez d'un service banalisé à une marque premium hautement recherchée."
+      ]
+    },
+    "social-media-management": {
+      "title": "Gestion des Réseaux Sociaux",
+      "description": "Améliorez votre présence en ligne avec des campagnes stratégiques et la création de contenu engageant.",
+      "longDescription": "Les réseaux sociaux sont là où vos clients passent leur temps. Nous gérons votre présence de bout en bout, créant des visuels époustouflants et des textes percutants qui élèvent l'empreinte numérique de votre marque sur toutes les plateformes pertinentes.",
+      "cameroonContext": "Les plateformes comme Facebook et Instagram sont les principaux moteurs de découverte au Cameroun. Nous exploitons les nuances culturelles locales pour garantir que votre contenu résonne profondément avec la démographie locale.",
+      "features": [
+        "Stratégie de Contenu",
+        "Engagement de la Communauté",
+        "Analyses & Rapports",
+        "Growth Hacking"
+      ],
+      "benefits": [
+        "Processus : Nous gérons votre empreinte numérique avec des calendriers de contenu sur mesure.",
+        "Impact Business : Amplifiez la notoriété de la marque et engagez-vous directement avec votre cible.",
+        "Niveau Supérieur : Devenez une autorité dans votre secteur en bâtissant une communauté passionnée."
+      ]
+    },
+    "digital-advertising": {
+      "title": "Publicité Numérique",
+      "description": "Générez du trafic ciblé et des conversions grâce à des campagnes publicitaires basées sur les données.",
+      "longDescription": "Arrêtez de compter sur le bouche-à-oreille imprévisible. La publicité numérique est une machine prévisible pour générer des revenus. Nous concevons des campagnes publicitaires à haute conversion sur Facebook, Instagram et Google, ciblant précisément les personnes prêtes à acheter.",
+      "cameroonContext": "La publicité traditionnelle est coûteuse et impossible à suivre. Les publicités numériques permettent aux entreprises camerounaises de cibler des villes ou quartiers spécifiques avec précision.",
+      "features": [
+        "Publicité Google Search",
+        "Publicité Facebook & Instagram",
+        "Campagnes de Retargeting",
+        "Tests A/B & Optimisation"
+      ],
+      "benefits": [
+        "Processus : Nous exploitons les données de ciblage pour positionner votre marque devant des acheteurs à forte intention.",
+        "Impact Business : Générez un ROI immédiat et mesurable, et développez vos revenus de manière prévisible.",
+        "Niveau Supérieur : Construisez un moteur de génération de prospects prévisible et évolutif."
+      ]
+    },
+    "seo-workspace-setup": {
+      "title": "SEO & Configuration Google Workspace",
+      "description": "Améliorez votre visibilité de recherche et optimisez votre productivité organisationnelle avec des experts.",
+      "longDescription": "La visibilité et l'efficacité opérationnelle sont les deux piliers d'une entreprise moderne. Le SEO garantit que vous apparaissez en premier lors des recherches. Parallèlement, Google Workspace professionnalise vos communications internes (ex: votre-nom@votre-entreprise.com).",
+      "cameroonContext": "De nombreuses entreprises locales utilisent encore des adresses @yahoo ou @gmail, ce qui diminue la confiance. De plus, la concurrence SEO locale est souvent faible, ce qui permet de dominer facilement les résultats de recherche.",
+      "features": [
+        "Audits SEO Techniques",
+        "Stratégie de Mots-clés",
+        "Intégration Google Workspace",
+        "Automatisation de la Productivité"
+      ],
+      "benefits": [
+        "Processus : Nous optimisons votre infrastructure numérique pour les moteurs de recherche tout en simplifiant vos communications.",
+        "Impact Business : Capturez un trafic de recherche organique de haute qualité tout en professionnalisant votre équipe.",
+        "Niveau Supérieur : Pérennisez votre entreprise en dominant les résultats de recherche et en opérant avec une efficacité maximale."
+      ]
+    }
+  }
+}

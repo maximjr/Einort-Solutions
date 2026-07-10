@@ -2,16 +2,13 @@ import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { CheckCircle2 } from "lucide-react";
 
-const erpFeatures = [
-  "Inventory & Supply Chain Management",
-  "Human Resources & Payroll",
-  "Financial Accounting & Reporting",
-  "CRM & Sales Pipeline",
-  "Custom Workflow Automation",
-  "Real-time Data Visualization",
-];
+import { useTranslation } from "react-i18next";
+
+const erpFeatures = ["f1", "f2", "f3", "f4", "f5", "f6"];
 
 export function ERP() {
+  const { t } = useTranslation('services');
+
   return (
     <section
       id="architecture"
@@ -91,7 +88,7 @@ export function ERP() {
                     <div className="h-3 w-24 bg-white/10 rounded"></div>
                   </div>
                   <p className="text-xs text-text-muted leading-relaxed">
-                    System status operational and fully distributed.
+                    {t("erp.status")}
                   </p>
                 </div>
               </div>
@@ -101,15 +98,13 @@ export function ERP() {
           <div className="space-y-10 pl-0 lg:pl-10">
             <FadeUp delay={0.1}>
               <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-4">
-                Enterprise Architecture
+                {t("erp.badge")}
               </h2>
               <h3 className="text-4xl md:text-5xl lg:text-6xl font-display font-medium tracking-tight text-white mb-6 leading-[1.1]">
-                BESPOKE ERP & <br /> CORE SYSTEMS.
+                {t("erp.title_part_1")} <br /> {t("erp.title_part_2")}
               </h3>
               <p className="text-xl text-text-muted leading-relaxed font-light">
-                Off-the-shelf software forces you to change your business to fit
-                the tool. We build custom Enterprise Resource Planning (ERP)
-                systems that map exactly to your unique operational flows.
+                {t("erp.description")}
               </p>
             </FadeUp>
 
@@ -119,7 +114,7 @@ export function ERP() {
                   <div key={i} className="flex items-start gap-4">
                     <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5 opacity-80" />
                     <span className="text-sm font-medium text-slate-300 leading-tight">
-                      {feature}
+                      {t(`erp.features.${feature}`)}
                     </span>
                   </div>
                 ))}

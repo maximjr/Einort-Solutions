@@ -3,28 +3,26 @@ import { FadeUp } from "../../components/animations/FadeUp";
 import { Button } from "../../components/ui/Button";
 import { ArrowRight } from "lucide-react";
 
+import { useTranslation } from "react-i18next";
+
 const reasons = [
   {
     number: "01",
-    title: "Engineering Rigor",
-    description:
-      "We follow robust software engineering practices. No spaghetti code. No shortcuts. Clean, maintainable, and highly performing architecture.",
+    key: "r1",
   },
   {
     number: "02",
-    title: "Business-First Mindset",
-    description:
-      "Technology serves the business. Every line of code we write is aimed at driving revenue, reducing operational costs, or enhancing your competitive moat.",
+    key: "r2",
   },
   {
     number: "03",
-    title: "Uncompromising Quality",
-    description:
-      "From pixel-perfect UI execution to sub-millisecond database query optimization, we obsess over the details that others ignore.",
+    key: "r3",
   },
 ];
 
 export function WhyChooseUs() {
+  const { t } = useTranslation('about');
+
   return (
     <section
       id="why-us"
@@ -35,15 +33,13 @@ export function WhyChooseUs() {
         <FadeUp>
           <div className="text-center max-w-3xl mx-auto mb-24">
             <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-4">
-              The Einort Standard
+              {t("why_choose_us.badge")}
             </h2>
             <h3 className="text-4xl md:text-5xl lg:text-6xl font-display font-medium tracking-tighter text-white mb-8 leading-[1.1]">
-              WHY ELITE TEAMS <br className="hidden md:block" /> CHOOSE US.
+              {t("why_choose_us.title_part_1")} <br className="hidden md:block" /> {t("why_choose_us.title_part_2")}
             </h3>
             <p className="text-xl text-text-muted font-light leading-relaxed">
-              We are not a standard dev shop. We are a team of product engineers
-              and designers committed to building industry-leading digital
-              experiences.
+              {t("why_choose_us.description")}
             </p>
           </div>
         </FadeUp>
@@ -57,10 +53,10 @@ export function WhyChooseUs() {
               <div className="relative z-10 pt-6 border-t border-white/10 group-hover:border-primary/50 transition-colors duration-500">
                 <div className="absolute top-0 left-0 w-0 h-px bg-gradient-to-r from-primary to-transparent group-hover:w-full transition-all duration-1000 ease-out"></div>
                 <h4 className="text-2xl font-display font-medium text-white mb-4 tracking-wide">
-                  {reason.title}
+                  {t(`why_choose_us.reasons.${reason.key}.title`)}
                 </h4>
                 <p className="text-text-muted leading-relaxed font-light text-[15px]">
-                  {reason.description}
+                  {t(`why_choose_us.reasons.${reason.key}.description`)}
                 </p>
               </div>
             </FadeUp>
@@ -78,7 +74,7 @@ export function WhyChooseUs() {
               }
               className="uppercase tracking-[0.2em] text-[11px] px-12 h-14 font-bold shadow-2xl gap-3"
             >
-              Start Your Project <ArrowRight size={16} />
+              {t("why_choose_us.cta")} <ArrowRight size={16} />
             </Button>
           </div>
         </FadeUp>

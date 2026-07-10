@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -16,27 +17,6 @@ import { Input } from "../../components/ui/Input";
 import { Logo } from "../../components/ui/Logo";
 import { useNavigate } from "react-router-dom";
 
-const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-const registerSchema = z
-  .object({
-    name: z.string().min(2, "Full name is required"),
-    email: z.string().email("Please enter a valid email address"),
-    phone: z.string().min(5, "Phone number is required"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    repeatPassword: z.string().min(6, "Password must be at least 6 characters"),
-  })
-  .refine((data) => data.password === data.repeatPassword, {
-    message: "Passwords don't match",
-    path: ["repeatPassword"],
-  });
-
-type LoginData = z.infer<typeof loginSchema>;
-type RegisterData = z.infer<typeof registerSchema>;
-
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -48,6 +28,7 @@ export function AuthModal({
   onClose,
   initialMode = "login",
 }: AuthModalProps) {
+  const { t } = useTranslation("auth");
   const [mode, setMode] = useState<"login" | "register">(initialMode);
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
@@ -55,6 +36,27 @@ export function AuthModal({
   const [successStatus, setSuccessStatus] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const loginSchema = useMemo(() => z.object({
+    email: z.string().email(t("validation.email_invalid")),
+    password: z.string().min(6, t("validation.password_min")),
+  }), [t]);
+
+  const registerSchema = useMemo(() => z
+    .object({
+      name: z.string().min(2, t("validation.name_required")),
+      email: z.string().email(t("validation.email_invalid")),
+      phone: z.string().min(5, t("validation.phone_required")),
+      password: z.string().min(6, t("validation.password_min")),
+      repeatPassword: z.string().min(6, t("validation.password_min")),
+    })
+    .refine((data) => data.password === data.repeatPassword, {
+      message: t("validation.passwords_match"),
+      path: ["repeatPassword"],
+    }), [t]);
+
+  type LoginData = z.infer<typeof loginSchema>;
+  type RegisterData = z.infer<typeof registerSchema>;
 
   const loginForm = useForm<LoginData>({ resolver: zodResolver(loginSchema) });
   const registerForm = useForm<RegisterData>({
@@ -137,7 +139,7 @@ export function AuthModal({
 
   const onLogin = async (data: LoginData) => {
     if (!auth) {
-      setErrorStatus("Authentication service offline.");
+      setErrorStatus(t("login.status.offline"));
       return;
     }
     setIsLoading(true);
@@ -149,7 +151,7 @@ export function AuthModal({
         data.email,
         data.password,
       );
-      setSuccessStatus("Tunnel verified. Establishing secure connection...");
+      setSuccessStatus(t("login.status.verifying"));
       await redirectUser(cred.user.uid, {
         email: data.email,
         fullName: "User",
@@ -165,13 +167,13 @@ export function AuthModal({
         error.code === "auth/wrong-password" ||
         error.code === "auth/invalid-email"
       ) {
-        setErrorStatus("Invalid email or password");
+        setErrorStatus(t("errors.invalid_credentials"));
       } else if (error.code === "auth/network-request-failed") {
-        setErrorStatus("Network connection issue");
+        setErrorStatus(t("errors.network"));
       } else if (error.code === "auth/too-many-requests") {
-        setErrorStatus("Too many failed attempts. Please try again later.");
+        setErrorStatus(t("errors.too_many_requests"));
       } else {
-        setErrorStatus("Authentication failed. Please attempt again later.");
+        setErrorStatus(t("errors.generic"));
       }
     }
   };
@@ -209,9 +211,7 @@ export function AuthModal({
         profileCompleted: true,
       });
 
-      setSuccessStatus(
-        "Account created successfully. Configuring Workspace...",
-      );
+      setSuccessStatus(t("register.status.success"));
       await redirectUser(user.uid, {
         email: data.email,
         fullName: data.name,
@@ -223,15 +223,15 @@ export function AuthModal({
       console.error(`[Firebase Signup Error] Code: ${error.code}, Message: ${error.message}`, error);
       
       if (error.code === "auth/email-already-in-use") {
-        setErrorStatus("Email already exists");
+        setErrorStatus(t("errors.email_exists"));
       } else if (error.code === "auth/weak-password") {
-        setErrorStatus("Weak password - must be at least 6 characters");
+        setErrorStatus(t("errors.weak_password"));
       } else if (error.code === "auth/invalid-email") {
-        setErrorStatus("Please enter a valid email address");
+        setErrorStatus(t("errors.invalid_email"));
       } else if (error.code === "auth/network-request-failed") {
-        setErrorStatus("Network connection issue");
+        setErrorStatus(t("errors.network"));
       } else {
-        setErrorStatus("Registration failed. Please attempt again later.");
+        setErrorStatus(t("errors.registration_generic"));
       }
     }
   };
@@ -270,13 +270,13 @@ export function AuthModal({
                   <div className="mt-16">
                     <h3 className="text-3xl font-display font-medium text-white mb-6 leading-[1.2]">
                       {mode === "login" 
-                        ? "Welcome back to your workspace." 
-                        : "Join our elite network of innovators."}
+                        ? t("login.subtitle") 
+                        : t("register.subtitle")}
                     </h3>
                     <p className="text-text-muted font-light leading-relaxed">
                        {mode === "login" 
-                         ? "Securely access your active deployments, track ongoing projects, and communicate directly with your engineering team."
-                         : "Create an account to begin your project discovery, track development milestones, and access secure enterprise resources."}
+                         ? t("login.description")
+                         : t("register.description")}
                     </p>
                   </div>
                 </div>
@@ -287,15 +287,15 @@ export function AuthModal({
                          <div className="flex flex-col gap-3">
                            <div className="flex items-center gap-3 text-sm text-slate-300">
                              <CheckCircle2 size={16} className="text-primary" />
-                             <span>Direct Engineering Access</span>
+                             <span>{t("register.benefits.engineering")}</span>
                            </div>
                            <div className="flex items-center gap-3 text-sm text-slate-300">
                              <CheckCircle2 size={16} className="text-primary" />
-                             <span>Real-time Project Tracking</span>
+                             <span>{t("register.benefits.tracking")}</span>
                            </div>
                            <div className="flex items-center gap-3 text-sm text-slate-300">
                              <CheckCircle2 size={16} className="text-primary" />
-                             <span>Secure Document Vault</span>
+                             <span>{t("register.benefits.vault")}</span>
                            </div>
                          </div>
                       )}
@@ -310,23 +310,23 @@ export function AuthModal({
                   <Logo />
                 </div>
                 <h2 className="text-2xl font-display text-white mb-2">
-                  {mode === "login" ? "Welcome Back" : "Create Account"}
+                  {mode === "login" ? t("login.title") : t("register.title")}
                 </h2>
                 <p className="text-text-muted text-sm font-light">
                   {mode === "login"
-                    ? "Sign in to access your client portal."
-                    : "Register to start your architectural journey."}
+                    ? t("login.form_subtitle")
+                    : t("register.form_subtitle")}
                 </p>
               </div>
 
               <div className="hidden md:block mb-10">
                 <h2 className="text-3xl font-display font-medium text-white mb-2">
-                  {mode === "login" ? "Sign In" : "Create Account"}
+                  {mode === "login" ? t("login.title") : t("register.title")}
                 </h2>
                 <p className="text-text-muted text-sm font-light">
                   {mode === "login"
-                    ? "Enter your credentials to access your portal."
-                    : "Fill in your details to get started."}
+                    ? t("login.form_subtitle")
+                    : t("register.form_subtitle")}
                 </p>
               </div>
 
@@ -336,12 +336,12 @@ export function AuthModal({
                       <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
                       <div className="text-sm text-red-200">
                         {errorStatus}
-                        {errorStatus === "Email already exists" && (
+                        {errorStatus === t("errors.email_exists") && (
                           <button
                             onClick={() => switchMode("login")}
                             className="ml-2 underline font-bold hover:text-white"
                           >
-                            Switch to Login
+                            {t("errors.switch_to_login")}
                           </button>
                         )}
                       </div>
@@ -362,7 +362,7 @@ export function AuthModal({
                     >
                       <div className="space-y-2">
                         <label className="text-xs font-medium text-slate-300">
-                          Email Address
+                          {t("login.email_label")}
                         </label>
                         <Input
                           placeholder="name@company.com"
@@ -379,7 +379,7 @@ export function AuthModal({
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <label className="text-xs font-medium text-slate-300">
-                            Password
+                            {t("login.password_label")}
                           </label>
                         </div>
                         <div className="relative">
@@ -413,7 +413,7 @@ export function AuthModal({
                         className="w-full mt-4 h-12 tracking-wide font-medium shadow-xl shadow-primary/20 transition-all hover:shadow-primary/30"
                         disabled={isLoading}
                       >
-                        {isLoading ? "Authenticating..." : "Sign In"}
+                        {isLoading ? t("login.submitting") : t("login.submit")}
                       </Button>
                     </form>
                   ) : (
@@ -424,7 +424,7 @@ export function AuthModal({
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div className="space-y-2">
                           <label className="text-xs font-medium text-slate-300">
-                            Full Name
+                            {t("register.name_label")}
                           </label>
                           <Input
                             placeholder="John Doe"
@@ -440,7 +440,7 @@ export function AuthModal({
 
                         <div className="space-y-2">
                           <label className="text-xs font-medium text-slate-300">
-                            Phone Number
+                            {t("register.phone_label")}
                           </label>
                           <Input
                             placeholder="+1 (555) 000-0000"
@@ -457,7 +457,7 @@ export function AuthModal({
 
                       <div className="space-y-2">
                         <label className="text-xs font-medium text-slate-300">
-                          Email Address
+                          {t("register.email_label")}
                         </label>
                         <Input
                           placeholder="name@company.com"
@@ -474,7 +474,7 @@ export function AuthModal({
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div className="space-y-2">
                           <label className="text-xs font-medium text-slate-300">
-                            Password
+                            {t("register.password_label")}
                           </label>
                           <div className="relative">
                             <Input
@@ -500,7 +500,7 @@ export function AuthModal({
 
                         <div className="space-y-2">
                           <label className="text-xs font-medium text-slate-300">
-                            Repeat Password
+                            {t("register.repeat_password_label")}
                           </label>
                           <div className="relative">
                             <Input
@@ -530,7 +530,7 @@ export function AuthModal({
                         className="w-full mt-4 h-12 tracking-wide font-medium shadow-xl shadow-primary/20 transition-all hover:shadow-primary/30"
                         disabled={isLoading}
                       >
-                        {isLoading ? "Creating Account..." : "Create Account"}
+                        {isLoading ? t("register.submitting") : t("register.submit")}
                       </Button>
                     </form>
                   )}
@@ -539,15 +539,15 @@ export function AuthModal({
               <div className="mt-8 pt-6 border-t border-white/5 text-center relative z-10 w-full max-w-sm mx-auto md:max-w-none md:mx-0">
                 <p className="text-sm text-slate-400">
                   {mode === "login"
-                    ? "Don't have an account?"
-                    : "Already have an account?"}
+                    ? t("login.no_account")
+                    : t("register.has_account")}
                   <button
                     onClick={() =>
                       switchMode(mode === "login" ? "register" : "login")
                     }
                     className="ml-2 text-primary font-medium hover:text-white transition-colors focus:outline-none"
                   >
-                    {mode === "login" ? "Create one" : "Sign in"}
+                    {mode === "login" ? t("login.switch_to_register") : t("register.switch_to_login")}
                   </button>
                 </p>
               </div>

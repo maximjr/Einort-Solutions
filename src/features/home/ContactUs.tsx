@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Input } from "../../components/ui/Input";
@@ -10,6 +11,7 @@ import { auth } from "../../lib/firebase";
 import { signInAnonymously } from "firebase/auth";
 
 export function ContactUs() {
+  const { t } = useTranslation(['contact', 'forms', 'errors']);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
@@ -38,7 +40,7 @@ export function ContactUs() {
           superAdminId,
         );
 
-        const fullMessage = `Contact Form Submission:\n\nName: ${name}\nEmail: ${email}\n\nMessage: ${message}`;
+        const fullMessage = t('contact:message_template', { name, email, message });
 
         await messageService.sendMessage(
           conversationId,
@@ -59,7 +61,7 @@ export function ContactUs() {
     } catch (error) {
       console.error("Error sending contact message:", error);
       // fallback if anonymous auth fails (e.g., if it's disabled in Firebase)
-      alert("There was an error sending your message. Please try again.");
+      alert(t('errors:contact_send'));
     } finally {
       setIsSubmitting(false);
     }
@@ -72,14 +74,13 @@ export function ContactUs() {
           <FadeUp>
             <div className="flex flex-col gap-4 text-center mb-12">
               <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
-                Get In Touch
+                {t('contact:badge')}
               </h2>
               <h3 className="text-4xl md:text-5xl font-display font-medium tracking-tight text-white leading-[1.1]">
-                CONTACT US
+                {t('contact:title')}
               </h3>
               <p className="text-lg text-text-muted mt-4 font-light">
-                Have a question or need assistance? Send a message directly to
-                our team.
+                {t('contact:description')}
               </p>
             </div>
           </FadeUp>
@@ -92,18 +93,17 @@ export function ContactUs() {
                     <CheckCircle2 size={40} className="text-primary" />
                   </div>
                   <h4 className="text-2xl font-medium text-white mb-4">
-                    Message Sent!
+                    {t('contact:success.title')}
                   </h4>
                   <p className="text-text-muted">
-                    Thank you, {name || "for reaching out"}. Our team will get
-                    back to you shortly via the client portal messenger.
+                    {t('contact:success.message', { name: name || "for reaching out" })}
                   </p>
                   <Button
                     className="mt-8"
                     onClick={() => setIsSuccess(false)}
                     variant="outline"
                   >
-                    Send Another Message
+                    {t('forms:buttons.send_another')}
                   </Button>
                 </div>
               ) : (
@@ -114,13 +114,13 @@ export function ContactUs() {
                         htmlFor="name"
                         className="text-sm font-medium text-text-muted"
                       >
-                        Your Name
+                        {t('forms:labels.name')}
                       </label>
                       <Input
                         id="name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="John Doe"
+                        placeholder={t('forms:placeholders.name')}
                         required
                         className="bg-surface border-white/10"
                         disabled={isSubmitting}
@@ -131,14 +131,14 @@ export function ContactUs() {
                         htmlFor="email"
                         className="text-sm font-medium text-text-muted"
                       >
-                        Email Address
+                        {t('forms:labels.email')}
                       </label>
                       <Input
                         id="email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="john@company.com"
+                        placeholder={t('forms:placeholders.email')}
                         required
                         className="bg-surface border-white/10"
                         disabled={isSubmitting}
@@ -151,13 +151,13 @@ export function ContactUs() {
                       htmlFor="message"
                       className="text-sm font-medium text-text-muted"
                     >
-                      Your Message
+                      {t('forms:labels.message')}
                     </label>
                     <textarea
                       id="message"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      placeholder="How can we help you?"
+                      placeholder={t('forms:placeholders.message')}
                       required
                       rows={5}
                       className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary/50 transition-all font-light resize-none"
@@ -173,11 +173,11 @@ export function ContactUs() {
                     {isSubmitting ? (
                       <span className="flex items-center gap-2">
                         <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
-                        Sending Message...
+                        {t('forms:buttons.sending')}
                       </span>
                     ) : (
                       <span className="flex items-center justify-center gap-2 font-bold tracking-[0.1em] uppercase">
-                        Send Message <Send size={18} />
+                        {t('forms:buttons.send_message')} <Send size={18} />
                       </span>
                     )}
                   </Button>

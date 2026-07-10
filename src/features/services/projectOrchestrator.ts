@@ -8,43 +8,7 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "../../lib/firebase";
 import { Project, ProjectStatus, OrchestratorResult } from "../../types";
-
-export enum OperationType {
-  CREATE = "create",
-  UPDATE = "update",
-  DELETE = "delete",
-  LIST = "list",
-  GET = "get",
-  WRITE = "write",
-}
-
-interface FirestoreErrorInfo {
-  error: string;
-  operationType: OperationType;
-  path: string | null;
-  authInfo: {
-    userId?: string | null;
-    email?: string | null;
-  };
-}
-
-/**
- * Standardized Firestore error interceptor conforming to enterprise specifications.
- */
-function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null): never {
-  const errMessage = error instanceof Error ? error.message : String(error);
-  const errInfo: FirestoreErrorInfo = {
-    error: errMessage,
-    authInfo: {
-      userId: auth?.currentUser?.uid || "anonymous",
-      email: auth?.currentUser?.email || "anonymous",
-    },
-    operationType,
-    path,
-  };
-  console.error("[Firestore Integrity Error]", JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
-}
+import { OperationType, handleFirestoreError } from "../../services/admin/diagnosticsHelper";
 
 export const ProjectOrchestrator = {
   /**

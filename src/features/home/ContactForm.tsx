@@ -19,58 +19,60 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "../../lib/utils";
-
-const formSchema = z.object({
-  projectType: z.string().min(1, "Please select a project type"),
-  budget: z.string().min(1, "Please select an estimated budget"),
-  timeline: z.string().min(1, "Please select a timeline"),
-  requirements: z
-    .string()
-    .min(10, "Please provide some details about your project"),
-  clientName: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  company: z.string().min(2, "Company name is required"),
-  industry: z.string().min(2, "Industry is required"),
-  urgency: z.string().min(1, "Please select urgency"),
-  selectedFeatures: z.array(z.string()),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
-const projectTypes = [
-  {
-    id: "enterprise",
-    label: "Websites & Web App Dev",
-    icon: <Code2 size={24} />,
-  },
-  { id: "saas", label: "ERP Solutions Dev", icon: <Database size={24} /> },
-  { id: "uiux", label: "UI/UX Redesign", icon: <LayoutTemplate size={24} /> },
-  { id: "other", label: "Mobile App Dev", icon: <Smartphone size={24} /> },
-];
-
-const budgetRanges = [
-  { id: "5k-20k", label: "$5k - $20k" },
-  { id: "20k-50k", label: "$20k - $50k" },
-  { id: "50k-100k", label: "$50k - $100k" },
-  { id: "100k+", label: "$100k+" },
-];
-
-const timelines = [
-  { id: "immediate", label: "Immediate (1-2 Months)" },
-  { id: "3-6m", label: "3-6 Months" },
-  { id: "6m+", label: "6+ Months" },
-  { id: "flexible", label: "Flexible" },
-];
-
 import { useAuth } from "../../hooks/useAuth";
 import { ProjectOrchestrator } from "../services/projectOrchestrator";
 
+import { useTranslation } from "react-i18next";
+
 export function ContactForm() {
+  const { t } = useTranslation(['forms', 'validation', 'errors']);
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { user } = useAuth();
+
+  const formSchema = z.object({
+    projectType: z.string().min(1, t("validation:project_type_required")),
+    budget: z.string().min(1, t("validation:budget_required")),
+    timeline: z.string().min(1, t("validation:timeline_required")),
+    requirements: z
+      .string()
+      .min(10, t("validation:requirements_min")),
+    clientName: z.string().min(2, t("validation:name_min")),
+    email: z.string().email(t("validation:email_invalid")),
+    company: z.string().min(2, t("validation:company_required")),
+    industry: z.string().min(2, t("validation:industry_required")),
+    urgency: z.string().min(1, t("validation:urgency_required")),
+    selectedFeatures: z.array(z.string()),
+  });
+
+  type ContactFormData = z.infer<typeof formSchema>;
+
+  const projectTypes = [
+    {
+      id: "enterprise",
+      label: t("wizard.project_types.enterprise"),
+      icon: <Code2 size={24} />,
+    },
+    { id: "saas", label: t("wizard.project_types.saas"), icon: <Database size={24} /> },
+    { id: "uiux", label: t("wizard.project_types.uiux"), icon: <LayoutTemplate size={24} /> },
+    { id: "other", label: t("wizard.project_types.other"), icon: <Smartphone size={24} /> },
+  ];
+
+  const budgetRanges = [
+    { id: "5k-20k", label: t("wizard.budgets.b1") },
+    { id: "20k-50k", label: t("wizard.budgets.b2") },
+    { id: "50k-100k", label: t("wizard.budgets.b3") },
+    { id: "100k+", label: t("wizard.budgets.b4") },
+  ];
+
+  const timelines = [
+    { id: "immediate", label: t("wizard.urgency.high") },
+    { id: "3-6m", label: t("wizard.urgency.medium") },
+    { id: "6m+", label: t("wizard.urgency.low") },
+    { id: "flexible", label: t("wizard.urgency.select") },
+  ];
 
   const {
     register,
@@ -80,7 +82,7 @@ export function ContactForm() {
     watch,
     reset,
     formState: { errors },
-  } = useForm<FormData>({
+  } = useForm<ContactFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       projectType: "",
@@ -112,7 +114,7 @@ export function ContactForm() {
     }
   };
 
-  const onSubmit = async (data: FormData) => {
+  const onSubmit = async (data: ContactFormData) => {
     setIsSubmitting(true);
     setSubmitError(null);
     try {
@@ -137,11 +139,11 @@ export function ContactForm() {
         setStep(1);
       } else {
         setSubmitError(
-          result.message || "An error occurred submitting your request.",
+          result.message || t("errors:generic"),
         );
       }
     } catch (error) {
-      setSubmitError("An error occurred submitting your request.");
+      setSubmitError(t("errors:generic"));
     } finally {
       setIsSubmitting(false);
     }
@@ -155,21 +157,20 @@ export function ContactForm() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
           <FadeUp className="lg:col-span-5 pt-8">
             <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-4">
-              Project Discovery
+              {t("project_discovery.badge")}
             </h2>
             <h3 className="text-4xl md:text-6xl font-display font-medium tracking-tighter text-white mb-6 leading-[1.1]">
-              INITIATE <br /> PROJECT DEV.
+              {t("project_discovery.title_part_1")} <br /> {t("project_discovery.title_part_2")}
             </h3>
             <p className="text-lg text-text-muted mb-10 leading-relaxed font-light">
-              Connect with our elite architecture team to evaluate your
-              requirements and scope your next enterprise deployment.
+              {t("project_discovery.description")}
             </p>
 
             <div className="space-y-6">
               {[
-                { stepNum: 1, title: "Scope" },
-                { stepNum: 2, title: "Details" },
-                { stepNum: 3, title: "Identity" },
+                { stepNum: 1, title: t("project_discovery.steps.step1") },
+                { stepNum: 2, title: t("project_discovery.steps.step2") },
+                { stepNum: 3, title: t("project_discovery.steps.step3") },
               ].map((s) => (
                 <div
                   key={s.stepNum}
@@ -225,7 +226,7 @@ export function ContactForm() {
                         className="flex-1"
                       >
                         <h4 className="text-2xl font-display text-white mb-6">
-                          What are we building?
+                          {t("wizard.step1_title")}
                         </h4>
                         <div className="grid grid-cols-2 gap-4 mb-8">
                           <Controller
@@ -277,7 +278,7 @@ export function ContactForm() {
                         )}
 
                         <h4 className="text-xl font-display text-white mb-4">
-                          Estimated Budget
+                          {t("wizard.budget_title")}
                         </h4>
                         <div className="grid grid-cols-2 gap-3 mb-4">
                           <Controller
@@ -318,7 +319,7 @@ export function ContactForm() {
                             onClick={handleNext}
                             className="gap-2"
                           >
-                            Continue <ArrowRight size={16} />
+                            {t("buttons.continue")} <ArrowRight size={16} />
                           </Button>
                         </div>
                       </motion.div>
@@ -332,7 +333,7 @@ export function ContactForm() {
                         className="flex-1"
                       >
                         <h4 className="text-2xl font-display text-white mb-6">
-                          Timeline & Details
+                          {t("wizard.step2_title")}
                         </h4>
                         <div className="grid grid-cols-2 gap-3 mb-8">
                           <Controller
@@ -373,22 +374,22 @@ export function ContactForm() {
                               className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
                               htmlFor="urgency"
                             >
-                              Urgency Level
+                              {t("labels.urgency")}
                             </label>
                             <select
                               id="urgency"
                               {...register("urgency")}
                               className={`flex w-full rounded-md border border-white/5 bg-surface/50 px-4 py-3 text-[15px] text-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all duration-300 ${errors.urgency ? "border-red-500/50" : ""}`}
                             >
-                              <option value="">Select urgency</option>
+                              <option value="">{t("wizard.urgency.select")}</option>
                               <option value="high">
-                                High - Immediate Start
+                                {t("wizard.urgency.high")}
                               </option>
                               <option value="medium">
-                                Medium - Within 3 Months
+                                {t("wizard.urgency.medium")}
                               </option>
                               <option value="low">
-                                Low - Exploring Options
+                                {t("wizard.urgency.low")}
                               </option>
                             </select>
                             {errors.urgency && (
@@ -403,12 +404,12 @@ export function ContactForm() {
                               className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
                               htmlFor="requirements"
                             >
-                              Project Requirements
+                              {t("labels.requirements")}
                             </label>
                             <textarea
                               id="requirements"
                               rows={5}
-                              placeholder="Describe the core objectives, existing tech stack, and key deliverables..."
+                              placeholder={t("placeholders.requirements")}
                               {...register("requirements")}
                               className={`flex w-full rounded-md border border-white/5 bg-surface/50 px-4 py-3 text-[15px] text-white placeholder:text-slate-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all duration-300 resize-none ${errors.requirements ? "border-red-500/50" : ""}`}
                             />
@@ -427,14 +428,14 @@ export function ContactForm() {
                             onClick={() => setStep(1)}
                             className="gap-2"
                           >
-                            <ArrowLeft size={16} /> Back
+                            <ArrowLeft size={16} /> {t("buttons.back")}
                           </Button>
                           <Button
                             type="button"
                             onClick={handleNext}
                             className="gap-2"
                           >
-                            Continue <ArrowRight size={16} />
+                            {t("buttons.continue")} <ArrowRight size={16} />
                           </Button>
                         </div>
                       </motion.div>
@@ -448,7 +449,7 @@ export function ContactForm() {
                         className="flex-1"
                       >
                         <h4 className="text-2xl font-display text-white mb-6">
-                          Identity Verification
+                          {t("wizard.step3_title")}
                         </h4>
                         <div className="space-y-5 mb-8">
                           <div className="space-y-2">
@@ -456,11 +457,11 @@ export function ContactForm() {
                               className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
                               htmlFor="clientName"
                             >
-                              Full Name
+                              {t("labels.full_name")}
                             </label>
                             <Input
                               id="clientName"
-                              placeholder="Jane Doe"
+                              placeholder={t("placeholders.full_name")}
                               {...register("clientName")}
                               className={
                                 errors.clientName ? "border-red-500/50" : ""
@@ -477,11 +478,11 @@ export function ContactForm() {
                               className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
                               htmlFor="company"
                             >
-                              Company / Organization
+                              {t("labels.company")}
                             </label>
                             <Input
                               id="company"
-                              placeholder="Acme Global"
+                              placeholder={t("placeholders.company")}
                               {...register("company")}
                               className={
                                 errors.company ? "border-red-500/50" : ""
@@ -498,11 +499,11 @@ export function ContactForm() {
                               className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
                               htmlFor="industry"
                             >
-                              Industry
+                              {t("labels.industry")}
                             </label>
                             <Input
                               id="industry"
-                              placeholder="Finance, Healthcare, Tech..."
+                              placeholder={t("placeholders.industry")}
                               {...register("industry")}
                               className={
                                 errors.industry ? "border-red-500/50" : ""
@@ -519,12 +520,12 @@ export function ContactForm() {
                               className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400"
                               htmlFor="email"
                             >
-                              Work Email
+                              {t("labels.work_email")}
                             </label>
                             <Input
                               id="email"
                               type="email"
-                              placeholder="jane@acmeglobal.com"
+                              placeholder={t("placeholders.work_email")}
                               {...register("email")}
                               className={
                                 errors.email ? "border-red-500/50" : ""
@@ -551,7 +552,7 @@ export function ContactForm() {
                             onClick={() => setStep(2)}
                             className="gap-2 px-0"
                           >
-                            <ArrowLeft size={16} /> Back
+                            <ArrowLeft size={16} /> {t("buttons.back")}
                           </Button>
                           {!user ? (
                             <Button
@@ -565,7 +566,7 @@ export function ContactForm() {
                               }
                               className="tracking-[0.1em] font-bold gap-2"
                             >
-                              Login to Submit
+                              {t("buttons.login_to_submit")}
                             </Button>
                           ) : (
                             <Button
@@ -577,7 +578,7 @@ export function ContactForm() {
                               {isSubmitting ? (
                                 <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
                               ) : (
-                                "Initiate Project Dev"
+                                t("buttons.initiate")
                               )}
                             </Button>
                           )}
@@ -614,14 +615,13 @@ export function ContactForm() {
                   <CheckCircle2 size={40} />
                 </div>
                 <h4 className="text-3xl font-display font-medium text-white mb-3">
-                  Request Secured
+                  {t("wizard.success.title")}
                 </h4>
                 <p className="text-text-muted text-lg font-light mb-8 max-w-sm">
-                  Our elite engineering team has received your brief and will be
-                  in touch shortly.
+                  {t("wizard.success.description")}
                 </p>
                 <Button variant="outline" onClick={() => setIsSuccess(false)}>
-                  Close & Continue
+                  {t("buttons.close_continue")}
                 </Button>
               </Card>
             </motion.div>

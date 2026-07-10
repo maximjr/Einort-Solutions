@@ -24,10 +24,11 @@ interface AdminMessengerProps {
 }
 
 import { useMessaging } from "../../hooks/useMessaging";
+import { useTranslation } from "react-i18next";
 
-function safelyFormatTime(timestamp: any): string {
+function safelyFormatTime(timestamp: any, t: any): string {
   try {
-    if (!timestamp) return "Now";
+    if (!timestamp) return t("messenger.now");
     if (typeof timestamp.toDate === "function") {
       return timestamp.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
@@ -40,10 +41,11 @@ function safelyFormatTime(timestamp: any): string {
   } catch (err) {
     console.debug("Failed parsing timestamp:", err);
   }
-  return "Sent";
+  return t("messenger.sent");
 }
 
 export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps) {
+  const { t } = useTranslation("admin");
   const { conversations } = useMessaging();
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
@@ -215,7 +217,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
         selectedConversation.id,
         currentAdminId,
         selectedClientId,
-        textToSend || "Administrative documents shared.",
+        textToSend || t("messenger.administrative_shared"),
         attachments.length > 0 ? "file" : "text",
         attachments
       );
@@ -274,15 +276,15 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
       <div className="w-full lg:w-[320px] flex flex-col border-r border-white/[0.05] bg-black/20 shrink-0">
         <div className="p-5 border-b border-white/[0.05]">
           <h3 className="text-[13px] font-semibold tracking-wide text-white flex items-center gap-2">
-            <MessageSquare size={16} className="text-primary" /> Active Clients
+            <MessageSquare size={16} className="text-primary" /> {t("messenger.active_clients")}
           </h3>
-          <p className="text-[11px] text-slate-500 font-light mt-1 w-full truncate">Select a client to manage communications</p>
+          <p className="text-[11px] text-slate-500 font-light mt-1 w-full truncate">{t("messenger.select_client")}</p>
         </div>
 
         <div className="flex-1 overflow-y-auto w-full scrollbar-premium pb-4" data-lenis-prevent="true">
           {clients.length === 0 ? (
             <div className="p-8 text-center text-slate-500 text-[13px] font-light">
-              No registered clients.
+              {t("messenger.no_registered_clients")}
             </div>
           ) : (
             <div className="px-3 pt-3 space-y-1">
@@ -292,6 +294,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                 const unread = conv?.unreadCount?.[currentAdminId] || 0;
                 const online = clientPresence[c.id] || false;
                 const isSelected = selectedClientId === c.id;
+                const clientName = c.fullName || c.displayName || c.name || t("placeholders.role_client");
 
                 return (
                   <button
@@ -305,14 +308,14 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                   >
                     <div className="relative shrink-0">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-[13px] uppercase transition-colors ${isSelected ? "bg-primary text-white shadow-lg" : "bg-white/[0.05] text-slate-300"}`}>
-                        {(c.fullName || c.displayName || c.name || "Client User").substring(0, 2)}
+                        {clientName.substring(0, 2)}
                       </div>
                       <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#0a0f18] transition-colors ${online ? "bg-emerald-400" : "bg-transparent border-transparent"}`}></span>
                     </div>
 
                     <div className="flex-1 min-w-0 overflow-hidden">
                       <div className="flex items-center justify-between mb-0.5">
-                        <p className={`text-[13px] font-medium truncate pr-2 ${isSelected ? "text-white" : "text-slate-300"}`}>{c.fullName || c.displayName || c.name || "Client User"}</p>
+                        <p className={`text-[13px] font-medium truncate pr-2 ${isSelected ? "text-white" : "text-slate-300"}`}>{clientName}</p>
                         {unread > 0 && (
                           <span className="flex-shrink-0 flex items-center justify-center w-5 h-5 bg-cyan-500 text-[#0a0f18] text-[10px] font-bold rounded-full shadow-[0_0_10px_rgba(34,211,238,0.4)]">
                             {unread}
@@ -326,7 +329,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                         </p>
                       ) : (
                         <p className={`text-[11px] truncate font-light italic ${isSelected ? "text-slate-400" : "text-slate-600"}`}>
-                          No messages yet
+                          {t("messenger.no_messages")}
                         </p>
                       )}
                     </div>
@@ -366,10 +369,10 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                   <div>
                     <div className="flex items-center gap-2">
                       <h4 className="text-[14px] font-semibold tracking-wide text-white">
-                        {activeSelectedClient.fullName || activeSelectedClient.displayName || activeSelectedClient.name || "Client User"}
+                        {activeSelectedClient.fullName || activeSelectedClient.displayName || activeSelectedClient.name || t("placeholders.role_client")}
                       </h4>
                       <span className={`text-[9px] px-2 py-0.5 rounded-full font-medium uppercase ${clientPresence[activeSelectedClient.id] ? "bg-emerald-500/10 text-emerald-400" : "bg-white/5 text-slate-400"}`}>
-                        {clientPresence[activeSelectedClient.id] ? "Online" : "Offline"}
+                        {clientPresence[activeSelectedClient.id] ? t("messenger.online") : t("messenger.offline")}
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-400 mt-0.5 font-light">{activeSelectedClient.email}</p>
@@ -385,10 +388,10 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                     onChange={(e) => updatePriority(e.target.value)}
                     className="bg-transparent text-slate-300 hover:text-white text-[11px] font-medium tracking-wide rounded focus:outline-none cursor-pointer py-1 appearance-none"
                   >
-                    <option value="none" className="bg-[#0a0f18] text-slate-300">Standard Priority</option>
-                    <option value="low" className="bg-[#0a0f18] text-slate-300">Low Priority</option>
-                    <option value="medium" className="bg-[#0a0f18] text-slate-300">Medium Priority</option>
-                    <option value="high" className="bg-[#0a0f18] text-slate-300">High Priority</option>
+                    <option value="none" className="bg-[#0a0f18] text-slate-300">{t("messenger.standard_priority")}</option>
+                    <option value="low" className="bg-[#0a0f18] text-slate-300">{t("messenger.low_priority")}</option>
+                    <option value="medium" className="bg-[#0a0f18] text-slate-300">{t("messenger.medium_priority")}</option>
+                    <option value="high" className="bg-[#0a0f18] text-slate-300">{t("messenger.high_priority")}</option>
                   </select>
                 </div>
 
@@ -401,9 +404,9 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                     onChange={(e) => updateStatus(e.target.value)}
                     className="bg-transparent text-slate-300 hover:text-white text-[11px] font-medium tracking-wide rounded focus:outline-none cursor-pointer py-1 appearance-none"
                   >
-                    <option value="active" className="bg-[#0a0f18] text-slate-300">Active</option>
-                    <option value="archived" className="bg-[#0a0f18] text-slate-300">Archived</option>
-                    <option value="closed" className="bg-[#0a0f18] text-slate-300">Closed</option>
+                    <option value="active" className="bg-[#0a0f18] text-slate-300">{t("messenger.active")}</option>
+                    <option value="archived" className="bg-[#0a0f18] text-slate-300">{t("messenger.archived")}</option>
+                    <option value="closed" className="bg-[#0a0f18] text-slate-300">{t("messenger.closed")}</option>
                   </select>
                 </div>
               </div>
@@ -420,7 +423,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                 {loadingMessages ? (
                 <div className="h-full flex flex-col items-center justify-center gap-4 py-12 text-slate-400">
                   <Loader2 className="w-5 h-5 text-primary animate-spin" />
-                  <p className="text-[11px] font-medium tracking-wide">Retrieving channel history...</p>
+                  <p className="text-[11px] font-medium tracking-wide">{t("messenger.retrieving_history")}</p>
                 </div>
               ) : messages.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-5 py-12">
@@ -429,9 +432,9 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                     <Globe className="w-6 h-6 relative z-10 opacity-50" />
                   </div>
                   <div className="space-y-2">
-                    <h5 className="text-[15px] font-semibold text-white tracking-wide">Secure Link Established</h5>
+                    <h5 className="text-[15px] font-semibold text-white tracking-wide">{t("messenger.secure_link_established")}</h5>
                     <p className="text-slate-400 font-light text-[13px] leading-relaxed max-w-sm mx-auto">
-                      Channel is open with {activeSelectedClient.fullName || activeSelectedClient.displayName || activeSelectedClient.name || "Client User"}. You may now send deliverables and secure communications.
+                      {t("messenger.channel_open", { name: activeSelectedClient.fullName || activeSelectedClient.displayName || activeSelectedClient.name || t("placeholders.role_client") })}
                     </p>
                   </div>
                 </div>
@@ -471,7 +474,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                                     className={`flex items-center gap-2 text-[12px] font-medium hover:underline transition-colors text-cyan-400 hover:text-cyan-300`}
                                   >
                                     <Paperclip size={12} className="shrink-0" />
-                                    <span>{attach.name || "Attachment"}</span>
+                                    <span>{attach.name || t("messenger.attachment")}</span>
                                   </a>
                                 ))}
                               </div>
@@ -479,7 +482,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                           </div>
                           <div className={`flex items-center gap-1.5 mt-1.5 px-1 text-[10px] text-slate-500 font-medium ${isMe ? "justify-end" : "justify-start"} transition-opacity`}>
                             <span>
-                              {safelyFormatTime(ms.timestamp)}
+                              {safelyFormatTime(ms.timestamp, t)}
                             </span>
                             {isMe && (
                               <span className="flex items-center ml-0.5">
@@ -521,7 +524,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
               {mockAttachment && (
                 <div className="flex items-center justify-between mb-3 bg-cyan-500/10 border border-cyan-500/20 rounded-xl px-3 py-2 text-[12px] text-cyan-400">
                   <span className="truncate flex items-center gap-2 font-medium">
-                    <CheckCircle2 size={14} /> Document attached
+                    <CheckCircle2 size={14} /> {t("messenger.document_attached")}
                   </span>
                   <button 
                     type="button" 
@@ -555,7 +558,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                           onClick={simulateAttachment}
                           className="w-full text-left font-medium text-[12px] text-slate-200 hover:text-white hover:bg-white/5 py-2 px-3 rounded-lg transition-colors cursor-pointer flex items-center gap-2"
                         >
-                          <Paperclip size={12} className="text-primary" /> Engineering Audit
+                          <Paperclip size={12} className="text-primary" /> {t("messenger.engineering_audit")}
                         </button>
                       </motion.div>
                     )}
@@ -572,7 +575,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                       e.target.style.height = e.target.scrollHeight + "px";
                     }}
                     onKeyDown={handleKeyPress}
-                    placeholder={`Reply to ${activeSelectedClient.fullName || activeSelectedClient.displayName || activeSelectedClient.name || "Client User"}...`}
+                    placeholder={t("messenger.reply_placeholder", { name: activeSelectedClient.fullName || activeSelectedClient.displayName || activeSelectedClient.name || t("placeholders.role_client") })}
                     disabled={sending}
                     rows={1}
                     className="w-full min-h-[44px] max-h-32 bg-white/[0.04] border border-white/[0.08] focus:border-white/20 focus:ring-1 focus:ring-white/10 rounded-2xl px-4 py-[13.5px] text-[14px] text-white placeholder-slate-400 font-light focus:outline-none resize-none transition-all scrollbar-premium shadow-inner"
@@ -586,7 +589,7 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
                 >
                   {sending ? <Loader2 size={16} className="animate-spin" /> : (
                     <>
-                      <span className="sm:hidden block mr-2">Send</span>
+                      <span className="sm:hidden block mr-2">{t("messenger.send")}</span>
                       <Send size={16} className="sm:ml-0.5" />
                     </>
                   )}
@@ -600,9 +603,9 @@ export function AdminMessenger({ clients, currentAdminId }: AdminMessengerProps)
               <div className="absolute inset-0 rounded-full bg-white/[0.01] blur-2xl"></div>
               <FolderLock size={28} className="relative z-10" />
             </div>
-            <h3 className="text-[17px] font-semibold text-white tracking-wide mb-2">Executive Command Center</h3>
+            <h3 className="text-[17px] font-semibold text-white tracking-wide mb-2">{t("messenger.executive_command_center")}</h3>
             <p className="text-slate-400 font-light text-[14px] max-w-sm mx-auto leading-relaxed">
-              Select a client from the directory to monitor pipelines, reply to inquiries, and manage secure deliverables.
+              {t("messenger.select_client_long")}
             </p>
           </div>
         )}

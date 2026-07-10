@@ -3,38 +3,41 @@ import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
-import { Helmet } from "react-helmet-async";
 import { SEO } from "../../components/seo/SEO";
 import { Globe, ArrowRight, ShieldCheck, Zap } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function LocationPage() {
   const { region } = useParams<{ region: string }>();
-  const formattedRegion = region
-    ? region.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
-    : "Global";
+  const { t } = useTranslation("seo");
+
+  const regionKey = region || "global";
+  const localizedRegion = t(`names.${regionKey}`) !== `names.${regionKey}`
+    ? t(`names.${regionKey}`)
+    : regionKey.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
   const schema = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Service",
-    serviceType: `${formattedRegion} Web Development`,
+    serviceType: `${localizedRegion} Web Development`,
     provider: {
       "@type": "Organization",
       name: "Einort Solutions",
     },
     areaServed: {
       "@type": "Place",
-      name: formattedRegion,
+      name: localizedRegion,
     },
-    description: `Premium enterprise software engineering, AI automation, and custom web development services for businesses in ${formattedRegion}.`,
+    description: t("location.description_template", { region: localizedRegion }),
   });
 
   return (
     <>
-      <Helmet>
-        <title>Enterprise Web Development in {formattedRegion} | Einort Solutions</title>
-        <meta name="description" content={`Einort Solutions delivers world-class custom software development and enterprise AI automation to businesses in ${formattedRegion}.`} />
-      </Helmet>
-      <SEO schema={schema} />
+      <SEO 
+        title={t("location.title_template", { region: localizedRegion })}
+        description={t("location.description_template", { region: localizedRegion })}
+        schema={schema} 
+      />
       <section className="pt-32 pb-24 bg-surface min-h-[80dvh] relative overflow-hidden">
         {/* Ambient background */}
         <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-primary/5 blur-[150px] rounded-full mix-blend-screen pointer-events-none"></div>
@@ -47,20 +50,17 @@ export function LocationPage() {
               <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full bg-primary/10 border border-primary/20 shadow-sm">
                 <Globe size={14} className="text-primary" />
                 <span className="text-xs uppercase tracking-widest font-bold text-primary">
-                  Enterprise Services in {formattedRegion}
+                  {t("location.services_badge", { region: localizedRegion })}
                 </span>
               </div>
               <h1 className="text-5xl md:text-7xl font-display font-medium text-white tracking-tight mb-8 leading-tight">
-                Premium Software Engineering for
+                {t("location.hero_title")}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400 block mt-2">
-                  {formattedRegion} Businesses
+                  {t("location.hero_title_accent", { region: localizedRegion })}
                 </span>
               </h1>
               <p className="text-xl text-slate-400 font-light max-w-2xl leading-relaxed mb-10">
-                Einort Solutions partners with industry leaders in{" "}
-                {formattedRegion} to design, architect, and deploy world-class
-                digital platforms. From highly scalable SaaS systems to custom
-                ERP platforms, we engineer tomorrow's digital reality.
+                {t("location.hero_description", { region: localizedRegion })}
               </p>
 
               <div className="flex flex-wrap gap-4">
@@ -70,7 +70,7 @@ export function LocationPage() {
                     size="lg"
                     className="gap-2 uppercase text-xs tracking-widest font-bold"
                   >
-                    Schedule Discovery <ArrowRight size={16} />
+                    {t("location.schedule_discovery")} <ArrowRight size={16} />
                   </Button>
                 </Link>
                 <Link to="/">
@@ -79,7 +79,7 @@ export function LocationPage() {
                     size="lg"
                     className="uppercase text-xs tracking-widest font-bold text-slate-300"
                   >
-                    Explore Global Services
+                    {t("location.explore_global")}
                   </Button>
                 </Link>
               </div>
@@ -90,18 +90,18 @@ export function LocationPage() {
             {[
               {
                 icon: <Zap size={24} />,
-                title: "Scalable Architecture",
-                desc: `We build cloud-native systems designed to handle enterprise traffic for ${formattedRegion} markets.`,
+                title: t("location.features.architecture_title"),
+                desc: t("location.features.architecture_desc", { region: localizedRegion }),
               },
               {
                 icon: <ShieldCheck size={24} />,
-                title: "Secure & Compliant",
-                desc: `Meeting the strict data security and compliance requirements standard in ${formattedRegion}.`,
+                title: t("location.features.secure_title"),
+                desc: t("location.features.secure_desc", { region: localizedRegion }),
               },
               {
                 icon: <Globe size={24} />,
-                title: "Local Market Expertise",
-                desc: `Deep understanding of buyer intent and user experience optimization for ${formattedRegion} audiences.`,
+                title: t("location.features.expertise_title"),
+                desc: t("location.features.expertise_desc", { region: localizedRegion }),
               },
             ].map((feature, i) => (
               <FadeUp key={i} delay={0.2 + i * 0.1}>

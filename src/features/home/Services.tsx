@@ -15,63 +15,39 @@ const services = [
   {
     id: "websites-web-apps",
     icon: <Code2 className="w-6 h-6 text-primary" />,
-    title: "Websites & Web Apps",
-    description:
-      "Build stunning, high-performance websites and intelligent web applications engineered for growth, scalability, and premium user experience.",
   },
   {
     id: "ui-ux-design",
     icon: <LayoutTemplate className="w-6 h-6 text-primary" />,
-    title: "UI/UX Design",
-    description:
-      "Crafting intuitive, visually exceptional, and conversion-focused user experiences that elevate digital engagement.",
   },
   {
     id: "erp-solutions",
     icon: <Database className="w-6 h-6 text-primary" />,
-    title: "ERP Solutions",
-    description:
-      "Streamline operations with intelligent ERP systems built to automate workflows, centralize management, and scale business efficiency.",
   },
   {
     id: "mobile-app-development",
     icon: <Smartphone className="w-6 h-6 text-primary" />,
-    title: "Mobile App Development",
-    description:
-      "Deliver premium mobile experiences with high-performance applications designed for seamless functionality and modern usability.",
   },
   {
     id: "branding-graphic-design",
     icon: <PenTool className="w-6 h-6 text-primary" />,
-    title: "Branding & Graphic Design",
-    description:
-      "Develop a compelling visual identity with professional graphic design and brand strategy that resonates with your audience.",
   },
   {
     id: "social-media-management",
     icon: <Share2 className="w-6 h-6 text-primary" />,
-    title: "Social Media Management",
-    description:
-      "Enhance your online presence with strategic social media campaigns, content creation, and community engagement.",
   },
   {
     id: "digital-advertising",
     icon: <Target className="w-6 h-6 text-primary" />,
-    title: "Digital Advertising (Facebook, Instagram, Google)",
-    description:
-      "Drive targeted traffic and conversions through data-driven digital advertising across major platforms.",
   },
   {
     id: "seo-workspace-setup",
     icon: <Search className="w-6 h-6 text-primary" />,
-    title: "SEO & Google Workspace Setup",
-    description:
-      "Improve search visibility and streamline organizational productivity with expert SEO strategies and Workspace integrations.",
   },
 ];
 
 export function Services() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation('services');
   const langPrefix = `/${i18n.resolvedLanguage || 'en'}`;
 
   return (
@@ -84,17 +60,16 @@ export function Services() {
           <FadeUp>
             <div className="flex flex-col gap-4">
               <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
-                Core Expertise
+                {t("badge")}
               </h2>
               <h3 className="text-4xl md:text-6xl font-display font-medium tracking-tight text-white max-w-2xl leading-[1.1]">
-                ENGINEERING AT <br /> THE HIGHEST LEVEL.
+                {t("title_part_1")} <br /> {t("title_part_2")}
               </h3>
             </div>
           </FadeUp>
           <FadeUp delay={0.1}>
             <p className="text-text-muted max-w-md text-base leading-relaxed font-light">
-              We do not just build websites; we engineer digital products that
-              serve as the foundation for modern enterprises.
+              {t("description")}
             </p>
           </FadeUp>
         </div>
@@ -116,12 +91,12 @@ export function Services() {
                       )}
                     </div>
                     <CardTitle className="text-2xl font-display font-medium text-white tracking-wide">
-                      {service.title}
+                      {t(`items.${service.id}.title`)}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-text-muted leading-relaxed font-light text-[15px]">
-                      {service.description}
+                      {t(`items.${service.id}.description`)}
                     </p>
                   </CardContent>
                 </Card>

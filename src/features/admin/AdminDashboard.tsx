@@ -51,6 +51,8 @@ import { AdminMessenger } from "./AdminMessenger";
 import { useMessaging } from "../../hooks/useMessaging";
 import { PullToRefresh } from "../../components/ui/PullToRefresh";
 
+import { useTranslation } from "react-i18next";
+
 const COLORS = [
   "#3b82f6",
   "#8b5cf6",
@@ -61,44 +63,46 @@ const COLORS = [
   "#64748b",
 ];
 
-const getDetailedStatusPill = (status: string) => {
-  const currentStatus = (status || "pending").toLowerCase();
-  
-  if (currentStatus === "cancelled") {
-    return {
-      label: "Cancelled",
-      bgClass: "bg-red-500/10 text-red-400 border-red-500/20",
-      dotClass: "bg-red-400 shadow-[0_0_8px_rgba(239,68,68,0.8)]",
-    };
-  }
-  
-  const pendingStages = ["pending", "new", "discovery"];
-  const completedStages = ["completed", "launched", "deployment"];
-  
-  if (pendingStages.includes(currentStatus)) {
-    return {
-      label: "Pending Review",
-      bgClass: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-      dotClass: "bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse",
-    };
-  }
-  
-  if (completedStages.includes(currentStatus)) {
-    return {
-      label: "Completed",
-      bgClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-      dotClass: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]",
-    };
-  }
-  
-  return {
-    label: "In Progress",
-    bgClass: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    dotClass: "bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse",
-  };
-};
-
 export function AdminDashboard() {
+  const { t } = useTranslation("admin");
+  
+  const getDetailedStatusPill = (status: string) => {
+    const currentStatus = (status || "pending").toLowerCase();
+    
+    if (currentStatus === "cancelled") {
+      return {
+        label: t("status.cancelled"),
+        bgClass: "bg-red-500/10 text-red-400 border-red-500/20",
+        dotClass: "bg-red-400 shadow-[0_0_8px_rgba(239,68,68,0.8)]",
+      };
+    }
+    
+    const pendingStages = ["pending", "new", "discovery"];
+    const completedStages = ["completed", "launched", "deployment"];
+    
+    if (pendingStages.includes(currentStatus)) {
+      return {
+        label: t("status.pending_review"),
+        bgClass: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+        dotClass: "bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse",
+      };
+    }
+    
+    if (completedStages.includes(currentStatus)) {
+      return {
+        label: t("status.completed"),
+        bgClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+        dotClass: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]",
+      };
+    }
+    
+    return {
+      label: t("status.in_progress"),
+      bgClass: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+      dotClass: "bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse",
+    };
+  };
+
   const location = useLocation();
   const [projects, setProjects] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
@@ -271,8 +275,8 @@ export function AdminDashboard() {
       await new Promise(resolve => setTimeout(resolve, 800));
     }}>
       <Helmet>
-        <title>Admin Intelligence | Einort Solutions</title>
-        <meta name="description" content="Enterprise command center and project pipeline." />
+        <title>{t("seo.title")}</title>
+        <meta name="description" content={t("seo.description")} />
       </Helmet>
       <section className="py-24 bg-surface min-h-[80dvh] relative pt-32">
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 blur-[150px] pointer-events-none rounded-full translate-x-1/2 -translate-y-1/2"></div>
@@ -280,8 +284,8 @@ export function AdminDashboard() {
       <Container>
         <Breadcrumbs
           items={[
-            { label: "Home", href: "/" },
-            { label: "Admin Intelligence" },
+            { label: t("breadcrumbs.home"), href: "/" },
+            { label: t("breadcrumbs.admin") },
           ]}
         />
 
@@ -289,19 +293,19 @@ export function AdminDashboard() {
           <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div>
               <h1 className="text-3xl md:text-5xl font-display font-medium text-white mb-4 flex items-center gap-4">
-                Executive Command Center
+                {t("headings.command_center")}
               </h1>
               <p className="text-text-muted font-light text-lg">
-                Enterprise Business Operating System
+                {t("headings.operating_system")}
               </p>
             </div>
             {syncError && (
               <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/20 px-4 py-3 rounded-xl text-red-500 text-sm shadow-[0_0_15px_rgba(239,68,68,0.1)]">
                 <AlertTriangle size={18} className="text-red-500" />
                 <p className="font-medium tracking-wide">
-                  System Notice: Realtime replication degraded.{" "}
+                  {t("notices.system_degraded")}{" "}
                   {syncError.includes("Security Rules")
-                    ? "Missing IAM permissions or security rules."
+                    ? t("notices.iam_error")
                     : ""}
                 </p>
               </div>
@@ -320,8 +324,8 @@ export function AdminDashboard() {
             }`}
           >
             <Briefcase className="w-4 h-4" />
-            <span className="hidden sm:inline">Analytics & Pipeline</span>
-            <span className="sm:hidden">Analytics</span>
+            <span className="hidden sm:inline">{t("tabs.analytics")}</span>
+            <span className="sm:hidden">{t("tabs.analytics_short")}</span>
           </button>
           
           <button
@@ -333,8 +337,8 @@ export function AdminDashboard() {
             }`}
           >
             <MessageSquare className="w-4 h-4" />
-            <span className="hidden sm:inline">Messaging Pipeline</span>
-            <span className="sm:hidden">Messages</span>
+            <span className="hidden sm:inline">{t("tabs.messaging")}</span>
+            <span className="sm:hidden">{t("tabs.messages_short")}</span>
             {unreadTotalCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center bg-cyan-400 text-[#030712] text-[9px] font-bold w-4 h-4 rounded-full font-mono shadow-[0_0_8px_rgba(34,211,238,0.7)] animate-pulse shrink-0">
                 {unreadTotalCount}
@@ -352,72 +356,72 @@ export function AdminDashboard() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8">
           {[
             {
-              label: "Active Projects",
+              label: t("stats.active_projects"),
               value: projects.length,
-              trend: "Live",
+              trend: t("stats.trends.live"),
               icon: <Briefcase className="w-4 h-4 md:w-5 md:h-5" />,
               color: "text-blue-400",
               bg: "bg-blue-400/10",
               border: "border-blue-400/20",
             },
             {
-              label: "Est. Revenue Pipeline",
+              label: t("stats.revenue_pipeline"),
               value: formatCurrency(totalPipelineValue),
-              trend: "Volume",
+              trend: t("stats.trends.volume"),
               icon: <DollarSign className="w-4 h-4 md:w-5 md:h-5" />,
               color: "text-emerald-400",
               bg: "bg-emerald-400/10",
               border: "border-emerald-400/20",
             },
             {
-              label: "High Priority Deals",
+              label: t("stats.high_priority"),
               value: urgentProjectsCount,
-              trend: "Urgent",
+              trend: t("stats.trends.urgent"),
               icon: <Zap className="w-4 h-4 md:w-5 md:h-5" />,
               color: "text-orange-400",
               bg: "bg-orange-400/10",
               border: "border-orange-400/20",
             },
             {
-              label: "Projected Conversion",
+              label: t("stats.conversion_rate"),
               value: `${conversionRate}%`,
-              trend: "Avg",
+              trend: t("stats.trends.avg"),
               icon: <Target className="w-4 h-4 md:w-5 md:h-5" />,
               color: "text-purple-400",
               bg: "bg-purple-400/10",
               border: "border-purple-400/20",
             },
             {
-              label: "Active Client Base",
+              label: t("stats.active_clients"),
               value: loadingUsers ? "-" : activeClientsCount,
-              trend: "Users",
+              trend: t("stats.trends.users"),
               icon: <Users className="w-4 h-4 md:w-5 md:h-5" />,
               color: "text-cyan-400",
               bg: "bg-cyan-400/10",
               border: "border-cyan-400/20",
             },
             {
-              label: "Avg. Lead Score",
+              label: t("stats.avg_lead_score"),
               value: loading ? "-" : averageLeadScore,
-              trend: "Score",
+              trend: t("stats.trends.score"),
               icon: <Activity className="w-4 h-4 md:w-5 md:h-5" />,
               color: "text-indigo-400",
               bg: "bg-indigo-400/10",
               border: "border-indigo-400/20",
             },
             {
-              label: "Abandoned Drafts",
+              label: t("stats.abandoned_drafts"),
               value: abandonedPrototypes,
-              trend: "Lost",
+              trend: t("stats.trends.lost"),
               icon: <ShieldAlert className="w-4 h-4 md:w-5 md:h-5" />,
               color: "text-red-400",
               bg: "bg-red-400/10",
               border: "border-red-400/20",
             },
             {
-              label: "System Health",
-              value: syncError ? "Degraded" : "Nominal",
-              trend: "Ops",
+              label: t("stats.system_health"),
+              value: syncError ? t("stats.health_status.degraded") : t("stats.health_status.nominal"),
+              trend: t("stats.trends.ops"),
               icon: <Activity className="w-4 h-4 md:w-5 md:h-5" />,
               color: syncError ? "text-red-400" : "text-green-400",
               bg: syncError ? "bg-red-400/10" : "bg-green-400/10",
@@ -461,7 +465,7 @@ export function AdminDashboard() {
             <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-2xl h-full flex flex-col">
               <CardHeader className="border-b border-white/[0.05] pb-4">
                 <CardTitle className="text-[11px] uppercase tracking-widest font-semibold text-slate-400">
-                  Sector Concentration
+                  {t("charts.sector_concentration")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col pt-6">
@@ -522,7 +526,7 @@ export function AdminDashboard() {
             <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-2xl h-full flex flex-col">
               <CardHeader className="border-b border-white/[0.05] pb-4">
                 <CardTitle className="text-[11px] uppercase tracking-widest font-semibold text-slate-400">
-                  Value Allocation
+                  {t("charts.value_allocation")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col pt-6">
@@ -575,7 +579,7 @@ export function AdminDashboard() {
             <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-2xl h-full flex flex-col">
               <CardHeader className="border-b border-white/[0.05] pb-4">
                 <CardTitle className="text-[11px] uppercase tracking-widest font-semibold text-slate-400">
-                  Delivery Trajectory
+                  {t("charts.delivery_trajectory")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col pt-6">
@@ -636,7 +640,7 @@ export function AdminDashboard() {
             <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-2xl h-full flex flex-col">
               <CardHeader className="border-b border-white/[0.05] pb-4">
                 <CardTitle className="text-[11px] uppercase tracking-widest font-semibold text-slate-400">
-                  Operational Status
+                  {t("charts.operational_status")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1 flex flex-col pt-6">
@@ -690,8 +694,8 @@ export function AdminDashboard() {
           <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-[2rem] overflow-hidden mb-6">
             <CardHeader className="border-b border-white/[0.05] bg-white/[0.01] p-6 lg:p-8">
               <CardTitle className="text-lg font-medium text-white flex items-center justify-between">
-                <span>Project Pipeline Command Center</span>
-                <span className="bg-white/5 px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-bold text-slate-400 border border-white/5">{projects.length} Total</span>
+                <span>{t("headings.pipeline_title")}</span>
+                <span className="bg-white/5 px-3 py-1 rounded-full text-[10px] uppercase tracking-widest font-bold text-slate-400 border border-white/5">{projects.length} {t("table.total")}</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
@@ -705,7 +709,7 @@ export function AdminDashboard() {
                 </div>
               ) : projects.length === 0 ? (
                 <div className="p-12 text-center text-slate-500 font-medium">
-                  No projects in the pipeline.
+                  {t("notices.no_projects")}
                 </div>
               ) : (
                 <>
@@ -723,8 +727,8 @@ export function AdminDashboard() {
                           >
                             <div className="flex justify-between items-start mb-4 gap-4">
                               <div className="min-w-0">
-                                <h4 className="text-lg font-display text-white truncate mb-1">{proj.company || "Classified Build"}</h4>
-                                <span className="text-xs text-slate-400 capitalize">{proj.industry || "N/A"} • {proj.projectType}</span>
+                                <h4 className="text-lg font-display text-white truncate mb-1">{proj.company || t("placeholders.classified_build")}</h4>
+                                <span className="text-xs text-slate-400 capitalize">{proj.industry || t("placeholders.na")} • {proj.projectType}</span>
                               </div>
                               <div className="flex-shrink-0 flex flex-col items-end gap-2">
                                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[9px] uppercase font-bold tracking-widest rounded-lg border shadow-sm ${detailedPill.bgClass}`}>
@@ -737,7 +741,7 @@ export function AdminDashboard() {
                               <span
                                 className={`px-2 py-0.5 text-[9px] uppercase font-bold tracking-widest rounded border ${proj.urgency === "high" ? "bg-orange-500/10 text-orange-400 border-orange-500/20" : proj.urgency === "medium" ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20" : "bg-primary/10 text-primary border-primary/20"}`}
                               >
-                                {proj.urgency || "Normal"} Urg
+                                {proj.urgency || t("placeholders.normal_urgency")} Urg
                               </span>
                               <span
                                 className={`px-2 py-0.5 text-[9px] uppercase font-bold tracking-widest rounded border ${risk.color}`}
@@ -747,11 +751,11 @@ export function AdminDashboard() {
                             </div>
                             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/5">
                                <div>
-                                 <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Budget</p>
+                                 <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">{t("table.budget", { defaultValue: "Budget" })}</p>
                                  <p className="font-mono text-sm text-slate-200">{proj.budget || "N/A"}</p>
                                </div>
                                <div>
-                                 <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Client</p>
+                                 <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">{t("table.client")}</p>
                                  <p className="text-sm text-slate-200 truncate">{proj.clientName || "Unknown"}</p>
                                </div>
                             </div>
@@ -767,7 +771,7 @@ export function AdminDashboard() {
                               >
                                 <div className="p-5 flex flex-col gap-5">
                                   <div>
-                                    <p className="text-[10px] uppercase tracking-widest text-[#64748b] font-bold mb-1 font-mono">Deal Command</p>
+                                    <p className="text-[10px] uppercase tracking-widest text-[#64748b] font-bold mb-1 font-mono">{t("actions.command")}</p>
                                   </div>
                                   
                                   <div className="w-full">
@@ -781,17 +785,17 @@ export function AdminDashboard() {
                                       className="w-full bg-white/[0.02] border border-white/10 text-slate-200 text-sm rounded-xl px-4 py-3.5 outline-none cursor-pointer uppercase tracking-wider appearance-none shadow-sm font-sans mb-3"
                                     >
                                       {[
-                                        { value: "pending", label: "01. Pending Verification" },
-                                        { value: "discovery", label: "02. Discovery Phase" },
-                                        { value: "planning", label: "03. Architecture Planning" },
-                                        { value: "ui_ux", label: "04. UI/UX Prototyping" },
-                                        { value: "development", label: "05. Engineering & Dev" },
-                                        { value: "testing", label: "06. Testing & QA" },
-                                        { value: "review", label: "07. Governance Review" },
-                                        { value: "revision", label: "08. Revision Loop" },
-                                        { value: "deployment", label: "09. Deployment Prep" },
-                                        { value: "completed", label: "10. Live / Completed" },
-                                        { value: "cancelled", label: "11. Decommissioned / Cancelled" },
+                                        { value: "pending", label: t("stages.pending") },
+                                        { value: "discovery", label: t("stages.discovery") },
+                                        { value: "planning", label: t("stages.planning") },
+                                        { value: "ui_ux", label: t("stages.ui_ux") },
+                                        { value: "development", label: t("stages.development") },
+                                        { value: "testing", label: t("stages.testing") },
+                                        { value: "review", label: t("stages.review") },
+                                        { value: "revision", label: t("stages.revision") },
+                                        { value: "deployment", label: t("stages.deployment") },
+                                        { value: "completed", label: t("stages.completed") },
+                                        { value: "cancelled", label: t("stages.cancelled") },
                                       ].map((option) => (
                                         <option key={option.value} value={option.value} className="bg-slate-950 text-white font-sans">
                                           {option.label}
@@ -811,19 +815,19 @@ export function AdminDashboard() {
                                           ];
 
                                           const currentIndex = orderedStages.indexOf(currentTarget);
-                                          let buttonText = "Accept Deal";
+                                          let buttonText = t("actions.accept_deal");
                                           let nextStatusVal = "discovery";
                                           let isCompleted = currentTarget === "completed";
 
                                           if (currentIndex !== -1 && currentIndex < orderedStages.length - 1) {
                                             const nextStatus = orderedStages[currentIndex + 1];
-                                            const nextLabel = nextStatus.replace("_", "/").toUpperCase();
-                                            buttonText = `Advance to ${nextLabel}`;
+                                            const nextLabel = t(`stages.${nextStatus}`).split(". ")[1].replace("_", "/").toUpperCase();
+                                            buttonText = t("actions.advance_to", { stage: nextLabel });
                                             nextStatusVal = nextStatus;
                                           } else if (currentTarget === "completed") {
-                                            buttonText = "Deal Fully Completed";
+                                            buttonText = t("actions.fully_completed");
                                           } else if (currentTarget === "cancelled") {
-                                            buttonText = "Re-Activate Project";
+                                            buttonText = t("actions.reactivate");
                                             nextStatusVal = "pending";
                                             isCompleted = false;
                                           }
@@ -848,7 +852,7 @@ export function AdminDashboard() {
                                               }`}
                                             >
                                               {isThisSyncing ? <Loader2 className="w-4 h-4 animate-spin text-primary" /> : null}
-                                              {isThisSyncing ? "Syncing..." : buttonText}
+                                              {isThisSyncing ? t("notices.syncing") : buttonText}
                                             </button>
                                           );
                                       })()}
@@ -858,7 +862,7 @@ export function AdminDashboard() {
                                   <div className="flex justify-end pt-4 border-t border-white/5">
                                     {deletingProjectId === proj.id ? (
                                       <div className="flexflex-col w-full gap-3 bg-red-950/20 border border-red-500/20 p-4 rounded-xl animate-pulse">
-                                        <span className="text-red-300 font-mono text-[10px] block mb-3 text-center uppercase tracking-widest font-bold">Decommission permanently?</span>
+                                        <span className="text-red-300 font-mono text-[10px] block mb-3 text-center uppercase tracking-widest font-bold">{t("notices.decommission_confirm")}</span>
                                         <div className="flex gap-2">
                                           <button
                                             onClick={async (e) => {
@@ -877,14 +881,14 @@ export function AdminDashboard() {
                                             disabled={isDeleting}
                                             className="flex-1 px-4 h-12 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-[11px] uppercase tracking-wider rounded-xl transition-colors cursor-pointer"
                                           >
-                                            {isDeleting ? "..." : "Confirm"}
+                                            {isDeleting ? "..." : t("actions.confirm")}
                                           </button>
                                           <button
                                             onClick={(e) => { e.stopPropagation(); setDeletingProjectId(null); }}
                                             disabled={isDeleting}
                                             className="flex-1 px-4 h-12 bg-white/5 text-slate-400 hover:text-white font-bold text-[11px] uppercase tracking-wider rounded-xl transition-colors cursor-pointer"
                                           >
-                                            Cancel
+                                            {t("actions.cancel")}
                                           </button>
                                         </div>
                                       </div>
@@ -893,7 +897,7 @@ export function AdminDashboard() {
                                         onClick={(e) => { e.stopPropagation(); setDeletingProjectId(proj.id); }}
                                         className="h-12 w-full flex items-center justify-center gap-1.5 px-4 bg-white/[0.02] border border-white/5 text-slate-400 hover:text-red-400 font-bold text-[11px] uppercase tracking-wider rounded-xl transition-all cursor-pointer"
                                       >
-                                        Delete Project
+                                        {t("actions.delete_project")}
                                       </button>
                                     )}
                                   </div>
@@ -911,16 +915,16 @@ export function AdminDashboard() {
                     <table className="w-full text-sm text-left whitespace-nowrap">
                       <thead className="bg-white/[0.01] text-[10px] uppercase tracking-widest text-slate-500 border-b border-white/[0.05]">
                         <tr>
-                          <th className="px-4 py-3">Client</th>
-                          <th className="px-4 py-3">Industry</th>
-                          <th className="px-4 py-3">Type</th>
-                          <th className="px-4 py-3">Budget & Timeline</th>
-                          <th className="px-4 py-3">Urgency & Risk</th>
+                          <th className="px-4 py-3">{t("table.client")}</th>
+                          <th className="px-4 py-3">{t("table.industry")}</th>
+                          <th className="px-4 py-3">{t("table.type")}</th>
+                          <th className="px-4 py-3">{t("table.budget_timeline")}</th>
+                          <th className="px-4 py-3">{t("table.urgency_risk")}</th>
                           <th className="px-4 py-3 max-w-[200px]">
-                            Requirements
+                            {t("table.requirements")}
                           </th>
-                          <th className="px-4 py-3">Lead Score</th>
-                          <th className="px-4 py-3">Status</th>
+                          <th className="px-4 py-3">{t("table.lead_score")}</th>
+                          <th className="px-4 py-3">{t("table.status")}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5">
@@ -939,24 +943,24 @@ export function AdminDashboard() {
                             >
                               <td className="px-6 py-5">
                                 <p className="font-medium text-white group-hover:text-primary transition-colors">
-                                  {proj.clientName || "Unknown"}
+                                  {proj.clientName || t("placeholders.unknown")}
                                 </p>
                                 <p className="text-[11px] text-slate-500 font-mono mt-1">
                                   {proj.company || ""}
                                 </p>
                               </td>
                               <td className="px-6 py-5 text-slate-400 capitalize">
-                                {proj.industry || "N/A"}
+                                {proj.industry || t("placeholders.na")}
                               </td>
                               <td className="px-6 py-5 text-slate-400 capitalize">
                                 {proj.projectType}
                               </td>
                               <td className="px-6 py-5">
                                 <p className="text-white font-mono text-sm">
-                                  {proj.budget || "N/A"}
+                                  {proj.budget || t("placeholders.na")}
                                 </p>
                                 <p className="text-[11px] text-slate-500 font-mono mt-1">
-                                  {proj.timeline || "N/A"}
+                                  {proj.timeline || t("placeholders.na")}
                                 </p>
                               </td>
                               <td className="px-6 py-5">
@@ -964,7 +968,7 @@ export function AdminDashboard() {
                                   <span
                                     className={`px-2 py-0.5 text-[9px] uppercase font-bold tracking-widest rounded border ${proj.urgency === "high" ? "bg-orange-500/10 text-orange-400 border-orange-500/20" : proj.urgency === "medium" ? "bg-yellow-500/10 text-yellow-400 border-yellow-500/20" : "bg-primary/10 text-primary border-primary/20"}`}
                                   >
-                                    {proj.urgency || "Normal"} Urgency
+                                    {proj.urgency || t("placeholders.normal_urgency")} {t("details.urgency", { defaultValue: "Urgency" })}
                                   </span>
                                   <span
                                     className={`px-2 py-0.5 text-[9px] uppercase font-bold tracking-widest rounded border ${risk.color}`}
@@ -978,7 +982,7 @@ export function AdminDashboard() {
                                   className="text-[11px] text-slate-500 tracking-wide"
                                   title={proj.requirements}
                                 >
-                                  {proj.requirements || "N/A"}
+                                  {proj.requirements || t("placeholders.na")}
                                 </span>
                               </td>
                               <td className="px-6 py-5">
@@ -1003,7 +1007,7 @@ export function AdminDashboard() {
                                     {detailedPill.label}
                                   </span>
                                   <span className="text-[9px] uppercase font-mono tracking-wider text-slate-500 ml-1">
-                                    Stage: {proj.status || "New"}
+                                    {t("details.stage")}: {proj.status || t("placeholders.unknown")}
                                   </span>
                                 </div>
                               </td>
@@ -1015,10 +1019,10 @@ export function AdminDashboard() {
                                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8 border-b border-white/5 pb-6">
                                       <div>
                                         <p className="text-[10px] uppercase tracking-widest text-[#64748b] font-bold mb-1 font-mono">
-                                          Deal Command Console
+                                          {t("actions.command_console")}
                                         </p>
                                         <h4 className="text-lg font-medium text-white font-display">
-                                          Pipeline Orchestrator & Audit
+                                          {t("actions.orchestrator_audit")}
                                         </h4>
                                       </div>
                                       
@@ -1120,7 +1124,7 @@ export function AdminDashboard() {
                                               {isThisProjectSyncing && (
                                                 <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
                                               )}
-                                              {isThisProjectSyncing ? "Syncing Pipeline..." : buttonText}
+                                              {isThisProjectSyncing ? t("notices.syncing") : buttonText}
                                             </button>
                                           );
                                         })()}
@@ -1128,7 +1132,7 @@ export function AdminDashboard() {
                                         {/* Decommission / Delete Project */}
                                         {deletingProjectId === proj.id ? (
                                           <div className="flex items-center gap-2 bg-red-950/20 border border-red-500/20 px-4 py-1.5 rounded-xl animate-pulse text-[11px] font-bold uppercase tracking-widest">
-                                            <span className="text-red-300 font-mono text-[10px]">Decommission permanently?</span>
+                                            <span className="text-red-300 font-mono text-[10px]">{t("notices.decommission_confirm")}</span>
                                             <button
                                               onClick={async (e) => {
                                                 e.stopPropagation();
@@ -1146,7 +1150,7 @@ export function AdminDashboard() {
                                               disabled={isDeleting}
                                               className="px-3 py-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-lg transition-colors cursor-pointer"
                                             >
-                                              {isDeleting ? "Deleting..." : "Confirm"}
+                                              {isDeleting ? "..." : t("actions.confirm")}
                                             </button>
                                             <button
                                               onClick={(e) => {
@@ -1156,7 +1160,7 @@ export function AdminDashboard() {
                                               disabled={isDeleting}
                                               className="px-2 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer"
                                             >
-                                              Cancel
+                                              {t("actions.cancel")}
                                             </button>
                                           </div>
                                         ) : (
@@ -1168,7 +1172,7 @@ export function AdminDashboard() {
                                             className="flex items-center gap-1.5 px-5 py-2.5 bg-white/[0.02] hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-slate-400 hover:text-red-400 font-bold text-[11px] uppercase tracking-widest rounded-xl transition-all duration-300 cursor-pointer"
                                           >
                                             <Trash2 size={13} />
-                                            Decommission Workspace
+                                            {t("actions.decommission_workspace")}
                                           </button>
                                         )}
                                       </div>
@@ -1181,30 +1185,30 @@ export function AdminDashboard() {
                                     {/* Project Summary / Details Block inside index */}
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-[#94a3b8] mt-6 bg-[#0c1224] border border-white/5 rounded-2xl p-6">
                                       <div>
-                                        <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2 font-mono">Client Details</h5>
-                                        <p className="text-white font-medium">{proj.clientName || "Unknown Client"}</p>
-                                        <p className="text-xs text-slate-400 font-mono mt-1">{proj.email || "No Email listed"}</p>
-                                        {proj.company && <p className="text-xs text-slate-400 mt-1">Company: {proj.company}</p>}
+                                        <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2 font-mono">{t("details.client_details")}</h5>
+                                        <p className="text-white font-medium">{proj.clientName || t("placeholders.unknown_client")}</p>
+                                        <p className="text-xs text-slate-400 font-mono mt-1">{proj.email || t("placeholders.no_email")}</p>
+                                        {proj.company && <p className="text-xs text-slate-400 mt-1">{t("details.company")}: {proj.company}</p>}
                                       </div>
                                       <div>
-                                        <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2 font-mono font-semibold">Scope & Timeline</h5>
-                                        <p className="text-slate-300">Phase: <span className="text-white font-medium capitalize">{proj.projectType}</span></p>
-                                        <p className="text-slate-300 mt-1">Budget Allocation: <span className="text-emerald-400 font-mono">{proj.budget || "N/A"}</span></p>
-                                        <p className="text-slate-300 mt-1">Timeline Window: <span className="text-blue-400">{proj.timeline || "N/A"}</span></p>
+                                        <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2 font-mono font-semibold">{t("details.scope_timeline")}</h5>
+                                        <p className="text-slate-300">{t("details.phase")}: <span className="text-white font-medium capitalize">{proj.projectType}</span></p>
+                                        <p className="text-slate-300 mt-1">{t("details.budget_allocation")}: <span className="text-emerald-400 font-mono">{proj.budget || t("placeholders.na")}</span></p>
+                                        <p className="text-slate-300 mt-1">{t("details.timeline_window")}: <span className="text-blue-400">{proj.timeline || t("placeholders.na")}</span></p>
                                       </div>
                                       <div>
-                                        <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2 font-mono font-semibold">Risk Auditing</h5>
+                                        <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2 font-mono font-semibold">{t("details.risk_auditing")}</h5>
                                         <div className="flex flex-col gap-1 text-xs">
-                                          <p>Lead Quality Score: <span className="text-white font-mono">{proj.leadScore || "N/A"}/100</span></p>
-                                          <p>Complexity Index: <span className="text-white font-mono">{proj.complexityScore || "N/A"}/10</span></p>
+                                          <p>{t("details.lead_quality_score")}: <span className="text-white font-mono">{proj.leadScore || t("placeholders.na")}/100</span></p>
+                                          <p>{t("details.complexity_index")}: <span className="text-white font-mono">{proj.complexityScore || t("placeholders.na")}/10</span></p>
                                           <p className="mt-1">
-                                            Status: <span className="px-2 py-0.5 rounded bg-white/5 text-white border border-white/10 uppercase tracking-widest text-[9px] font-bold">{proj.status || "new"}</span>
+                                            {t("details.status")}: <span className="px-2 py-0.5 rounded bg-white/5 text-white border border-white/10 uppercase tracking-widest text-[9px] font-bold">{proj.status || t("placeholders.unknown")}</span>
                                           </p>
                                         </div>
                                       </div>
                                       {proj.requirements && (
                                         <div className="col-span-1 md:col-span-3 border-t border-white/5 pt-4 mt-2">
-                                          <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2 font-mono font-semibold">Full Business Requirements</h5>
+                                          <h5 className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-2 font-mono font-semibold">{t("details.business_requirements")}</h5>
                                           <p className="text-slate-300 bg-white/[0.01] border border-white/5 p-4 rounded-xl text-xs leading-relaxed whitespace-pre-wrap font-sans">
                                             {proj.requirements}
                                           </p>
@@ -1231,7 +1235,7 @@ export function AdminDashboard() {
           <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-2xl overflow-hidden mt-6 mb-6">
             <CardHeader className="border-b border-white/[0.05] bg-white/[0.01]">
               <CardTitle className="text-lg font-medium text-white">
-                Global Client Base
+                {t("client_base.title")}
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
@@ -1265,7 +1269,7 @@ export function AdminDashboard() {
                 </div>
               ) : users.length === 0 ? (
                 <div className="p-12 text-center text-slate-500 font-medium">
-                  No clients registered.
+                  {t("placeholders.no_clients")}
                 </div>
               ) : (
                 <>
@@ -1276,20 +1280,20 @@ export function AdminDashboard() {
                         <div key={`mob-u-${u.id}`} className="bg-white/[0.02] border border-white/[0.05] p-5 rounded-2xl">
                           <div className="flex justify-between items-start mb-3">
                             <div>
-                              <p className="font-medium text-white mb-1">{u.name || "Unknown"}</p>
+                              <p className="font-medium text-white mb-1">{u.name || t("placeholders.unknown")}</p>
                               <p className="text-[10px] text-slate-500 font-mono">{u.email || ""}</p>
                             </div>
                             <span className={`px-2 py-0.5 text-[9px] uppercase font-bold tracking-widest rounded border ${u.role === "super_admin" ? "bg-purple-500/10 text-purple-400 border-purple-500/20" : u.role === "admin" ? "bg-primary/10 text-primary border-primary/20" : "bg-white/[0.02] text-slate-400 border-white/10"}`}>
-                              {u.role || "Client"}
+                              {u.role || t("placeholders.role_client")}
                             </span>
                           </div>
                           <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-white/5">
                             <div>
-                              <p className="text-[9px] uppercase tracking-widest text-slate-500">Account Type</p>
-                              <p className="text-xs text-slate-300 capitalize mt-1">{u.accountType || "Standard"}</p>
+                              <p className="text-[9px] uppercase tracking-widest text-slate-500">{t("client_base.headers.account_type")}</p>
+                              <p className="text-xs text-slate-300 capitalize mt-1">{u.accountType || t("placeholders.account_standard")}</p>
                             </div>
                             <div>
-                              <p className="text-[9px] uppercase tracking-widest text-slate-500">Projects</p>
+                              <p className="text-[9px] uppercase tracking-widest text-slate-500">{t("client_base.headers.projects")}</p>
                               <p className="text-xs text-slate-300 mt-1">{userProjects}</p>
                             </div>
                           </div>
@@ -1302,11 +1306,11 @@ export function AdminDashboard() {
                     <table className="w-full text-sm text-left whitespace-nowrap">
                     <thead className="bg-white/[0.01] text-[10px] uppercase tracking-widest text-slate-500 border-b border-white/[0.05]">
                       <tr>
-                        <th className="px-4 py-3">Client</th>
-                        <th className="px-4 py-3">Account Type</th>
-                        <th className="px-4 py-3">Role</th>
-                        <th className="px-4 py-3">Projects</th>
-                        <th className="px-4 py-3">Registered</th>
+                        <th className="px-4 py-3">{t("client_base.headers.client")}</th>
+                        <th className="px-4 py-3">{t("client_base.headers.account_type")}</th>
+                        <th className="px-4 py-3">{t("client_base.headers.role")}</th>
+                        <th className="px-4 py-3">{t("client_base.headers.projects")}</th>
+                        <th className="px-4 py-3">{t("client_base.headers.registered")}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
@@ -1321,20 +1325,20 @@ export function AdminDashboard() {
                           >
                             <td className="px-6 py-5">
                               <p className="font-medium text-white">
-                                {u.name || "Unknown"}
+                                {u.name || t("placeholders.unknown")}
                               </p>
                               <p className="text-[11px] text-slate-500 font-mono mt-1">
                                 {u.email || ""}
                               </p>
                             </td>
                             <td className="px-6 py-5 text-slate-400 capitalize">
-                              {u.accountType || "Standard"}
+                              {u.accountType || t("placeholders.account_standard")}
                             </td>
                             <td className="px-6 py-5">
                               <span
                                 className={`px-2 py-0.5 text-[9px] uppercase font-bold tracking-widest rounded border ${u.role === "super_admin" ? "bg-purple-500/10 text-purple-400 border-purple-500/20" : u.role === "admin" ? "bg-primary/10 text-primary border-primary/20" : "bg-white/[0.02] text-slate-400 border-white/10"}`}
                               >
-                                {u.role || "Client"}
+                                {u.role || t("placeholders.role_client")}
                               </span>
                             </td>
                             <td className="px-6 py-5">
@@ -1363,17 +1367,17 @@ export function AdminDashboard() {
           <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-2xl overflow-hidden mt-6">
             <CardHeader className="flex flex-row items-center justify-between border-b border-white/[0.05] bg-white/[0.01]">
               <CardTitle className="text-lg font-medium text-white">
-                Live Activity Feed
+                {t("activity_feed.title")}
               </CardTitle>
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20 shadow-[0_0_10px_rgba(59,130,246,0.15)] pulse-glow">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block"></span>
-                System Stream
+                {t("activity_feed.system_stream")}
               </div>
             </CardHeader>
             <CardContent className="p-6">
               {activities.length === 0 ? (
                 <div className="py-8 text-center border-t border-white/5 text-slate-500 text-sm">
-                  Waiting for client activity events...
+                  {t("placeholders.waiting_activity")}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -1388,7 +1392,7 @@ export function AdminDashboard() {
                       <div className="flex-1">
                         <div className="flex justify-between items-center mb-1">
                           <p className="text-sm text-white font-medium">
-                            {act.actionTitle || "System Event"}
+                            {act.actionTitle || t("placeholders.system_event")}
                           </p>
                           <span className="text-xs font-mono text-slate-500">
                             {act.timestamp?.toDate

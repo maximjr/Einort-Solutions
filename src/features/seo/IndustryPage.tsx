@@ -3,34 +3,37 @@ import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
-import { Helmet } from "react-helmet-async";
 import { SEO } from "../../components/seo/SEO";
 import { Building2, ArrowRight, Cog, LayoutGrid } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function IndustryPage() {
   const { industry } = useParams<{ industry: string }>();
-  const formattedIndustry = industry
-    ? industry.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
-    : "Enterprise";
+  const { t } = useTranslation("seo");
+  
+  const industryKey = industry || "enterprise";
+  const localizedIndustry = t(`names.${industryKey}`) !== `names.${industryKey}` 
+    ? t(`names.${industryKey}`) 
+    : industryKey.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
   const schema = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Service",
-    serviceType: `${formattedIndustry} Software Development`,
+    serviceType: `${localizedIndustry} Software Development`,
     provider: {
       "@type": "Organization",
       name: "Einort Solutions",
     },
-    description: `Specialized enterprise software architecture, custom ERPs, and premium web platforms tailored for the ${formattedIndustry} industry.`,
+    description: t("industry.description_template", { industry: localizedIndustry }),
   });
 
   return (
     <>
-      <Helmet>
-        <title>{formattedIndustry} Web Development & Custom Software | Einort Solutions</title>
-        <meta name="description" content={`Specialized cutting-edge web design and enterprise software solutions for the ${formattedIndustry} sector by Einort Solutions.`} />
-      </Helmet>
-      <SEO schema={schema} />
+      <SEO 
+        title={t("industry.title_template", { industry: localizedIndustry })}
+        description={t("industry.description_template", { industry: localizedIndustry })}
+        schema={schema} 
+      />
       <section className="pt-32 pb-24 bg-surface min-h-[80dvh] relative overflow-hidden">
         {/* Ambient background */}
         <div className="absolute top-1/4 right-1/4 w-[600px] h-[600px] bg-primary/5 blur-[150px] rounded-full mix-blend-screen pointer-events-none"></div>
@@ -43,20 +46,17 @@ export function IndustryPage() {
               <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 rounded-full bg-primary/10 border border-primary/20 shadow-sm">
                 <Building2 size={14} className="text-primary" />
                 <span className="text-xs uppercase tracking-widest font-bold text-primary">
-                  {formattedIndustry} Digital Solutions
+                  {t("industry.solutions_badge", { industry: localizedIndustry })}
                 </span>
               </div>
               <h1 className="text-5xl md:text-7xl font-display font-medium text-white tracking-tight mb-8 leading-tight">
-                Enterprise Software for
+                {t("industry.hero_title")}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400 block mt-2">
-                  {formattedIndustry} Leaders
+                  {t("industry.hero_title_accent", { industry: localizedIndustry })}
                 </span>
               </h1>
               <p className="text-xl text-slate-400 font-light max-w-2xl leading-relaxed mb-10">
-                Einort Solutions builds highly reliable, customized digital
-                infrastructure specifically for the {formattedIndustry} sector.
-                Empower your operations with bespoke software architecture that
-                scales with your ambition.
+                {t("industry.hero_description", { industry: localizedIndustry })}
               </p>
 
               <div className="flex flex-wrap gap-4">
@@ -66,7 +66,7 @@ export function IndustryPage() {
                     size="lg"
                     className="gap-2 uppercase text-xs tracking-widest font-bold"
                   >
-                    Start {formattedIndustry} Project <ArrowRight size={16} />
+                    {t("industry.start_project", { industry: localizedIndustry })} <ArrowRight size={16} />
                   </Button>
                 </Link>
               </div>
@@ -77,18 +77,18 @@ export function IndustryPage() {
             {[
               {
                 icon: <Cog size={24} />,
-                title: "Custom ERP & CRM",
-                desc: `Bespoke internal systems designed perfectly around your ${formattedIndustry} workflows.`,
+                title: t("industry.features.erp_title"),
+                desc: t("industry.features.erp_desc", { industry: localizedIndustry }),
               },
               {
                 icon: <LayoutGrid size={24} />,
-                title: "Client-Facing Portals",
-                desc: `World-class digital experiences that build trust and drive conversions in your sector.`,
+                title: t("industry.features.portals_title"),
+                desc: t("industry.features.portals_desc"),
               },
               {
                 icon: <Building2 size={24} />,
-                title: "Legacy Modernization",
-                desc: "Securely transform outdated systems into lightning-fast, modern cloud-native applications.",
+                title: t("industry.features.modernization_title"),
+                desc: t("industry.features.modernization_desc"),
               },
             ].map((feature, i) => (
               <FadeUp key={i} delay={0.2 + i * 0.1}>

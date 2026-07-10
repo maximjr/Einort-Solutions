@@ -3,7 +3,7 @@ import { motion, useMotionValue, useTransform, animate } from "motion/react";
 import { Loader2 } from "lucide-react";
 
 interface PullToRefreshProps {
-  onRefresh: () => Promise<void>;
+  onRefresh?: () => Promise<void>;
   children: React.ReactNode;
 }
 
@@ -29,6 +29,13 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
   };
 
   useEffect(() => {
+    const isTouchDevice =
+      "ontouchstart" in window ||
+      navigator.maxTouchPoints > 0 ||
+      window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
+    if (!isTouchDevice) return;
+
     const element = containerRef.current;
     if (!element) return;
 
@@ -103,7 +110,13 @@ export function PullToRefresh({ onRefresh, children }: PullToRefreshProps) {
         });
         
         try {
-          await onRefresh();
+          if (onRefresh) {
+            await onRefresh();
+          } else {
+            // Default behavior: short delay then reload
+            await new Promise(resolve => setTimeout(resolve, 800));
+            window.location.reload();
+          }
         } finally {
           setIsRefreshing(false);
           // Phase 4: Smooth elastic snap-back

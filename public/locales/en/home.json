@@ -7,5 +7,27 @@
     "description": "We are committed to engineering exceptional digital experiences through premium design, enterprise-grade development, and intelligent innovation that transforms ideas into scalable realities.",
     "button_primary": "Initiate Project Dev",
     "button_whatsapp": "Chat Via WhatsApp"
+  },
+  "testimonials": {
+    "badge": "Client Reality",
+    "title_part_1": "PROVEN RESULTS FROM",
+    "title_part_2": "ENTERPRISE PARTNERS.",
+    "items": {
+      "t1": {
+        "quote": "EINORT didn't just build our platform; they architected a foundation that allowed us to scale from 1,000 to 100,000 users without a single hiccup. Their engineering quality is unparalleled.",
+        "author": "Sarah Jenkins",
+        "role": "CTO, Finova Tech"
+      },
+      "t2": {
+        "quote": "Working with EINORT is like having an elite, in-house product team. They understand business objectives and translate them into flawless digital experiences. A truly premium agency.",
+        "author": "Marcus Chen",
+        "role": "Director of Product, LogisticsPro"
+      },
+      "t3": {
+        "quote": "The ERP system EINORT developed for us completely transformed our operational efficiency. We cut manual processes by 60% and gained real-time visibility into our supply chain.",
+        "author": "David Ross",
+        "role": "Operations Lead, Apex Global"
+      }
+    }
   }
 }

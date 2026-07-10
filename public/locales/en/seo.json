@@ -1,0 +1,77 @@
+{
+  "default": {
+    "title": "Einort Solutions | Elite Custom Software & Enterprise Web Architecture",
+    "description": "Einort Solutions is a global enterprise software engineering agency. We specialize in custom web development, ERP systems, AI automation, and premium UI/UX design across the USA, Canada, and Europe."
+  },
+  "home": {
+    "title": "Einort Solutions | Elite Custom Software & Enterprise Web Architecture",
+    "description": "Einort Solutions provides world-class enterprise software architecture, full-stack systems engineering, and scalable cloud infrastructure for modern businesses globally."
+  },
+  "admin": {
+    "title": "Admin Intelligence | Einort Solutions",
+    "description": "Enterprise command center and project pipeline."
+  },
+  "client_portal": {
+    "title": "Client Portal | Einort Solutions",
+    "description": "Manage your ongoing projects, billing, and consultations."
+  },
+  "names": {
+    "global": "Global",
+    "usa": "USA",
+    "canada": "Canada",
+    "europe": "Europe",
+    "uk": "United Kingdom",
+    "germany": "Germany",
+    "france": "France",
+    "cameroon": "Cameroon",
+    "enterprise": "Enterprise",
+    "saas": "SaaS",
+    "fintech": "Fintech",
+    "healthcare": "Healthcare",
+    "logistics": "Logistics",
+    "retail": "Retail"
+  },
+  "location": {
+    "title_template": "Enterprise Web Development & Software Engineering in {{region}} | Einort Solutions",
+    "description_template": "Einort Solutions delivers world-class custom software development, AI automation, and premium UI/UX design services to businesses in {{region}}.",
+    "services_badge": "Enterprise Solutions in {{region}}",
+    "hero_title": "World-Class Software Architecture",
+    "hero_title_accent": "For Businesses in {{region}}",
+    "hero_description": "We build scalable, high-performance systems and beautifully designed digital platforms for elite companies in {{region}}.",
+    "schedule_discovery": "Schedule Discovery",
+    "explore_global": "Explore Global",
+    "features": {
+      "architecture_title": "Enterprise Architecture",
+      "architecture_desc": "Bespoke software systems engineered for {{region}} market leadership.",
+      "secure_title": "Secure Infrastructure",
+      "secure_desc": "Bulletproof cloud solutions compliant with {{region}} data standards.",
+      "expertise_title": "Global Expertise",
+      "expertise_desc": "Local context with world-class engineering standards in {{region}}."
+    }
+  },
+  "industry": {
+    "title_template": "{{industry}} Web Development & Custom Software Architecture | Einort Solutions",
+    "description_template": "Specialized cutting-edge web design and enterprise software solutions for the {{industry}} sector by Einort Solutions.",
+    "solutions_badge": "{{industry}} Solutions",
+    "hero_title": "Architectural Excellence",
+    "hero_title_accent": "For the {{industry}} Sector",
+    "hero_description": "Transforming {{industry}} operations through custom ERP systems, AI integrations, and high-performance software engineering.",
+    "start_project": "Start {{industry}} Project",
+    "features": {
+      "erp_title": "Custom ERP Solutions",
+      "erp_desc": "Streamline {{industry}} operations with integrated management systems.",
+      "portals_title": "Enterprise Portals",
+      "portals_desc": "Secure, high-performance platforms for client and internal operations.",
+      "modernization_title": "Legacy Modernization",
+      "modernization_desc": "Upgrade outdated systems to modern, scalable cloud architectures."
+    }
+  },
+  "og": {
+    "title": "Einort Solutions | Custom Web Apps & Enterprise Architecture",
+    "description": "World-class software development, premium UI/UX design, and scalable cloud infrastructure for modern businesses. Providing enterprise AI automation and ERP services globally."
+  },
+  "twitter": {
+    "title": "Einort Solutions | Enterprise Software Agency",
+    "description": "Premium enterprise software engineering and architecture for global businesses."
+  }
+}

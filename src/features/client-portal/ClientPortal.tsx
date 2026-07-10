@@ -27,49 +27,52 @@ import {
 import { db } from "../../lib/firebase";
 import { Helmet } from "react-helmet-async";
 
-const getDetailedStatusPill = (status: string) => {
-  const currentStatus = (status || "pending").toLowerCase();
-  
-  if (currentStatus === "cancelled") {
-    return {
-      label: "Cancelled",
-      bgClass: "bg-red-500/10 text-red-400 border-red-500/20",
-      dotClass: "bg-red-400 shadow-[0_0_8px_rgba(239,68,68,0.8)]",
-    };
-  }
-  
-  const pendingStages = ["pending", "new", "discovery"];
-  const completedStages = ["completed", "launched", "deployment"];
-  
-  if (pendingStages.includes(currentStatus)) {
-    return {
-      label: "Pending Review",
-      bgClass: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-      dotClass: "bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse",
-    };
-  }
-  
-  if (completedStages.includes(currentStatus)) {
-    return {
-      label: "Completed",
-      bgClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-      dotClass: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]",
-    };
-  }
-  
-  return {
-    label: "In Progress",
-    bgClass: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    dotClass: "bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse",
-  };
-};
+import { useTranslation } from "react-i18next";
 
 export function ClientPortal() {
+  const { t, i18n } = useTranslation("portal");
   const { userData, user } = useAuth();
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const getDetailedStatusPill = (status: string) => {
+    const currentStatus = (status || "pending").toLowerCase();
+    
+    if (currentStatus === "cancelled") {
+      return {
+        label: t("project_status.cancelled"),
+        bgClass: "bg-red-500/10 text-red-400 border-red-500/20",
+        dotClass: "bg-red-400 shadow-[0_0_8px_rgba(239,68,68,0.8)]",
+      };
+    }
+    
+    const pendingStages = ["pending", "new", "discovery"];
+    const completedStages = ["completed", "launched", "deployment"];
+    
+    if (pendingStages.includes(currentStatus)) {
+      return {
+        label: t("project_status.pending_review"),
+        bgClass: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+        dotClass: "bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.8)] animate-pulse",
+      };
+    }
+    
+    if (completedStages.includes(currentStatus)) {
+      return {
+        label: t("project_status.completed"),
+        bgClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+        dotClass: "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]",
+      };
+    }
+    
+    return {
+      label: t("project_status.in_progress"),
+      bgClass: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+      dotClass: "bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse",
+    };
+  };
 
   useEffect(() => {
     if (!user || !db) {
@@ -154,16 +157,16 @@ export function ClientPortal() {
   }, [user?.uid, user?.email]);
 
   const stages = [
-    { key: "pending", label: "Submission" },
-    { key: "discovery", label: "Discovery" },
-    { key: "planning", label: "Planning" },
-    { key: "ui_ux", label: "UI / UX Design" },
-    { key: "development", label: "Engineering" },
-    { key: "testing", label: "QA & Inspection" },
-    { key: "review", label: "Governance Review" },
-    { key: "revision", label: "Revision Loop" },
-    { key: "deployment", label: "Staging & Release" },
-    { key: "completed", label: "Launched" },
+    { key: "pending", label: t("stages.pending") },
+    { key: "discovery", label: t("stages.discovery") },
+    { key: "planning", label: t("stages.planning") },
+    { key: "ui_ux", label: t("stages.ui_ux") },
+    { key: "development", label: t("stages.development") },
+    { key: "testing", label: t("stages.testing") },
+    { key: "review", label: t("stages.review") },
+    { key: "revision", label: t("stages.revision") },
+    { key: "deployment", label: t("stages.deployment") },
+    { key: "completed", label: t("stages.completed") },
   ];
 
   const getStageIndex = (status: string) => {
@@ -191,8 +194,8 @@ export function ClientPortal() {
       await new Promise(resolve => setTimeout(resolve, 800));
     }}>
       <Helmet>
-        <title>Client Portal | Einort Solutions</title>
-        <meta name="description" content="Manage your ongoing projects, billing, and consultations." />
+        <title>{t("seo.title")}</title>
+        <meta name="description" content={t("seo.description")} />
       </Helmet>
       <section className="py-24 bg-[#030712] min-h-screen relative pt-32 overflow-hidden">
         {/* Premium Background Ambience */}
@@ -202,8 +205,8 @@ export function ClientPortal() {
       <Container className="relative z-10">
         <Breadcrumbs
           items={[
-            { label: "Global Workspace", href: "/" },
-            { label: "Client Workspace" },
+            { label: t("breadcrumbs.home"), href: "/" },
+            { label: t("breadcrumbs.portal") },
           ]}
         />
 
@@ -211,19 +214,14 @@ export function ClientPortal() {
           <div className="mb-14 flex items-end justify-between border-b border-white/[0.05] pb-8">
             <div>
               <h1 className="text-4xl md:text-5xl font-display font-medium text-white tracking-tight mb-2">
-                Executive Workspace
+                {t("headings.workspace")}
               </h1>
               <p className="text-slate-400 font-light text-lg">
-                Welcome back,{" "}
-                <span className="text-white font-medium">
-                  {userData?.fullName || "Valued Partner"}
-                </span>
-                .
+                {t("headings.welcome", { name: userData?.fullName || t("placeholders.partner") })}
               </p>
             </div>
             <div className="hidden md:flex items-center gap-4 text-[11px] uppercase tracking-widest font-bold text-slate-500 bg-white/[0.02] border border-white/[0.05] px-4 py-2 rounded-full">
-              <ShieldCheck size={14} className="text-primary" /> SECURE TUNNEL
-              ACTIVE
+              <ShieldCheck size={14} className="text-primary" /> {t("status.secure_tunnel")}
             </div>
           </div>
         </FadeUp>
@@ -233,12 +231,12 @@ export function ClientPortal() {
             <FadeUp delay={0.1}>
               <div className="flex items-center justify-between mb-0 md:mb-2 bg-white/[0.02] md:bg-transparent border border-white/[0.05] md:border-transparent rounded-2xl p-4 md:p-0">
                 <h2 className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
-                  Active Engagements
+                  {t("headings.active_engagements")}
                 </h2>
                 {projects.length > 0 && !projects[0].isError && (
                   <Link to="/#contact">
                     <span className="text-[10px] md:text-[11px] font-bold uppercase tracking-widest text-primary hover:text-white transition-colors cursor-pointer flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-full md:bg-transparent md:px-0">
-                      Request Build <ArrowRight size={12} />
+                      {t("actions.request_build")} <ArrowRight size={12} />
                     </span>
                   </Link>
                 )}
@@ -262,17 +260,17 @@ export function ClientPortal() {
                     <Box className="w-8 h-8 text-primary" />
                   </div>
                   <h3 className="text-xl md:text-2xl font-display text-white mb-4 relative z-10 tracking-tight px-4">
-                    You're ready to build something exceptional.
+                    {t("empty_state.title")}
                   </h3>
                   <p className="text-sm md:text-base text-slate-400 font-light mb-10 max-w-md relative z-10 leading-relaxed px-2">
-                    Initiate a private consultation to discuss architecture, timelines, and resourcing for your next enterprise application.
+                    {t("empty_state.description")}
                   </p>
                   <Link to="/#contact" className="relative z-10 w-full md:w-auto">
                     <Button
                       variant="primary"
                       className="w-full md:w-auto uppercase tracking-widest text-[11px] font-bold h-14 md:h-12 px-8 shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_30px_rgba(59,130,246,0.4)] transition-all duration-300 rounded-2xl"
                     >
-                      Initiate Discovery
+                      {t("actions.initiate_discovery")}
                     </Button>
                   </Link>
                 </Card>
@@ -299,14 +297,14 @@ export function ClientPortal() {
                               <h3
                                 className={`text-2xl md:text-3xl font-display tracking-tight transition-colors mb-3 md:mb-2 ${proj.isError ? "text-red-400 font-mono" : "text-white"}`}
                               >
-                                {proj.company || "Classified Build"}
+                                {proj.company || t("placeholders.classified_build")}
                               </h3>
                               <div className="flex flex-wrap items-center gap-2 md:gap-3">
                                 <span className="text-[10px] md:text-[11px] uppercase font-bold tracking-widest text-primary bg-primary/10 px-2.5 py-1 md:py-0.5 rounded-lg md:rounded border border-primary/20">
-                                  {proj.projectType || "Enterprise Platform"}
+                                  {proj.projectType || t("placeholders.platform")}
                                 </span>
                                 <span className="text-[10px] md:text-[11px] uppercase font-bold tracking-widest text-slate-500 px-2.5 py-1 bg-white/[0.02] rounded-lg md:bg-transparent md:p-0 border border-white/5 md:border-transparent">
-                                  {proj.industry || "N/A"}
+                                  {proj.industry || t("placeholders.na")}
                                 </span>
                               </div>
                             </div>
@@ -319,11 +317,11 @@ export function ClientPortal() {
                                 {!proj.isError && (
                                   <span className={`w-1.5 h-1.5 rounded-full ${detailedPill.dotClass} block`}></span>
                                 )}
-                                {proj.isError ? "Error" : detailedPill.label}
+                                {proj.isError ? t("placeholders.error") : detailedPill.label}
                               </div>
                               {!proj.isError && (
                                 <span className="hidden sm:inline-block text-[10px] uppercase font-mono tracking-wider text-slate-400 px-3 py-1.5 bg-white/[0.02] border border-white/5 rounded-xl">
-                                  Stage: {proj.status || "New"}
+                                  Stage: {proj.status || t("placeholders.new")}
                                 </span>
                               )}
                             </div>
@@ -332,10 +330,10 @@ export function ClientPortal() {
                           {proj.isError ? (
                             <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6 text-sm text-slate-300">
                               <p className="mb-2 font-medium">
-                                Project details unavailable
+                                {t("placeholders.details_unavailable")}
                               </p>
                               <p className="opacity-70 text-xs">
-                                Information for this project is currently initializing or restricted.
+                                {t("placeholders.restricted_init")}
                               </p>
                             </div>
                           ) : (
@@ -344,7 +342,7 @@ export function ClientPortal() {
                               <div className="mb-8 md:mb-10 block">
                                 <div className="flex justify-between items-end mb-3">
                                   <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500">
-                                    Delivery Velocity
+                                    {t("metrics.velocity")}
                                   </p>
                                   <p className="text-[11px] font-mono text-primary bg-primary/10 px-2 py-0.5 rounded-md border border-primary/20">
                                     {Math.round(
@@ -352,7 +350,7 @@ export function ClientPortal() {
                                         stages.length) *
                                         100,
                                     )}
-                                    % CLR
+                                    % {t("metrics.clr")}
                                   </p>
                                 </div>
                                 
@@ -408,10 +406,10 @@ export function ClientPortal() {
                                     <div className="flex justify-between items-start mb-4">
                                       <div>
                                         <p className="text-[9px] uppercase font-bold tracking-widest text-slate-500 mb-1">
-                                          Current Milestone
+                                          {t("metrics.current_milestone")}
                                         </p>
                                         <p className="text-lg font-semibold text-white tracking-tight">
-                                          {stages[currentStageIndex]?.label || "N/A"}
+                                          {stages[currentStageIndex]?.label || t("placeholders.na")}
                                         </p>
                                       </div>
                                     </div>
@@ -421,7 +419,7 @@ export function ClientPortal() {
                                          style={{width: `${((currentStageIndex + 1) / stages.length) * 100}%`}}></div>
                                     </div>
                                     <div className="text-[10px] text-slate-400 flex justify-between items-center w-full">
-                                      <span className="truncate pr-2">Next: <span className="text-white">{stages[currentStageIndex + 1] ? stages[currentStageIndex + 1].label : "None"}</span></span>
+                                      <span className="truncate pr-2">{t("metrics.next")}: <span className="text-white">{stages[currentStageIndex + 1] ? stages[currentStageIndex + 1].label : t("placeholders.none")}</span></span>
                                       <span className="font-mono bg-white/5 px-2 py-1 rounded text-slate-300 flex-shrink-0">{currentStageIndex + 1}/{stages.length}</span>
                                     </div>
                                   </div>
@@ -432,34 +430,34 @@ export function ClientPortal() {
                               <div className="flex-grow grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 pt-6 md:pt-8 border-t border-white/5">
                                 <div className="bg-white/[0.01] p-4 rounded-2xl md:p-0 md:bg-transparent md:rounded-none border border-white/[0.02] md:border-none">
                                   <p className="text-[9px] md:text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5 md:mb-2 text-center md:text-left">
-                                    Estimated Budget
+                                    {t("metrics.budget")}
                                   </p>
                                   <p className="text-sm md:text-base text-white font-mono object-contain text-center md:text-left">
-                                    {proj.budget || "TBD"}
+                                    {proj.budget || t("placeholders.tbd")}
                                   </p>
                                 </div>
                                 <div className="bg-white/[0.01] p-4 rounded-2xl md:p-0 md:bg-transparent md:rounded-none border border-white/[0.02] md:border-none">
                                   <p className="text-[9px] md:text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5 md:mb-2 text-center md:text-left">
-                                    Delivery Scope
+                                    {t("metrics.scope")}
                                   </p>
                                   <p className="text-sm md:text-base text-white font-mono text-center md:text-left">
-                                    {proj.timeline || "TBD"}
+                                    {proj.timeline || t("placeholders.tbd")}
                                   </p>
                                 </div>
                                 <div className="col-span-2 lg:col-span-2 bg-white/[0.01] p-4 rounded-2xl md:p-0 md:bg-transparent md:rounded-none border border-white/[0.02] md:border-none flex items-center justify-between md:block">
                                   <p className="text-[9px] md:text-[10px] uppercase font-bold tracking-widest text-slate-500 md:mb-2 mb-0">
-                                    Commencement
+                                    {t("metrics.commencement")}
                                   </p>
                                   <p className="text-xs md:text-sm text-slate-400 font-mono">
                                     {proj.createdAt
                                       ? proj.createdAt
                                           .toDate()
-                                          .toLocaleDateString("en-US", {
+                                          .toLocaleDateString(i18n.language === 'fr' ? "fr-FR" : "en-US", {
                                             year: "numeric",
                                             month: "short",
                                             day: "numeric",
                                           })
-                                      : "Just now"}
+                                      : t("placeholders.just_now")}
                                   </p>
                                 </div>
                               </div>
@@ -468,7 +466,7 @@ export function ClientPortal() {
                               <div className="flex justify-end gap-3 pt-6 mt-6 border-t border-white/5">
                                 {deletingId === proj.id ? (
                                   <div className="flex flex-col sm:flex-row items-center w-full sm:w-auto gap-3 bg-red-950/20 border border-red-500/20 p-3 sm:px-4 sm:py-2 rounded-[1.5rem] sm:rounded-2xl animate-pulse">
-                                    <span className="text-xs text-red-300 font-mono text-center sm:text-left w-full sm:w-auto">Decommission build?</span>
+                                    <span className="text-xs text-red-300 font-mono text-center sm:text-left w-full sm:w-auto">{t("actions.decommission_build")}</span>
                                     <div className="flex w-full sm:w-auto gap-2">
                                       <button
                                         onClick={async () => {
@@ -485,14 +483,14 @@ export function ClientPortal() {
                                         disabled={isDeleting}
                                         className="flex-1 sm:flex-none justify-center items-center gap-1.5 px-4 h-10 sm:h-auto sm:py-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-[10px] uppercase tracking-wider rounded-xl sm:rounded-lg transition-colors cursor-pointer"
                                       >
-                                        {isDeleting ? "..." : "Confirm"}
+                                        {isDeleting ? "..." : t("actions.confirm")}
                                       </button>
                                       <button
                                         onClick={() => setDeletingId(null)}
                                         disabled={isDeleting}
                                         className="flex-1 sm:flex-none justify-center h-10 sm:h-auto sm:px-2 sm:py-1 text-[10px] uppercase tracking-wider text-slate-400 hover:text-white bg-white/5 sm:bg-transparent rounded-xl sm:rounded-none transition-colors cursor-pointer"
                                       >
-                                        Cancel
+                                        {t("actions.cancel")}
                                       </button>
                                     </div>
                                   </div>
@@ -502,7 +500,7 @@ export function ClientPortal() {
                                     className="flex items-center justify-center w-full md:w-auto gap-1.5 px-4 h-12 md:h-9 bg-white/[0.02] hover:bg-red-500/10 border border-white/5 hover:border-red-500/20 text-slate-400 hover:text-red-400 font-bold text-[10px] uppercase tracking-wider rounded-2xl transition-all duration-300 cursor-pointer"
                                   >
                                     <Trash2 size={13} className="hidden md:inline" />
-                                    Delete Request
+                                    {t("actions.delete_request")}
                                   </button>
                                 )}
                               </div>
@@ -522,7 +520,7 @@ export function ClientPortal() {
               <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-[2rem] p-6 md:p-8 relative overflow-hidden group">
                 <div className="absolute -right-10 -top-10 w-40 h-40 bg-primary/5 rounded-full blur-[40px] group-hover:bg-primary/10 transition-colors duration-700"></div>
                 <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-6 md:mb-8 flex items-center border-b border-white/[0.05] pb-4">
-                  <Activity size={14} className="text-primary mr-2" /> Live Intelligence
+                  <Activity size={14} className="text-primary mr-2" /> {t("headings.intelligence")}
                 </h3>
 
                 {projects.length > 0 && !projects[0].isError ? (
@@ -531,36 +529,36 @@ export function ClientPortal() {
                       <div className="absolute left-[-16px] top-1.5 w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)] pulse-glow"></div>
                       <div className="absolute left-[-13px] top-3 bottom-[-24px] w-[1px] bg-white/[0.05]"></div>
                       <p className="text-[13px] md:text-sm text-white font-medium mb-1 tracking-wide">
-                        Project Synchronized
+                        {t("intelligence.synchronized")}
                       </p>
                       <p className="text-[10px] md:text-[11px] font-mono text-emerald-400">
-                        System Nominal • Live
+                        {t("status.nominal")}
                       </p>
                     </div>
                     <div className="relative">
                       <div className="absolute left-[-16px] top-1.5 w-1.5 h-1.5 rounded-full bg-white/20"></div>
                       <div className="absolute left-[-13px] top-3 bottom-[-24px] w-[1px] bg-white/[0.05]"></div>
                       <p className="text-[13px] md:text-sm text-slate-300 font-medium mb-1 tracking-wide">
-                        Engineering Review
+                        {t("intelligence.review")}
                       </p>
                       <p className="text-[10px] md:text-[11px] font-mono text-slate-500">
-                        Pending Assignment
+                        {t("status.pending")}
                       </p>
                     </div>
                     <div className="relative">
                       <div className="absolute left-[-16px] top-1.5 w-1.5 h-1.5 rounded-full bg-white/20"></div>
                       <p className="text-[13px] md:text-sm text-slate-400 font-medium mb-1 tracking-wide">
-                        Executive Discovery Call
+                        {t("intelligence.discovery_call")}
                       </p>
                       <p className="text-[10px] md:text-[11px] font-mono text-slate-600">
-                        Locked
+                        {t("status.locked")}
                       </p>
                     </div>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-6 text-center">
                     <p className="text-slate-500 text-sm font-light leading-relaxed">
-                      Intelligence stream offline until a project is initiated.
+                      {t("status.offline")}
                     </p>
                   </div>
                 )}
@@ -570,7 +568,7 @@ export function ClientPortal() {
             <FadeUp delay={0.4}>
                     <Card className="bg-white/[0.015] border-white/[0.05] shadow-none rounded-[2rem] p-6 md:p-8 hover:border-white/10 transition-colors group relative overflow-hidden">
                       <h3 className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-6 md:mb-8 border-b border-white/[0.05] pb-4">
-                        Dedicated Support
+                        {t("headings.support")}
                       </h3>
                       <div className="space-y-6">
                         <div className="flex items-start gap-4 flex-col lg:flex-row">
@@ -579,16 +577,16 @@ export function ClientPortal() {
                           </div>
                           <div>
                             <p className="text-[13px] md:text-sm text-white font-medium tracking-wide mb-1">
-                              Secondary Support Line
+                              {t("support_cards.line")}
                             </p>
                             <p className="text-xs text-slate-500 leading-relaxed font-light mb-3">
-                              Use the global floating pipeline for instant architectural communication.
+                              {t("support_cards.line_desc")}
                             </p>
                             <a
                               href="mailto:einortsolutions237@gmail.com"
                               className="text-[10px] md:text-[11px] uppercase font-bold tracking-widest text-primary hover:text-white transition-colors flex items-center gap-1 bg-white/[0.02] inline-flex px-3 py-1.5 rounded-lg border border-white/5"
                             >
-                              Legacy Email <ArrowRight size={10} />
+                              {t("actions.legacy_email")} <ArrowRight size={10} />
                             </a>
                           </div>
                         </div>
@@ -598,10 +596,10 @@ export function ClientPortal() {
                           </div>
                           <div>
                             <p className="text-[13px] md:text-sm text-white font-medium tracking-wide mb-1">
-                              Agile Syncs
+                              {t("support_cards.syncs")}
                             </p>
                             <p className="text-xs text-slate-500 leading-relaxed font-light">
-                              Scheduled alignment meetings will populate here post-kickoff.
+                              {t("support_cards.syncs_desc")}
                             </p>
                           </div>
                         </div>

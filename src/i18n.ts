@@ -11,7 +11,7 @@ i18n
     fallbackLng: 'en',
     supportedLngs: ['en', 'fr'],
     defaultNS: 'common',
-    ns: ['common', 'home', 'services', 'contact', 'navbar', 'footer', 'faq'],
+    ns: ['common', 'home', 'services', 'contact', 'navbar', 'footer', 'faq', 'about', 'hero', 'forms', 'validation', 'errors', 'seo', 'admin', 'case_studies'],
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },

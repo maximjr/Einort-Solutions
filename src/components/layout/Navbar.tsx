@@ -304,14 +304,14 @@ export function Navbar() {
                   </div>
                   <div className="flex flex-col flex-1 min-w-0">
                     <span className="text-white font-display font-medium text-lg truncate">
-                      {userData?.fullName || "Authenticated User"}
+                      {userData?.fullName || t("authenticated_user")}
                     </span>
                     <span className="text-primary font-mono text-[10px] uppercase tracking-widest mt-0.5 truncate">
                       {userData?.role === "super_admin"
-                        ? "Super Admin"
+                        ? t("roles.super_admin")
                         : userData?.role === "admin"
-                          ? "Administrator"
-                          : "Enterprise Client"}
+                          ? t("roles.admin")
+                          : t("roles.client")}
                     </span>
                   </div>
                   <div className="shrink-0 pl-2 border-l border-white/10">

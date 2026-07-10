@@ -92,7 +92,7 @@ function HomePage() {
   );
 }
 
-import { PullToRefresh } from "./components/layout/PullToRefresh";
+import { PullToRefresh } from "./components/ui/PullToRefresh";
 
 function MessengerWrapper() {
   const { user, userData } = useAuth();

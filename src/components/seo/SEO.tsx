@@ -20,73 +20,74 @@ export function SEO({
   lang = "en",
 }: SEOProps = {}) {
   const location = useLocation();
+  const { t, i18n } = useTranslation("seo");
+
+  const normalizedPath = useMemo(() => {
+    return location.pathname.replace(/^\/(en|fr)/, "") || "/";
+  }, [location.pathname]);
 
   const routeConfig = useMemo(() => {
-    switch (location.pathname) {
+    switch (normalizedPath) {
       case "/":
         return {
-          title:
-            "Einort Solutions | Elite Custom Software & Enterprise Web Architecture",
-          description:
-            "Einort Solutions provides world-class enterprise software architecture, full-stack systems engineering, and scalable cloud infrastructure for modern businesses globally.",
+          title: t("home.title"),
+          description: t("home.description"),
         };
       case "/admin":
         return {
-          title: "Admin Intelligence | Einort Solutions",
-          description: "Enterprise command center and project pipeline.",
+          title: t("admin.title"),
+          description: t("admin.description"),
         };
       case "/client-portal":
         return {
-          title: "Client Portal | Einort Solutions",
-          description:
-            "Manage your ongoing projects, billing, and consultations.",
+          title: t("client_portal.title"),
+          description: t("client_portal.description"),
         };
       default:
-        if (location.pathname.startsWith("/locations/")) {
-          const region = location.pathname
+        if (normalizedPath.startsWith("/locations/")) {
+          const region = normalizedPath
             .replace("/locations/", "")
             .replace(/-/g, " ");
           const formattedRegion =
             region.charAt(0).toUpperCase() + region.slice(1);
           return {
-            title: `Enterprise Web Development & Software Engineering in ${formattedRegion} | Einort Solutions`,
-            description: `Einort Solutions delivers world-class custom software development, AI automation, and premium UI/UX design services to businesses in ${formattedRegion}.`,
+            title: t("locations.title", { region: formattedRegion }),
+            description: t("locations.description", { region: formattedRegion }),
           };
         }
-        if (location.pathname.startsWith("/services/")) {
-          const serviceName = location.pathname
+        if (normalizedPath.startsWith("/services/")) {
+          const serviceName = normalizedPath
             .replace("/services/", "")
             .replace(/-/g, " ");
           const formattedService =
             serviceName.charAt(0).toUpperCase() + serviceName.slice(1);
           return {
-            title: `${formattedService} Services | Best ${formattedService} Company | Einort Solutions`,
-            description: `Partner with Einort Solutions for premium ${formattedService}. We build scalable, enterprise-grade applications and digital automation systems for global brands.`,
+            title: t("services.title", { service: formattedService }),
+            description: t("services.description", { service: formattedService }),
           };
         }
-        if (location.pathname.startsWith("/industries/")) {
-          const industryName = location.pathname
+        if (normalizedPath.startsWith("/industries/")) {
+          const industryName = normalizedPath
             .replace("/industries/", "")
             .replace(/-/g, " ");
           const formattedIndustry =
             industryName.charAt(0).toUpperCase() + industryName.slice(1);
           return {
-            title: `${formattedIndustry} Web Development & Custom Software Architecture | Einort Solutions`,
-            description: `Specialized cutting-edge web design and enterprise software solutions for the ${formattedIndustry} sector by Einort Solutions.`,
+            title: t("industries.title", { industry: formattedIndustry }),
+            description: t("industries.description", { industry: formattedIndustry }),
           };
         }
         return {
-          title: SEO_CONFIG.title,
-          description: SEO_CONFIG.description,
+          title: t("default.title"),
+          description: t("default.description"),
         };
     }
-  }, [location.pathname]);
+  }, [normalizedPath, t]);
 
-  const { i18n } = useTranslation();
   const currentLang = i18n.resolvedLanguage || lang;
   
-  const basePath = location.pathname.replace(/^\/fr/, '');
-  const urlEn = `https://einort.com${basePath === '' ? '/' : basePath}`;
+  const basePath = location.pathname.replace(/^\/(en|fr)/, '');
+  const urlEn = `https://einort.com/en${basePath === '' ? '' : basePath}`;
   const urlFr = `https://einort.com/fr${basePath === '' ? '' : basePath}`;
   
   const url = canonical || (currentLang === 'fr' ? urlFr : urlEn);

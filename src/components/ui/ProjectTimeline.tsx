@@ -1,27 +1,29 @@
 import { motion } from "motion/react";
 import { CheckCircle2, Clock, Map, Layout, Code2, ShieldAlert, FileSearch, RefreshCw, Server, Send, Ban } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export interface ProjectTimelineProps {
   status: string;
 }
 
-// Full 10-stage execution pipeline plus custom styling for decommissioning
-const PIPELINE_STAGES = [
-  { key: "pending", label: "01. Submission", icon: Clock, description: "Awaiting workspace verification" },
-  { key: "discovery", label: "02. Discovery", icon: Map, description: "Evaluating architecture & team scope" },
-  { key: "planning", label: "03. Planning", icon: ShieldAlert, description: "Laying out software schematics" },
-  { key: "ui_ux", label: "04. UI/UX Design", icon: Layout, description: "Prototyping dynamic visual layers" },
-  { key: "development", label: "05. Engineering", icon: Code2, description: "Active software engineering sprint" },
-  { key: "testing", label: "06. QA Testing", icon: FileSearch, description: "Rigorous stress & integrity testing" },
-  { key: "review", label: "07. Gov Review", icon: ShieldAlert, description: "Evaluating regulatory & visual compliance" },
-  { key: "revision", label: "08. Revision", icon: RefreshCw, description: "Resolving feedback iterations" },
-  { key: "deployment", label: "09. Deployment", icon: Server, description: "Deploying to production hypervisor" },
-  { key: "completed", label: "10. Launched", icon: Send, description: "Production release active" },
-];
-
 export function ProjectTimeline({ status }: ProjectTimelineProps) {
+  const { t } = useTranslation("admin");
   const currentStatus = (status || "pending").toLowerCase();
   const isCancelled = currentStatus === "cancelled";
+
+  // Full 10-stage execution pipeline plus custom styling for decommissioning
+  const PIPELINE_STAGES = [
+    { key: "pending", label: t("timeline_stages.pending.label"), icon: Clock, description: t("timeline_stages.pending.description") },
+    { key: "discovery", label: t("timeline_stages.discovery.label"), icon: Map, description: t("timeline_stages.discovery.description") },
+    { key: "planning", label: t("timeline_stages.planning.label"), icon: ShieldAlert, description: t("timeline_stages.planning.description") },
+    { key: "ui_ux", label: t("timeline_stages.ui_ux.label"), icon: Layout, description: t("timeline_stages.ui_ux.description") },
+    { key: "development", label: t("timeline_stages.development.label"), icon: Code2, description: t("timeline_stages.development.description") },
+    { key: "testing", label: t("timeline_stages.testing.label"), icon: FileSearch, description: t("timeline_stages.testing.description") },
+    { key: "review", label: t("timeline_stages.review.label"), icon: ShieldAlert, description: t("timeline_stages.review.description") },
+    { key: "revision", label: t("timeline_stages.revision.label"), icon: RefreshCw, description: t("timeline_stages.revision.description") },
+    { key: "deployment", label: t("timeline_stages.deployment.label"), icon: Server, description: t("timeline_stages.deployment.description") },
+    { key: "completed", label: t("timeline_stages.completed.label"), icon: Send, description: t("timeline_stages.completed.description") },
+  ];
 
   // Gracefully resolve legacy or sub-states
   let mappedStatus = currentStatus;
@@ -39,20 +41,20 @@ export function ProjectTimeline({ status }: ProjectTimelineProps) {
         <div className="flex items-center gap-3 bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mb-6">
           <Ban className="text-red-400 shrink-0" size={20} />
           <div>
-            <h4 className="text-sm font-semibold text-red-200">PROJECT DECOMMISSIONED</h4>
-            <p className="text-xs text-red-400">This engagement has been archived. State transitions are frozen until re-activated.</p>
+            <h4 className="text-sm font-semibold text-red-200">{t("notices.project_decommissioned")}</h4>
+            <p className="text-xs text-red-400">{t("notices.engagement_archived")}</p>
           </div>
         </div>
       ) : (
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-4">
           <div>
-            <span className="text-[10px] uppercase font-mono tracking-wider text-slate-500 font-semibold">Active Operational Milestone</span>
+            <span className="text-[10px] uppercase font-mono tracking-wider text-slate-500 font-semibold">{t("notices.active_operational_milestone")}</span>
             <h4 className="text-[15px] font-medium text-white capitalize mt-1 flex items-center gap-2">
-              {PIPELINE_STAGES[currentIndex]?.label || "N/A"}
+              {PIPELINE_STAGES[currentIndex]?.label || t("placeholders.na")}
             </h4>
           </div>
           <p className="text-xs text-slate-400 font-mono italic">
-            {PIPELINE_STAGES[currentIndex]?.description || "N/A"}
+            {PIPELINE_STAGES[currentIndex]?.description || t("placeholders.na")}
           </p>
         </div>
       )}
