@@ -10,7 +10,6 @@ import { Loadable } from "./components/shared/Loadable";
 
 // Eagerly loaded features (Above the fold)
 import { Hero } from "./features/home/Hero";
-import { useAuth } from "./hooks/useAuth";
 
 // Lazy loaded features
 const Services = Loadable(
@@ -58,13 +57,6 @@ const IndustryPage = Loadable(
 const CaseStudyPage = Loadable(
   lazy(() => import("./features/case-studies/CaseStudyPage").then((m) => ({ default: m.CaseStudyPage }))),
 );
-const GlobalFloatingMessenger = Loadable(
-  lazy(() =>
-    import("./components/layout/GlobalFloatingMessenger").then((m) => ({
-      default: m.GlobalFloatingMessenger,
-    })),
-  ),
-);
 
 function HomePage() {
   return (
@@ -94,22 +86,10 @@ function HomePage() {
 
 import { PullToRefresh } from "./components/ui/PullToRefresh";
 
+import { WhatsAppMessenger } from "./components/layout/WhatsAppMessenger";
+
 function MessengerWrapper() {
-  const { user, userData } = useAuth();
-  const isClient =
-    user &&
-    userData &&
-    userData.role !== "admin" &&
-    userData.role !== "super_admin" &&
-    !userData.isAdmin;
-
-  if (!isClient) return null;
-
-  return (
-    <Suspense fallback={null}>
-      <GlobalFloatingMessenger />
-    </Suspense>
-  );
+  return <WhatsAppMessenger />;
 }
 
 function Layout() {

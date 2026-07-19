@@ -61,9 +61,6 @@ export function CaseStudies() {
                   {t(`items.${study.id}.description`)}
                 </p>
                 <div className="mt-auto">
-                  <div className="text-sm font-medium text-white mb-6 py-2 px-4 bg-white/5 inline-block rounded-lg border border-white/10">
-                    {t("key_result")} {t(`items.${study.id}.metric`)}
-                  </div>
                   <Link
                     to={`/case-studies/${study.id}`}
                     className="inline-flex items-center text-sm font-bold tracking-[0.1em] text-white hover:text-primary transition-colors uppercase group-hover:gap-3 gap-2"

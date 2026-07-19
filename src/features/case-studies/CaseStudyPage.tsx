@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
+import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
 
 const caseStudiesData: Record<string, any> = {
   "global-logistics-erp": {
@@ -99,13 +100,15 @@ export function CaseStudyPage() {
       <Container>
         <div className="max-w-4xl mx-auto">
           <FadeUp>
-            <Link
-              to="/"
-              className="inline-flex items-center text-sm font-bold tracking-[0.1em] text-text-muted hover:text-white transition-colors uppercase gap-2 mb-12"
-            >
-              <ArrowLeft size={16} />
-              Back to Home
-            </Link>
+            <div className="mb-12">
+              <Breadcrumbs 
+                items={[
+                  { label: "Home", href: "/" },
+                  { label: "Case Studies" },
+                  { label: data.title }
+                ]} 
+              />
+            </div>
           </FadeUp>
 
           <FadeUp delay={0.1}>

@@ -1,11 +1,11 @@
 {
   "default": {
-    "title": "Einort Solutions | Architecture Logicielle sur Mesure et Web d'Entreprise Élite",
-    "description": "Einort Solutions est une agence mondiale d'ingénierie logicielle d'entreprise. Nous nous spécialisons dans le développement web personnalisé, les systèmes ERP, l'automatisation de l'IA et le design UI/UX premium."
+    "title": "Einort Solutions | Agence Web & Développement de Logiciels au Cameroun",
+    "description": "Einort Solutions est une agence de premier plan en ingénierie logicielle basée à Douala, Cameroun. Nous sommes spécialisés dans le développement web sur mesure, les systèmes ERP, l'automatisation IA et la conception UI/UX premium au Cameroun, en Afrique et dans le monde."
   },
   "home": {
-    "title": "Einort Solutions | Architecture Logicielle sur Mesure et Web d'Entreprise Élite",
-    "description": "Einort Solutions fournit une architecture logicielle d'entreprise de classe mondiale, une ingénierie de systèmes full-stack et une infrastructure cloud évolutive pour les entreprises modernes du monde entier."
+    "title": "Einort Solutions | Meilleure Agence Web & Logicielle au Cameroun",
+    "description": "Einort Solutions fournit une architecture logicielle d'entreprise de classe mondiale, une ingénierie de systèmes full-stack et une infrastructure cloud évolutive pour les entreprises modernes au Cameroun et à l'échelle mondiale."
   },
   "admin": {
     "title": "Admin Intelligence | Einort Solutions",
@@ -67,11 +67,15 @@
     }
   },
   "og": {
-    "title": "Einort Solutions | Applications Web sur Mesure et Architecture d'Entreprise",
-    "description": "Développement logiciel de classe mondiale, design UI/UX premium et infrastructure cloud évolutive pour les entreprises modernes."
+    "title": "Einort Solutions | Applications Web sur Mesure & Architecture d'Entreprise Cameroun",
+    "description": "Développement de logiciels de classe mondiale, conception UI/UX premium et infrastructure cloud évolutive pour les entreprises modernes au Cameroun et dans le monde. Top agence web à Douala."
   },
   "twitter": {
-    "title": "Einort Solutions | Agence de Logiciels d'Entreprise",
-    "description": "Ingénierie et architecture logicielles d'entreprise premium pour les entreprises mondiales."
+    "title": "Einort Solutions | Agence de Logiciels d'Entreprise Cameroun",
+    "description": "Ingénierie et architecture de logiciels d'entreprise premium pour les entreprises au Cameroun et au-delà."
+  },
+  "services": {
+    "title_template": "Solutions de {{service}} | Einort Solutions",
+    "description_template": "Expertise en {{service}} et développement sur mesure pour votre entreprise."
   }
 }

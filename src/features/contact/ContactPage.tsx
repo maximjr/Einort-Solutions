@@ -8,6 +8,7 @@ import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/Card";
 import { SEO } from "../../components/seo/SEO";
+import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
 import { ProjectOrchestrator } from "../services/projectOrchestrator";
 import { useAuth } from "../../hooks/useAuth";
 import {
@@ -174,6 +175,14 @@ export function ContactPage() {
       <section className="py-20 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/10 blur-[150px] pointer-events-none rounded-full translate-x-1/3 -translate-y-1/3"></div>
         <Container>
+          <div className="max-w-3xl mx-auto mb-10 relative z-10">
+            <Breadcrumbs 
+              items={[
+                { label: "Home", href: "/" },
+                { label: "Contact Us" }
+              ]} 
+            />
+          </div>
           <FadeUp>
             <div className="max-w-3xl text-center mx-auto mb-16 relative z-10">
               <h1 className="text-4xl md:text-6xl font-display font-medium text-white mb-6 leading-tight tracking-tight">

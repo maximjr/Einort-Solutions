@@ -51,8 +51,8 @@ export function SEO({
           const formattedRegion =
             region.charAt(0).toUpperCase() + region.slice(1);
           return {
-            title: t("locations.title", { region: formattedRegion }),
-            description: t("locations.description", { region: formattedRegion }),
+            title: t("location.title_template", { region: formattedRegion }),
+            description: t("location.description_template", { region: formattedRegion }),
           };
         }
         if (normalizedPath.startsWith("/services/")) {
@@ -62,8 +62,8 @@ export function SEO({
           const formattedService =
             serviceName.charAt(0).toUpperCase() + serviceName.slice(1);
           return {
-            title: t("services.title", { service: formattedService }),
-            description: t("services.description", { service: formattedService }),
+            title: t("services.title_template", { service: formattedService }),
+            description: t("services.description_template", { service: formattedService }),
           };
         }
         if (normalizedPath.startsWith("/industries/")) {
@@ -73,8 +73,8 @@ export function SEO({
           const formattedIndustry =
             industryName.charAt(0).toUpperCase() + industryName.slice(1);
           return {
-            title: t("industries.title", { industry: formattedIndustry }),
-            description: t("industries.description", { industry: formattedIndustry }),
+            title: t("industry.title_template", { industry: formattedIndustry }),
+            description: t("industry.description_template", { industry: formattedIndustry }),
           };
         }
         return {
@@ -162,7 +162,8 @@ export function SEO({
       <html lang={currentLang} />
       <title>{metaTitle}</title>
       <meta name="description" content={metaDescription} />
-
+      <meta name="keywords" content={SEO_CONFIG.keywords} />
+      
       {/* Open Graph */}
       <meta property="og:type" content={SEO_CONFIG.openGraph.type} />
       <meta property="og:title" content={metaTitle} />

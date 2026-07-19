@@ -1,11 +1,11 @@
 {
   "default": {
     "title": "Einort Solutions | Elite Custom Software & Enterprise Web Architecture",
-    "description": "Einort Solutions is a global enterprise software engineering agency. We specialize in custom web development, ERP systems, AI automation, and premium UI/UX design across the USA, Canada, and Europe."
+    "description": "Einort Solutions is a premier enterprise software engineering agency based in Douala, Cameroon. We specialize in custom web development, ERP systems, AI automation, and premium UI/UX design across Cameroon, Africa, and globally."
   },
   "home": {
-    "title": "Einort Solutions | Elite Custom Software & Enterprise Web Architecture",
-    "description": "Einort Solutions provides world-class enterprise software architecture, full-stack systems engineering, and scalable cloud infrastructure for modern businesses globally."
+    "title": "Einort Solutions | Top Web Development & Software Agency in Cameroon",
+    "description": "Einort Solutions provides world-class enterprise software architecture, full-stack systems engineering, and scalable cloud infrastructure for modern businesses in Cameroon and globally."
   },
   "admin": {
     "title": "Admin Intelligence | Einort Solutions",
@@ -67,11 +67,15 @@
     }
   },
   "og": {
-    "title": "Einort Solutions | Custom Web Apps & Enterprise Architecture",
-    "description": "World-class software development, premium UI/UX design, and scalable cloud infrastructure for modern businesses. Providing enterprise AI automation and ERP services globally."
+    "title": "Einort Solutions | Custom Web Apps & Enterprise Architecture Cameroon",
+    "description": "World-class software development, premium UI/UX design, and scalable cloud infrastructure for modern businesses in Cameroon and globally. Top web agency in Douala."
   },
   "twitter": {
-    "title": "Einort Solutions | Enterprise Software Agency",
-    "description": "Premium enterprise software engineering and architecture for global businesses."
+    "title": "Einort Solutions | Enterprise Software Agency Cameroon",
+    "description": "Premium enterprise software engineering and architecture for businesses in Cameroon and beyond."
+  },
+  "services": {
+    "title_template": "{{service}} Services & Custom Solutions | Einort Solutions",
+    "description_template": "Expert {{service}} solutions and enterprise engineering tailored for your business."
   }
 }

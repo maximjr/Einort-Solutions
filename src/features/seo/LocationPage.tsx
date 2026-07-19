@@ -3,6 +3,7 @@ import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
+import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
 import { SEO } from "../../components/seo/SEO";
 import { Globe, ArrowRight, ShieldCheck, Zap } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -43,6 +44,15 @@ export function LocationPage() {
         <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-primary/5 blur-[150px] rounded-full mix-blend-screen pointer-events-none"></div>
 
         <Container>
+          <div className="mb-10 max-w-4xl mx-auto">
+            <Breadcrumbs 
+              items={[
+                { label: "Home", href: "/" },
+                { label: "Locations" },
+                { label: localizedRegion }
+              ]} 
+            />
+          </div>
           <div className="max-w-4xl mx-auto border-l-2 border-primary/20 pl-6 md:pl-10 relative">
             <div className="absolute -left-[2px] top-0 w-[2px] h-32 bg-gradient-to-b from-primary to-transparent"></div>
 

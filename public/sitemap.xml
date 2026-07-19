@@ -1,102 +1,347 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://einort.com</loc>
+    <loc>https://einort.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en" />
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://einort.com/:lang</loc>
+    <loc>https://einort.com/en</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en" />
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/fr</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en" />
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/en/:lang</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/:lang" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/:lang" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/:lang" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/case-studies/fintech-mobile-app</loc>
+    <loc>https://einort.com/fr/:lang</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/:lang" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/:lang" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/:lang" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/case-studies/global-logistics-erp</loc>
+    <loc>https://einort.com/en/case-studies/fintech-mobile-app</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/case-studies/fintech-mobile-app" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/case-studies/fintech-mobile-app" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/case-studies/fintech-mobile-app" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/case-studies/healthcare-portal</loc>
+    <loc>https://einort.com/fr/case-studies/fintech-mobile-app</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/case-studies/fintech-mobile-app" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/case-studies/fintech-mobile-app" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/case-studies/fintech-mobile-app" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/contact</loc>
+    <loc>https://einort.com/en/case-studies/global-logistics-erp</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/case-studies/global-logistics-erp" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/case-studies/global-logistics-erp" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/case-studies/global-logistics-erp" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/industries/finance</loc>
+    <loc>https://einort.com/fr/case-studies/global-logistics-erp</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/case-studies/global-logistics-erp" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/case-studies/global-logistics-erp" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/case-studies/global-logistics-erp" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/industries/healthcare</loc>
+    <loc>https://einort.com/en/case-studies/healthcare-portal</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/case-studies/healthcare-portal" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/case-studies/healthcare-portal" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/case-studies/healthcare-portal" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/industries/real-estate</loc>
+    <loc>https://einort.com/fr/case-studies/healthcare-portal</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/case-studies/healthcare-portal" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/case-studies/healthcare-portal" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/case-studies/healthcare-portal" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/industries/retail</loc>
+    <loc>https://einort.com/en/contact</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/contact" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/contact" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/contact" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/locations/canada</loc>
+    <loc>https://einort.com/fr/contact</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/contact" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/contact" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/contact" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/locations/europe</loc>
+    <loc>https://einort.com/en/industries/finance</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/industries/finance" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/industries/finance" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/industries/finance" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/locations/united-kingdom</loc>
+    <loc>https://einort.com/fr/industries/finance</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/industries/finance" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/industries/finance" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/industries/finance" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/locations/usa</loc>
+    <loc>https://einort.com/en/industries/healthcare</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/industries/healthcare" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/industries/healthcare" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/industries/healthcare" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/services/ai-automation</loc>
+    <loc>https://einort.com/fr/industries/healthcare</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/industries/healthcare" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/industries/healthcare" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/industries/healthcare" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/services/crm-erp</loc>
+    <loc>https://einort.com/en/industries/real-estate</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/industries/real-estate" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/industries/real-estate" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/industries/real-estate" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/services/custom-software</loc>
+    <loc>https://einort.com/fr/industries/real-estate</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/industries/real-estate" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/industries/real-estate" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/industries/real-estate" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/services/enterprise-web</loc>
+    <loc>https://einort.com/en/industries/retail</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/industries/retail" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/industries/retail" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/industries/retail" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/services/saas</loc>
+    <loc>https://einort.com/fr/industries/retail</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/industries/retail" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/industries/retail" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/industries/retail" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/services/ui-ux</loc>
+    <loc>https://einort.com/en/locations/cameroon</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/locations/cameroon" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/locations/cameroon" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/locations/cameroon" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/fr/locations/cameroon</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/locations/cameroon" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/locations/cameroon" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/locations/cameroon" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/en/locations/canada</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/locations/canada" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/locations/canada" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/locations/canada" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/fr/locations/canada</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/locations/canada" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/locations/canada" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/locations/canada" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/en/locations/europe</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/locations/europe" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/locations/europe" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/locations/europe" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/fr/locations/europe</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/locations/europe" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/locations/europe" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/locations/europe" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/en/locations/united-kingdom</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/locations/united-kingdom" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/locations/united-kingdom" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/locations/united-kingdom" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/fr/locations/united-kingdom</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/locations/united-kingdom" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/locations/united-kingdom" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/locations/united-kingdom" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/en/locations/usa</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/locations/usa" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/locations/usa" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/locations/usa" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/fr/locations/usa</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/locations/usa" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/locations/usa" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/locations/usa" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/en/services/ai-automation</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services/ai-automation" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services/ai-automation" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/services/ai-automation" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/fr/services/ai-automation</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services/ai-automation" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services/ai-automation" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/services/ai-automation" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/en/services/crm-erp</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services/crm-erp" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services/crm-erp" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/services/crm-erp" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/fr/services/crm-erp</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services/crm-erp" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services/crm-erp" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/services/crm-erp" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/en/services/custom-software</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services/custom-software" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services/custom-software" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/services/custom-software" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/fr/services/custom-software</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services/custom-software" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services/custom-software" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/services/custom-software" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/en/services/enterprise-web</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services/enterprise-web" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services/enterprise-web" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/services/enterprise-web" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/fr/services/enterprise-web</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services/enterprise-web" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services/enterprise-web" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/services/enterprise-web" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/en/services/saas</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services/saas" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services/saas" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/services/saas" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/fr/services/saas</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services/saas" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services/saas" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/services/saas" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/en/services/ui-ux</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services/ui-ux" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services/ui-ux" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/services/ui-ux" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/fr/services/ui-ux</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services/ui-ux" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services/ui-ux" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/services/ui-ux" />
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
