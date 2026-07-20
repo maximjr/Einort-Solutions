@@ -62,10 +62,10 @@
     "step2_title": "Calendrier et Détails",
     "step3_title": "Vérification d'Identité",
     "budgets": {
-      "b1": "5k$ - 20k$",
-      "b2": "20k$ - 50k$",
-      "b3": "50k$ - 100k$",
-      "b4": "100k$+"
+      "b1": "1k$ - 5k$",
+      "b2": "5k$ - 10k$",
+      "b3": "10k$ - 15k$",
+      "b4": "20k$+"
     },
     "project_types": {
       "enterprise": "Dév de Sites et App Web",

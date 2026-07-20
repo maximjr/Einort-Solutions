@@ -61,10 +61,10 @@ export function ContactForm() {
   ];
 
   const budgetRanges = [
-    { id: "5k-20k", label: t("wizard.budgets.b1") },
-    { id: "20k-50k", label: t("wizard.budgets.b2") },
-    { id: "50k-100k", label: t("wizard.budgets.b3") },
-    { id: "100k+", label: t("wizard.budgets.b4") },
+    { id: "1k-5k", label: t("wizard.budgets.b1") },
+    { id: "5k-10k", label: t("wizard.budgets.b2") },
+    { id: "10k-15k", label: t("wizard.budgets.b3") },
+    { id: "20k+", label: t("wizard.budgets.b4") },
   ];
 
   const timelines = [

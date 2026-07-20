@@ -9,6 +9,7 @@ import {
   Mail,
   Calendar,
   Trash2,
+  MessageSquare,
 } from "lucide-react";
 import { Container } from "../../components/layout/Container";
 import { Card } from "../../components/ui/Card";
@@ -18,6 +19,7 @@ import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
 import { useAuth } from "../../hooks/useAuth";
 import { projectService } from "../../services/admin/projectService";
 import { PullToRefresh } from "../../components/ui/PullToRefresh";
+import { ClientMessenger } from "./ClientMessenger";
 import {
   collection,
   query,
@@ -36,6 +38,7 @@ export function ClientPortal() {
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [activeView, setActiveView] = useState<"overview" | "messaging">("overview");
 
   const getDetailedStatusPill = (status: string) => {
     const currentStatus = (status || "pending").toLowerCase();
@@ -226,7 +229,33 @@ export function ClientPortal() {
           </div>
         </FadeUp>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+        <FadeUp delay={0.05}>
+          <div className="flex items-center gap-4 mb-8">
+            <button
+              onClick={() => setActiveView("overview")}
+              className={`px-6 py-2.5 rounded-full text-[11px] font-bold uppercase tracking-widest transition-colors cursor-pointer ${
+                activeView === "overview" 
+                  ? "bg-primary text-white" 
+                  : "bg-white/[0.02] text-slate-400 hover:text-white hover:bg-white/[0.05]"
+              }`}
+            >
+              {t("tabs.overview", "Overview")}
+            </button>
+            <button
+              onClick={() => setActiveView("messaging")}
+              className={`px-6 py-2.5 rounded-full text-[11px] font-bold uppercase tracking-widest transition-colors flex items-center gap-2 cursor-pointer ${
+                activeView === "messaging" 
+                  ? "bg-primary text-white" 
+                  : "bg-white/[0.02] text-slate-400 hover:text-white hover:bg-white/[0.05]"
+              }`}
+            >
+              <MessageSquare size={14} /> {t("tabs.messaging", "Messages")}
+            </button>
+          </div>
+        </FadeUp>
+
+        {activeView === "overview" ? (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
           <div className="lg:col-span-8 flex flex-col gap-6 md:gap-8">
             <FadeUp delay={0.1}>
               <div className="flex items-center justify-between mb-0 md:mb-2 bg-white/[0.02] md:bg-transparent border border-white/[0.05] md:border-transparent rounded-2xl p-4 md:p-0">
@@ -608,6 +637,17 @@ export function ClientPortal() {
             </FadeUp>
           </div>
         </div>
+        ) : (
+          <FadeUp delay={0.1}>
+            <div className="h-[600px] md:h-[700px] w-full rounded-[2rem] overflow-hidden border border-white/[0.05] bg-white/[0.015]">
+              <ClientMessenger 
+                userId={user?.uid || ""} 
+                userEmail={user?.email || ""} 
+                userName={userData?.fullName || "Partner"} 
+              />
+            </div>
+          </FadeUp>
+        )}
       </Container>
       </section>
     </PullToRefresh>
