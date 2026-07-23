@@ -91,16 +91,16 @@ export function CaseStudyPage() {
   }
 
   return (
-    <div className="min-h-screen pt-32 pb-24 relative z-10 selection:bg-primary selection:text-white">
+    <main className="min-h-screen pt-32 pb-24 relative z-10 selection:bg-primary selection:text-white">
       <Helmet>
         <title>{data.title} | Case Study</title>
         <meta name="description" content={data.overview} />
       </Helmet>
 
       <Container>
-        <div className="max-w-4xl mx-auto">
+        <article className="max-w-4xl mx-auto">
           <FadeUp>
-            <div className="mb-12">
+            <nav className="mb-12">
               <Breadcrumbs 
                 items={[
                   { label: "Home", href: "/" },
@@ -108,22 +108,22 @@ export function CaseStudyPage() {
                   { label: data.title }
                 ]} 
               />
-            </div>
+            </nav>
           </FadeUp>
 
           <FadeUp delay={0.1}>
-            <div className="flex flex-col gap-4 mb-16">
+            <header className="flex flex-col gap-4 mb-16">
               <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
                 {data.category}
               </span>
               <h1 className="text-4xl md:text-6xl font-display font-medium tracking-tight text-white leading-[1.1]">
                 {data.title}
               </h1>
-            </div>
+            </header>
           </FadeUp>
 
           <FadeUp delay={0.2}>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 border-y border-white/10 py-8">
+            <section className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 border-y border-white/10 py-8">
               <div>
                 <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-text-muted mb-2">
                   Client Industry
@@ -134,7 +134,7 @@ export function CaseStudyPage() {
                 <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-text-muted mb-2">
                   Timeline
                 </h4>
-                <p className="text-white font-medium">{data.timeline}</p>
+                <time className="text-white font-medium">{data.timeline}</time>
               </div>
               <div className="col-span-2">
                 <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-text-muted mb-2">
@@ -142,39 +142,39 @@ export function CaseStudyPage() {
                 </h4>
                 <p className="text-primary font-bold">{data.metric}</p>
               </div>
-            </div>
+            </section>
           </FadeUp>
 
           <div className="space-y-16 text-lg font-light leading-relaxed text-text-muted">
             <FadeUp delay={0.3}>
-              <div>
+              <section>
                 <h2 className="text-2xl font-medium text-white mb-6">
                   Project Overview
                 </h2>
                 <p>{data.overview}</p>
-              </div>
+              </section>
             </FadeUp>
 
             <FadeUp delay={0.4}>
-              <div>
+              <section>
                 <h2 className="text-2xl font-medium text-white mb-6">
                   The Challenge
                 </h2>
                 <p>{data.challenge}</p>
-              </div>
+              </section>
             </FadeUp>
 
             <FadeUp delay={0.5}>
-              <div>
+              <section>
                 <h2 className="text-2xl font-medium text-white mb-6">
                   Our Solution
                 </h2>
                 <p>{data.solution}</p>
-              </div>
+              </section>
             </FadeUp>
 
             <FadeUp delay={0.6}>
-              <div>
+              <section>
                 <h2 className="text-2xl font-medium text-white mb-6">
                   Business Impact
                 </h2>
@@ -189,11 +189,11 @@ export function CaseStudyPage() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </section>
             </FadeUp>
           </div>
-        </div>
+        </article>
       </Container>
-    </div>
+    </main>
   );
 }

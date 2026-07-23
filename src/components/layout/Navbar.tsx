@@ -19,6 +19,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { Logo } from "../ui/Logo";
 import { Loadable } from "../shared/Loadable";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { SOCIAL_LINKS } from "../../config/socialLinks";
 
 const AuthModal = Loadable(
   lazy(() =>
@@ -469,6 +470,22 @@ export function Navbar() {
                   {t("sign_out")}
                 </button>
               )}
+            </div>
+
+            {/* BOTTOM: Social Icons */}
+            <div className="flex justify-center items-center gap-6 pb-8 pt-4">
+              {SOCIAL_LINKS.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={link.ariaLabel}
+                  className={`text-slate-400 transition-colors duration-300 ${link.hoverColor}`}
+                >
+                  {link.icon}
+                </a>
+              ))}
             </div>
           </div>
         </div>

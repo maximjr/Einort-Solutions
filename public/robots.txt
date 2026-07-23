@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /client-portal/
+Disallow: /*?*
 
-Sitemap: https://lfdservice.org/sitemap.xml
+# Sitemaps
+Sitemap: https://einort.com/sitemap.xml

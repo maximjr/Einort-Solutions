@@ -1,133 +1,47 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
-import { getAnalytics } from "firebase/analytics";
-import firebaseConfig from '../../firebase-applet-config.json';
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
+import { getAuth, Auth } from "firebase/auth";
+import { getFirestore, initializeFirestore, Firestore, setLogLevel } from "firebase/firestore";
+import { getAnalytics, Analytics, isSupported } from "firebase/analytics";
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
-}, firebaseConfig.firestoreDatabaseId || '(default)');
+const firebaseConfig = {
+  apiKey: "AIzaSyBgZkkDSUz-_bPpCA7t2UAd3Qrw1TeY6js",
+  authDomain: "new-einort-web.firebaseapp.com",
+  projectId: "new-einort-web",
+  storageBucket: "new-einort-web.firebasestorage.app",
+  messagingSenderId: "80255620883",
+  appId: "1:80255620883:web:b422bd14ad45842eedace6",
+  measurementId: "G-SCP4L95TFC"
+};
 
-// TEMP debug code as requested
-onAuthStateChanged(auth, (user) => {
-});
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let db: Firestore | null = null;
+let analytics: Analytics | null = null;
+const isFirebaseConfigured = true;
 
-// Initialize analytics only if window is defined (browser environment)
-export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+try {
+  // Set Firestore log level to silent to prevent internal network errors from being intercepted as critical app errors
+  setLogLevel('silent');
 
-// Error Handling Spec for Firestore Operations
-export enum OperationType {
-  CREATE = 'create',
-  UPDATE = 'update',
-  DELETE = 'delete',
-  LIST = 'list',
-  GET = 'get',
-  WRITE = 'write',
-}
-
-export interface FirestoreErrorInfo {
-  error: string;
-  operationType: OperationType;
-  path: string | null;
-  authInfo: {
-    userId: string | undefined;
-    email: string | null | undefined;
-    emailVerified: boolean | undefined;
-    isAnonymous: boolean | undefined;
-    tenantId: string | null | undefined;
-    providerInfo: {
-      providerId: string;
-      displayName: string | null;
-      email: string | null;
-      photoUrl: string | null;
-    }[];
+  if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+  } else {
+    app = getApp();
+    auth = getAuth(app);
+    db = getFirestore(app);
   }
-}
-
-export function getFriendlyErrorMessage(error: unknown): string {
-  if (typeof error === 'string') {
-    try {
-      const parsed = JSON.parse(error);
-      if (parsed.error) return getFriendlyErrorMessage(parsed.error);
-    } catch {
-      return error;
+  
+  isSupported().then(yes => {
+    if (yes && app) {
+      analytics = getAnalytics(app);
     }
-  }
-
-  const err = error as { code?: string; message?: string };
-  const code = err?.code || err?.message || "";
-  
-  // Auth Errors
-  if (code.includes('auth/user-not-found') || code.includes('auth/wrong-password') || code.includes('auth/invalid-credential')) {
-    return 'Invalid email or password. Please try again.';
-  }
-  if (code.includes('auth/email-already-in-use')) {
-    return 'This email is already registered. Please sign in instead.';
-  }
-  if (code.includes('auth/weak-password')) {
-    return 'Password is too weak. Please use at least 6 characters.';
-  }
-  if (code.includes('auth/network-request-failed')) {
-    return 'Network error. Please check your internet connection.';
-  }
-  if (code.includes('auth/too-many-requests')) {
-    return 'Too many failed attempts. Please try again later.';
-  }
-  if (code.includes('auth/requires-recent-login')) {
-    return 'For security, please log out and log back in before performing this action.';
-  }
-
-  // Firestore Errors
-  if (code.includes('permission-denied')) {
-    return 'You do not have permission to perform this action.';
-  }
-  if (code.includes('unavailable')) {
-    return 'The service is temporarily unavailable. Please check your connection.';
-  }
-  if (code.includes('deadline-exceeded')) {
-    return 'The request timed out. Please try again.';
-  }
-  if (code.includes('quota-exceeded')) {
-    return 'Service quota exceeded. Please try again later.';
-  }
-
-  return 'An unexpected error occurred. Please try again.';
+  }).catch(() => {
+    console.warn("Firebase Analytics not supported in this environment");
+  });
+} catch (error) {
+  console.error("Firebase initialization failed:", error);
 }
 
-export function handleAuthError(error: unknown) {
-  const message = getFriendlyErrorMessage(error);
-  console.error('Auth Error:', error);
-  return message;
-}
-
-export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
-  const errInfo: FirestoreErrorInfo = {
-    error: error instanceof Error ? (error as { message?: string }).message : String(error),
-    authInfo: {
-      userId: auth.currentUser?.uid,
-      email: auth.currentUser?.email,
-      emailVerified: auth.currentUser?.emailVerified,
-      isAnonymous: auth.currentUser?.isAnonymous,
-      tenantId: auth.currentUser?.tenantId,
-      providerInfo: auth.currentUser?.providerData.map(provider => ({
-        providerId: provider.providerId,
-        displayName: provider.displayName,
-        email: provider.email,
-        photoUrl: provider.photoURL
-      })) || []
-    },
-    operationType,
-    path
-  }
-  console.error('Firestore Error:', JSON.stringify(errInfo));
-  
-  // Create a new error that includes the friendly message but keeps the JSON for debugging
-  const friendlyMessage = getFriendlyErrorMessage(error);
-  const errorWithMetadata = new Error(JSON.stringify(errInfo));
-  Object.assign(errorWithMetadata, { friendlyMessage });
-  
-  throw errorWithMetadata;
-}
-
+export { app, auth, db, analytics, isFirebaseConfigured };

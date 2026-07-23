@@ -9,6 +9,7 @@ import {
 import { db, auth } from "../../lib/firebase";
 import { Project, ProjectStatus, OrchestratorResult } from "../../types";
 import { OperationType, handleFirestoreError } from "../../services/admin/diagnosticsHelper";
+import { AnalyticsService } from "../../lib/analytics";
 
 export const ProjectOrchestrator = {
   /**
@@ -62,6 +63,15 @@ export const ProjectOrchestrator = {
       };
 
       await setDoc(docRef, newProject);
+      
+      try {
+        AnalyticsService.trackEvent("Lead", { 
+          content_name: projectInput.projectType,
+          currency: "USD"
+        });
+      } catch (e) {
+        console.error("Failed to track lead event", e);
+      }
 
       return {
         success: true,
