@@ -7,7 +7,6 @@ const __dirname = path.dirname(__filename);
 
 const BASE_URL = 'https://einort.com';
 const srcDir = path.join(__dirname, 'src');
-
 const publicRoutes = new Set(['/']);
 
 // 1. Extract static routes from App.tsx
@@ -36,9 +35,8 @@ function crawlFiles(dir) {
       const linkRegexes = [
         /to=["'](\/[^"']*)["']/g,
         /href=["'](\/[^"']*)["']/g,
-        /to=\{[\`'"](\/[^\`'"]*)[\`'"]\}/g
+        /to=\{[`'"](\/[^`'"]*)[`'"]\}/g
       ];
-
       for (const regex of linkRegexes) {
         let linkMatch;
         while ((linkMatch = regex.exec(content)) !== null) {
@@ -46,9 +44,13 @@ function crawlFiles(dir) {
           // Extrapolate exact path without hash or query string
           routePath = routePath.split('#')[0].split('?')[0];
           
+          // Remove /en or /fr from the discovered paths
+          routePath = routePath.replace(/^\/(en|fr)(\/|$)/, '/');
+          if (routePath === '' || routePath === '/') routePath = '/';
+          else if (routePath.endsWith('/')) routePath = routePath.slice(0, -1);
+          
           if (
             routePath && 
-            routePath !== '/' &&
             !routePath.includes('$') && 
             !routePath.includes(':') && 
             !routePath.startsWith('/admin') && 
@@ -69,7 +71,7 @@ if (fs.existsSync(srcDir)) {
 // 3. Fallback discovery for dynamically derived data objects that might not be explicitly linked with <Link>
 const dynamicParams = {
   ':serviceId': ['enterprise-web', 'custom-software', 'saas', 'crm-erp', 'ai-automation', 'ui-ux'],
-  ':region': ['usa', 'canada', 'europe', 'united-kingdom'],
+  ':region': ['usa', 'canada', 'europe', 'united-kingdom', 'cameroon'],
   ':industry': ['healthcare', 'finance', 'real-estate', 'retail'],
   ':caseId': ['global-logistics-erp', 'fintech-mobile-app', 'healthcare-portal']
 };
@@ -95,6 +97,7 @@ for (const routePath of appTsxPaths) {
         generatedPaths = newPaths;
       }
     }
+    
     // Add these combinations if they are public
     if (!routePath.startsWith('/admin') && !routePath.startsWith('/client-portal')) {
         generatedPaths.forEach(gp => publicRoutes.add(gp));
@@ -102,18 +105,45 @@ for (const routePath of appTsxPaths) {
   }
 }
 
+const generateUrlEntry = (route) => {
+  const pureRoute = route === '/' ? '' : route;
+  const enUrl = `${BASE_URL}/en${pureRoute}`;
+  const frUrl = `${BASE_URL}/fr${pureRoute}`;
+  const xDefault = enUrl;
+
+  return `
+  <url>
+    <loc>${enUrl}</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="${enUrl}" />
+    <xhtml:link rel="alternate" hreflang="fr" href="${frUrl}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${xDefault}" />
+    <changefreq>${pureRoute === '' ? 'weekly' : 'monthly'}</changefreq>
+    <priority>${pureRoute === '' ? '1.0' : '0.8'}</priority>
+  </url>
+  <url>
+    <loc>${frUrl}</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="${enUrl}" />
+    <xhtml:link rel="alternate" hreflang="fr" href="${frUrl}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${xDefault}" />
+    <changefreq>${pureRoute === '' ? 'weekly' : 'monthly'}</changefreq>
+    <priority>${pureRoute === '' ? '1.0' : '0.8'}</priority>
+  </url>`;
+};
+
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${Array.from(publicRoutes)
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>${BASE_URL}/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="${BASE_URL}/en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="${BASE_URL}/fr" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${BASE_URL}/en" />
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>${Array.from(publicRoutes)
   .sort()
-  .map(
-    (route) => `  <url>
-    <loc>${BASE_URL}${route === '/' ? '' : route}</loc>
-    <changefreq>${route === '/' ? 'weekly' : 'monthly'}</changefreq>
-    <priority>${route === '/' ? '1.0' : '0.8'}</priority>
-  </url>`
-  )
-  .join('\n')}
+  .map(generateUrlEntry)
+  .join('')}
 </urlset>`;
 
 const publicDir = path.resolve(__dirname, 'public');
@@ -122,4 +152,4 @@ if (!fs.existsSync(publicDir)) {
 }
 
 fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), sitemap);
-console.log('Sitemap generated successfully by crawling React Router configuration!');
+console.log('Multilingual Sitemap generated successfully by crawling React Router configuration!');
