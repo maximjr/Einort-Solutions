@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
 import { SEO } from "./components/seo/SEO";
-import { AnalyticsProvider } from "./lib/analytics";
+import { MetaPixelTracker } from "./components/seo/MetaPixelTracker";
 
 import { ProtectedRoute } from "./components/shared/ProtectedRoute";
 import { Loadable } from "./components/shared/Loadable";
@@ -245,7 +245,7 @@ export default function App() {
     <HelmetProvider>
       <AuthProvider>
         <BrowserRouter>
-          <AnalyticsProvider>
+          <MetaPixelTracker />
           <SEO />
           <ErrorBoundary>
             <Routes>
@@ -386,7 +386,6 @@ export default function App() {
               <Route path="*" element={<RootRedirect />} />
             </Routes>
           </ErrorBoundary>
-        </AnalyticsProvider>
         </BrowserRouter>
       </AuthProvider>
     </HelmetProvider>

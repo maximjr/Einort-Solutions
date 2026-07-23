@@ -9,7 +9,7 @@ import {
 import { db, auth } from "../../lib/firebase";
 import { Project, ProjectStatus, OrchestratorResult } from "../../types";
 import { OperationType, handleFirestoreError } from "../../services/admin/diagnosticsHelper";
-import { AnalyticsService } from "../../lib/analytics";
+import { trackEvent } from "../../lib/analytics/meta-pixel";
 
 export const ProjectOrchestrator = {
   /**
@@ -65,7 +65,7 @@ export const ProjectOrchestrator = {
       await setDoc(docRef, newProject);
       
       try {
-        AnalyticsService.trackEvent("Lead", { 
+        trackEvent("Lead", { 
           content_name: projectInput.projectType,
           currency: "USD"
         });

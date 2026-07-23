@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { Logo } from "../ui/Logo";
 import { useTranslation } from "react-i18next";
 import { SOCIAL_LINKS } from "../../config/socialLinks";
-import { AnalyticsService } from "../../lib/analytics";
 
 export function Footer() {
   const { t } = useTranslation("footer");
@@ -37,7 +36,6 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={link.ariaLabel}
-                  onClick={() => AnalyticsService.trackSocialClick({ network: link.name })}
                   className={`text-slate-500 transition-colors duration-300 ${link.hoverColor}`}
                 >
                   {link.icon}

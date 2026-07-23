@@ -62,7 +62,7 @@ const servicesList = [
 ];
 
 // --- Components ---
-import { AnalyticsService } from "../../lib/analytics";
+import { trackEvent } from "../../lib/analytics/meta-pixel";
 
 export function ContactPage() {
   const { user } = useAuth();
@@ -232,11 +232,11 @@ export function ContactPage() {
                           <p className="text-sm text-text-muted mb-1 font-medium">{method.title}</p>
                           <div className="text-white text-[15px]">
                             {method.title === "Phone Numbers" ? (
-                              <a href={`tel:${method.details.replace(/\s+/g, '')}`} className="hover:text-primary transition-colors" onClick={() => AnalyticsService.trackPhoneClick()}>
+                              <a href={`tel:${method.details.replace(/\s+/g, '')}`} className="hover:text-primary transition-colors" onClick={() => trackEvent("Contact", { method: "phone" })}>
                                 {method.details}
                               </a>
                             ) : method.title === "Email Addresses" ? (
-                              <a href={`mailto:${method.details}`} className="hover:text-primary transition-colors" onClick={() => AnalyticsService.trackEmailClick()}>
+                              <a href={`mailto:${method.details}`} className="hover:text-primary transition-colors" onClick={() => trackEvent("Contact", { method: "email" })}>
                                 {method.details}
                               </a>
                             ) : method.title === "Website" ? (
