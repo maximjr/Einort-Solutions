@@ -1,8 +1,10 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { AlertOctagon, RotateCcw } from 'lucide-react';
+import React, { ErrorInfo, ReactNode } from 'react';
+import { AlertCircle, RefreshCw, Home } from 'lucide-react';
+import { logger } from '../lib/logger';
+import { getFriendlyErrorMessage } from '../lib/firebase';
 
 interface Props {
-  children?: ReactNode;
+  children: ReactNode;
 }
 
 interface State {
@@ -24,31 +26,53 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+    logger.error('React component tree crashed', error, { errorInfo });
   }
+
+  private handleReset = () => {
+    this.setState({ hasError: false, error: null });
+    window.location.reload();
+  };
+
+  private handleGoHome = () => {
+    this.setState({ hasError: false, error: null });
+    window.location.href = '/';
+  };
 
   public render() {
     if (this.state.hasError) {
-      return (
-        <div className="min-h-screen bg-[#020617] text-white flex flex-col items-center justify-center p-6 text-center font-sans">
-          <div className="w-16 h-16 bg-red-500/10 border border-red-500/30 rounded-2xl flex items-center justify-center mb-6 geometric-clip">
-            <AlertOctagon className="w-8 h-8 text-red-500" />
-          </div>
-          <h1 className="font-display font-medium text-3xl mb-4 text-white">System Exception</h1>
-          <p className="text-silver-metallic font-light text-sm max-w-md mb-8">
-            The rendering engine encountered an unexpected fault. Our telemetry has captured the breakdown. 
-          </p>
-          
-          <div className="bg-white/5 border border-white/10 p-4 rounded-xl max-w-lg w-full mb-8 text-left overflow-x-auto text-[10px] font-mono text-white/50">
-             {this.state.error?.message || "Unknown rendering error"}
-          </div>
+      const friendlyMessage = ((this.state.error as Error & { friendlyMessage?: string })?.friendlyMessage as string | undefined) || getFriendlyErrorMessage(this.state.error);
 
-          <button 
-            onClick={() => window.location.reload()}
-            className="flex items-center gap-2 geometric-clip-button px-6 py-3 bg-white text-dark hover:bg-white/90 transition-colors uppercase tracking-widest text-[10px] font-bold"
-          >
-             <RotateCcw className="w-4 h-4" /> Initialize Recovery Sequence
-          </button>
+      return (
+        <div className="min-h-[60vh] flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-red-100 p-8 text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="h-8 w-8 text-red-600" />
+            </div>
+            
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h2>
+            <p className="text-gray-600 mb-8">
+              {friendlyMessage}
+            </p>
+            
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={this.handleReset}
+                className="flex items-center justify-center gap-2 bg-[#059669] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#047857] transition-all shadow-md"
+              >
+                <RefreshCw className="h-5 w-5" />
+                Try Again
+              </button>
+              
+              <button
+                onClick={this.handleGoHome}
+                className="flex items-center justify-center gap-2 bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-bold hover:bg-gray-200 transition-all"
+              >
+                <Home className="h-5 w-5" />
+                Go to Home
+              </button>
+            </div>
+          </div>
         </div>
       );
     }

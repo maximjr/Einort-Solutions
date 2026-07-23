@@ -1,16 +1,24 @@
-import { StrictMode, Suspense } from "react";
-import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
-import "./index.css";
-import "./i18n";
-import { reportWebVitals } from "./lib/vitals";
+import {StrictMode} from 'react';
+import {createRoot} from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
+import App from './App.tsx';
+import './index.css';
+import './lib/i18n';
+import { logger } from './lib/logger';
 
-createRoot(document.getElementById("root")!).render(
+// Global error monitoring for enterprise QA
+window.addEventListener('error', (event) => {
+  logger.error('Uncaught global error', event.error || event.message);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  logger.error('Unhandled promise rejection', event.reason);
+});
+
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>}>
+    <HelmetProvider>
       <App />
-    </Suspense>
+    </HelmetProvider>
   </StrictMode>,
 );
-
-reportWebVitals();
