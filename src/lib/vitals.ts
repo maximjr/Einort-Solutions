@@ -1,3 +1,4 @@
+import { AnalyticsService } from "./analytics";
 import { onCLS, onFCP, onINP, onLCP, onTTFB, Metric } from "web-vitals";
 
 const VITALS_ENDPOINT =
@@ -24,6 +25,7 @@ export function reportWebVitals(onPerfEntry?: (metric: Metric) => void) {
 
     try {
       // Use `navigator.sendBeacon()` if available, otherwise fallback to `fetch()`
+      AnalyticsService.trackPerformance({ metric: metric.name, value: Math.round(metric.name === "CLS" ? metric.value * 1000 : metric.value) });
       if (navigator.sendBeacon) {
         navigator.sendBeacon(VITALS_ENDPOINT, body);
       } else {

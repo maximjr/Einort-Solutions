@@ -1,4 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from "react";
+import { AnalyticsService } from "../../lib/analytics";
 
 interface Props {
   children?: ReactNode;
@@ -21,6 +22,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private handleGlobalError = (event: ErrorEvent) => {
     console.error("[Global Error]:", event.error);
+    AnalyticsService.trackError(event.error || event.message, { type: "global_error", url: window.location.href });
     this.setState({
       hasError: true,
       globalError: `[Global] ${event.message}\n${event.filename}:${event.lineno}:${event.colno}`,
@@ -30,6 +32,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private handleUnhandledRejection = (event: PromiseRejectionEvent) => {
     console.error("[Unhandled Promise Rejection]:", event.reason);
+    AnalyticsService.trackError(event.reason instanceof Error ? event.reason : String(event.reason), { type: "unhandled_rejection", url: window.location.href });
     this.setState({
       hasError: true,
       globalError: `[Promise Rejection] ${event.reason}`,
@@ -53,6 +56,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("[React ErrorBoundary Crash]:", error, errorInfo);
+    AnalyticsService.trackError(error, { type: "react_error_boundary", componentStack: errorInfo.componentStack, url: window.location.href });
     this.setState({ errorInfo });
   }
 

@@ -18,7 +18,7 @@ export function Hero() {
   const scaleText = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
 
   return (
-    <section
+    <header
       ref={containerRef}
       className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden flex flex-col justify-center min-h-[100dvh] perspective-[1000px]"
     >
@@ -111,6 +111,6 @@ export function Hero() {
           </div>
         </FadeUp>
       </Container>
-    </section>
+    </header>
   );
 }
