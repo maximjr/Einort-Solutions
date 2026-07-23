@@ -11,7 +11,6 @@ import { SEO } from "../../components/seo/SEO";
 import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
 import { ProjectOrchestrator } from "../services/projectOrchestrator";
 import { useAuth } from "../../hooks/useAuth";
-import { SocialMediaSection } from "../../components/shared/SocialMediaSection";
 import {
   MapPin,
   Phone,
@@ -62,8 +61,6 @@ const servicesList = [
 ];
 
 // --- Components ---
-import { trackEvent } from "../../lib/analytics/meta-pixel";
-
 export function ContactPage() {
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -230,23 +227,7 @@ export function ContactPage() {
                         </div>
                         <div>
                           <p className="text-sm text-text-muted mb-1 font-medium">{method.title}</p>
-                          <div className="text-white text-[15px]">
-                            {method.title === "Phone Numbers" ? (
-                              <a href={`tel:${method.details.replace(/\s+/g, '')}`} className="hover:text-primary transition-colors" onClick={() => trackEvent("Contact", { method: "phone" })}>
-                                {method.details}
-                              </a>
-                            ) : method.title === "Email Addresses" ? (
-                              <a href={`mailto:${method.details}`} className="hover:text-primary transition-colors" onClick={() => trackEvent("Contact", { method: "email" })}>
-                                {method.details}
-                              </a>
-                            ) : method.title === "Website" ? (
-                              <a href={`https://${method.details}`} target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-                                {method.details}
-                              </a>
-                            ) : (
-                              method.details
-                            )}
-                          </div>
+                          <p className="text-white text-[15px]">{method.details}</p>
                         </div>
                       </CardContent>
                     </Card>
@@ -519,13 +500,6 @@ export function ContactPage() {
           </div>
         </Container>
       </section>
-
-      {/* Social Media Connect Section */}
-      <div className="bg-surface pb-12">
-        <Container>
-          <SocialMediaSection />
-        </Container>
-      </div>
 
       {/* 8. Final CTA Banner */}
       <section className="py-24 relative overflow-hidden">

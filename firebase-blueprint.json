@@ -1,142 +1,133 @@
 {
   "entities": {
     "User": {
-      "title": "User",
-      "description": "User profile information",
+      "title": "User Profile",
+      "description": "Stores user records, metadata, security permissions, and roles.",
       "type": "object",
       "properties": {
-        "id": { "type": "string", "description": "Firebase Auth UID" },
-        "name": { "type": "string", "description": "Full name" },
-        "email": { "type": "string", "format": "email" },
-        "phoneNumber": { "type": "string" },
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "fullName": { "type": "string" },
+        "role": { "type": "string", "enum": ["client", "admin", "super_admin"] },
+        "accountType": { "type": "string" },
+        "permissions": { "type": "array" },
+        "isAdmin": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastLogin": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "fullName", "role", "accountType", "isAdmin"]
+    },
+    "Project": {
+      "title": "Enterprise Project Ledger",
+      "description": "The golden ledger containing budget, delivery milestones, lead metrics, and business requirements.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "clientName": { "type": "string" },
+        "company": { "type": "string" },
+        "email": { "type": "string" },
+        "projectType": { "type": "string" },
+        "industry": { "type": "string" },
+        "budget": { "type": "string" },
+        "timeline": { "type": "string" },
+        "urgency": { "type": "string", "enum": ["low", "medium", "high"] },
+        "status": { "type": "string" },
+        "requirements": { "type": "string" },
+        "leadScore": { "type": "integer" },
+        "complexityScore": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "clientName", "projectType", "industry", "budget", "timeline", "status"]
+    },
+    "Inquiry": {
+      "title": "Public Lead Inquiry",
+      "description": "Inbound client contact and request submissions.",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "company": { "type": "string" },
+        "projectType": { "type": "string" },
+        "budget": { "type": "string" },
+        "requirements": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["id", "name", "email"]
+      "required": ["fullName", "email", "company"]
     },
-    "Subscription": {
-      "title": "Subscription",
-      "description": "User subscription details",
+    "ClientActivity": {
+      "title": "Audit Stream Event",
+      "description": "Historical audit and engagement tracing of user actions for transparency.",
       "type": "object",
       "properties": {
         "userId": { "type": "string" },
-        "name": { "type": "string" },
-        "email": { "type": "string" },
-        "phone": { "type": "string" },
-        "planType": { "type": "string", "enum": ["weekly", "monthly", "yearly"] },
-        "amount": { "type": "number" },
-        "status": { "type": "string", "enum": ["pending", "active", "expired", "key_generated"] },
-        "paymentMethod": { "type": "string", "enum": ["momo", "om", "cash"] },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "startDate": { "type": "string", "format": "date-time" },
-        "expiryDate": { "type": "string", "format": "date-time" },
-        "subscriptionKey": { "type": "string" }
-      },
-      "required": ["userId", "planType", "status", "createdAt"]
-    },
-    "ActivationKey": {
-      "title": "ActivationKey",
-      "description": "One-time use activation keys",
-      "type": "object",
-      "properties": {
-        "userId": { "type": "string" },
-        "email": { "type": "string" },
-        "plan": { "type": "string" },
-        "durationDays": { "type": "number" },
-        "key": { "type": "string" },
-        "status": { "type": "string", "enum": ["unused", "used"] },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "expiresAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["key", "status", "expiresAt"]
-    },
-    "LiveStream": {
-      "title": "LiveStream",
-      "description": "Live stream configuration and status",
-      "type": "object",
-      "properties": {
-        "isLive": { "type": "boolean" },
-        "streamUrl": { "type": "string" },
-        "title": { "type": "string" },
+        "clientEmail": { "type": "string" },
+        "actionTitle": { "type": "string" },
         "description": { "type": "string" },
-        "startedAt": { "type": "string", "format": "date-time" },
-        "visibility": { "type": "string", "enum": ["public", "subscribers"] },
-        "chatEnabled": { "type": "boolean" },
-        "thumbnailUrl": { "type": "string" }
+        "timestamp": { "type": "string", "format": "date-time" }
       },
-      "required": ["isLive", "streamUrl"]
+      "required": ["clientEmail", "actionTitle", "timestamp"]
     },
-    "PastSeminar": {
-      "title": "PastSeminar",
-      "description": "Information about a past seminar/video",
+    "Conversation": {
+      "title": "Enterprise Conversation Conduit",
+      "description": "Premium conversation conduit tracking administrative support threads.",
       "type": "object",
       "properties": {
-        "title": { "type": "string" },
-        "category": { "type": "string" },
-        "description": { "type": "string" },
-        "duration": { "type": "string" },
-        "trainer": { "type": "string" },
-        "image": { "type": "string" },
-        "videoUrl": { "type": "string" },
-        "createdAt": { "type": "string", "format": "date-time" }
-      },
-      "required": ["title", "videoUrl"]
-    },
-    "SeminarMessage": {
-      "title": "SeminarMessage",
-      "description": "Chat messages sent during a live seminar",
-      "type": "object",
-      "properties": {
-        "userId": { "type": "string" },
-        "userName": { "type": "string" },
-        "text": { "type": "string", "maxLength": 500 },
+        "clientId": { "type": "string" },
+        "adminId": { "type": "string" },
+        "participants": { "type": "array" },
+        "lastMessage": { "type": "string" },
+        "lastMessageTime": { "type": "string", "format": "date-time" },
+        "unreadCount": { "type": "object" },
+        "status": { "type": "string" },
+        "priority": { "type": "string", "enum": ["none", "low", "medium", "high"] },
         "createdAt": { "type": "string", "format": "date-time" },
-        "streamStartedAt": { "type": "string" }
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "projectId": { "type": "string" }
       },
-      "required": ["userId", "userName", "text", "createdAt"]
+      "required": ["clientId", "adminId", "participants", "status", "priority", "createdAt", "updatedAt"]
     },
-    "SeminarAttendance": {
-      "title": "SeminarAttendance",
-      "description": "Attendance record for live seminars",
+    "Message": {
+      "title": "Enterprise Pipeline Message",
+      "description": "Secure messages with media attachments and status markers inside a conversation room.",
       "type": "object",
       "properties": {
-        "userId": { "type": "string" },
-        "userEmail": { "type": "string" },
-        "userName": { "type": "string" },
-        "streamTitle": { "type": "string" },
-        "startedAt": { "type": "string" },
-        "joinedAt": { "type": "string", "format": "date-time" }
+        "senderId": { "type": "string" },
+        "receiverId": { "type": "string" },
+        "text": { "type": "string" },
+        "attachments": { "type": "array" },
+        "type": { "type": "string" },
+        "read": { "type": "boolean" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "status": { "type": "string" }
       },
-      "required": ["userId", "joinedAt"]
+      "required": ["senderId", "receiverId", "text", "type", "timestamp"]
     }
   },
   "firestore": {
     "/users/{userId}": {
       "schema": { "$ref": "#/entities/User" },
-      "description": "User profile documents"
+      "description": "User ledger with secure access boundaries."
     },
-    "/subscriptions/{subId}": {
-      "schema": { "$ref": "#/entities/Subscription" },
-      "description": "Subscription tracking documents"
+    "/projects/{projectId}": {
+      "schema": { "$ref": "#/entities/Project" },
+      "description": "Active delivery projects connected to business. Managed by Admins, read by Client."
     },
-    "/activationKeys/{keyId}": {
-      "schema": { "$ref": "#/entities/ActivationKey" },
-      "description": "Activation key documents"
+    "/inquiries/{inquiryId}": {
+      "schema": { "$ref": "#/entities/Inquiry" },
+      "description": "Contact form submissions for prospects."
     },
-    "/liveStream/current": {
-      "schema": { "$ref": "#/entities/LiveStream" },
-      "description": "Current live stream status and config"
+    "/clientActivity/{activityId}": {
+      "schema": { "$ref": "#/entities/ClientActivity" },
+      "description": "Client interaction audit logs."
     },
-    "/pastSeminars/{seminarId}": {
-      "schema": { "$ref": "#/entities/PastSeminar" },
-      "description": "Past Seminars"
+    "/conversations/{conversationId}": {
+      "schema": { "$ref": "#/entities/Conversation" },
+      "description": "Active administrative support and consultation rooms."
     },
-    "/seminarMessages/{messageId}": {
-      "schema": { "$ref": "#/entities/SeminarMessage" },
-      "description": "Chat messages for live seminars"
-    },
-    "/seminarAttendance/{attendanceId}": {
-      "schema": { "$ref": "#/entities/SeminarAttendance" },
-      "description": "Attendance tracking for live seminars"
+    "/conversations/{conversationId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/Message" },
+      "description": "Secure communication timeline stream."
     }
   }
 }

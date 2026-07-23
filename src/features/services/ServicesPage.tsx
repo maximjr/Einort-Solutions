@@ -83,10 +83,10 @@ export function ServicesPage() {
         description={service.description}
         schema={jsonLdSchema}
       />
-      <main className="pt-32 pb-24 bg-surface min-h-[80dvh] relative overflow-hidden">
+      <section className="pt-32 pb-24 bg-surface min-h-[80dvh] relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 blur-[200px] pointer-events-none rounded-full translate-x-1/3 -translate-y-1/3"></div>
         <Container>
-          <header className="mb-16 relative z-10 max-w-4xl">
+          <div className="mb-16 relative z-10 max-w-4xl">
             <FadeUp>
               <Breadcrumbs
                 items={[
@@ -103,12 +103,12 @@ export function ServicesPage() {
                 {service.description}
               </p>
             </FadeUp>
-          </header>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 relative z-10 mb-24">
-            <article className="col-span-1 lg:col-span-2 space-y-12">
+            <div className="col-span-1 lg:col-span-2 space-y-12">
               <FadeUp delay={0.1}>
-                <section className="prose prose-invert max-w-none">
+                <div className="prose prose-invert max-w-none">
                   <h2 className="text-2xl font-display text-white mb-4">{t("ui.enterprise_overview")}</h2>
                   <p className="text-text-muted leading-relaxed text-[17px] font-light">{service.longDescription}</p>
                   {service.cameroonContext && (
@@ -116,31 +116,29 @@ export function ServicesPage() {
                        {service.cameroonContext}
                     </div>
                   )}
-                </section>
+                </div>
               </FadeUp>
               
               <FadeUp delay={0.3}>
-                 <section>
-                   <h2 className="text-2xl font-display text-white mb-6">{t("ui.execution_process")}</h2>
-                   <div className="space-y-6">
-                      {Array.isArray(service.benefits) && service.benefits.map((benefit: string, i: number) => {
-                         const parts = benefit.split(': ');
-                         const title = parts[0];
-                         const desc = parts.length > 1 ? parts.slice(1).join(': ') : '';
-                         
-                         return (
-                           <div key={i} className="bg-background/50 border border-white/5 p-6 rounded-xl hover:border-white/10 transition-colors">
-                             <h4 className="text-white font-medium mb-2">{title}</h4>
-                             <p className="text-text-muted font-light leading-relaxed">{desc || title}</p>
-                           </div>
-                         )
-                      })}
-                   </div>
-                 </section>
+                 <h2 className="text-2xl font-display text-white mb-6">{t("ui.execution_process")}</h2>
+                 <div className="space-y-6">
+                    {Array.isArray(service.benefits) && service.benefits.map((benefit: string, i: number) => {
+                       const parts = benefit.split(': ');
+                       const title = parts[0];
+                       const desc = parts.length > 1 ? parts.slice(1).join(': ') : '';
+                       
+                       return (
+                         <div key={i} className="bg-background/50 border border-white/5 p-6 rounded-xl hover:border-white/10 transition-colors">
+                           <h4 className="text-white font-medium mb-2">{title}</h4>
+                           <p className="text-text-muted font-light leading-relaxed">{desc || title}</p>
+                         </div>
+                       )
+                    })}
+                 </div>
               </FadeUp>
-            </article>
+            </div>
 
-            <aside className="col-span-1">
+            <div className="col-span-1">
               <FadeUp delay={0.4}>
                 <Card className="bg-background/50 border-white/5 p-8 sticky top-32">
                   <h3 className="text-white font-display text-lg mb-6 flex items-center gap-2">
@@ -165,10 +163,10 @@ export function ServicesPage() {
                   </div>
                 </Card>
               </FadeUp>
-            </aside>
+            </div>
           </div>
         </Container>
-      </main>
+      </section>
     </>
   );
 }

@@ -2,7 +2,6 @@ import { Container } from "./Container";
 import { Link } from "react-router-dom";
 import { Logo } from "../ui/Logo";
 import { useTranslation } from "react-i18next";
-import { SOCIAL_LINKS } from "../../config/socialLinks";
 
 export function Footer() {
   const { t } = useTranslation("footer");
@@ -25,23 +24,9 @@ export function Footer() {
                 </span>
               </div>
             </Link>
-            <p className="text-sm text-text-muted leading-relaxed max-w-xs font-light mb-8">
+            <p className="text-sm text-text-muted leading-relaxed max-w-xs font-light">
               {t("description")}
             </p>
-            <div className="flex items-center gap-4">
-              {SOCIAL_LINKS.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={link.ariaLabel}
-                  className={`text-slate-500 transition-colors duration-300 ${link.hoverColor}`}
-                >
-                  {link.icon}
-                </a>
-              ))}
-            </div>
           </div>
           <div>
             <h4 className="text-[11px] font-bold uppercase tracking-[0.2em] text-white mb-6">
@@ -126,14 +111,6 @@ export function Footer() {
               {t("company")}
             </h4>
             <ul className="space-y-4 text-sm text-text-muted font-light">
-              <li>
-                <Link
-                  to={`${langPrefix}/about`}
-                  className="hover:text-primary transition-colors"
-                >
-                  {t("about_us", "About Us")}
-                </Link>
-              </li>
               <li>
                 <Link
                   to={`${langPrefix}/#architecture`}

@@ -86,27 +86,21 @@ export const SEO_CONFIG = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Einort Solutions",
-    legalName: "Einort Solutions LLC",
     url: "https://einort.com",
     logo: "https://einort.com/icon.png",
-    description: "Premier software engineering agency and enterprise web architecture firm based in Douala, Cameroon. Specializing in custom CRM & ERP solutions, full-stack web development, and AI automation.",
-    foundingDate: "2022",
-    founders: [
-      {
-        "@type": "Person",
-        name: "Einort Leadership"
-      }
+    description:
+      "Premier software engineering agency in Douala, Cameroon. Custom CRM & ERP solutions, and full-stack enterprise web development.",
+    sameAs: [
+      "https://twitter.com/einortsolutions",
+      "https://linkedin.com/company/einortsolutions",
     ],
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: "+237686661578",
-      contactType: "customer service",
-      email: "contact@einort.com",
-      areaServed: ["CM", "US", "CA", "GB", "DE", "FR"],
-      availableLanguage: ["en", "fr"]
-    },
     areaServed: [
-      "CM", "US", "CA", "GB", "DE", "FR"
+      "CM",
+      "US",
+      "CA",
+      "GB",
+      "DE",
+      "FR",
     ],
     knowsAbout: [
       "Enterprise Software Architecture",
@@ -115,22 +109,18 @@ export const SEO_CONFIG = {
       "AI Automation",
       "Web Design",
       "UI/UX",
-      "Digital Transformation",
-      "Cloud Infrastructure",
-      "Semantic SEO",
-      "Cybersecurity"
     ],
   },
   localBusinessSchema: {
     "@context": "https://schema.org",
-    "@type": ["LocalBusiness", "ProfessionalService", "SoftwareApplication", "TechArticle"],
+    "@type": ["LocalBusiness", "ProfessionalService"],
     name: "Einort Solutions",
     image: "https://einort.com/icon.png",
     "@id": "https://einort.com",
     url: "https://einort.com",
     telephone: "+237686661578",
     email: "contact@einort.com",
-    priceRange: "$$$",
+    priceRange: "$$",
     address: {
       "@type": "PostalAddress",
       streetAddress: "Douala",
@@ -147,7 +137,11 @@ export const SEO_CONFIG = {
     openingHoursSpecification: {
       "@type": "OpeningHoursSpecification",
       dayOfWeek: [
-        "Monday", "Tuesday", "Wednesday", "Thursday", "Friday"
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
       ],
       opens: "08:00",
       closes: "18:00"
@@ -158,42 +152,42 @@ export const SEO_CONFIG = {
     },
     hasOfferCatalog: {
       "@type": "OfferCatalog",
-      name: "Enterprise Software Engineering Services",
+      name: "Software Engineering Services",
       itemListElement: [
         {
           "@type": "Offer",
           itemOffered: {
-            "@type": "ProfessionalService",
-            name: "Custom Software Development",
-            description: "End-to-end bespoke software engineering."
+            "@type": "Service",
+            name: "Custom Software Development"
           }
         },
         {
           "@type": "Offer",
           itemOffered: {
-            "@type": "ProfessionalService",
-            name: "Enterprise Web Architecture",
-            description: "Scalable web applications and platform architecture."
+            "@type": "Service",
+            name: "Enterprise Web Architecture"
           }
         },
         {
           "@type": "Offer",
           itemOffered: {
-            "@type": "ProfessionalService",
-            name: "ERP & CRM Systems Development",
-            description: "Custom enterprise resource planning systems."
+            "@type": "Service",
+            name: "ERP & CRM Systems Development"
           }
         },
         {
           "@type": "Offer",
           itemOffered: {
-            "@type": "ProfessionalService",
-            name: "AI Automation Solutions",
-            description: "Artificial Intelligence integrations and workflow automation."
+            "@type": "Service",
+            name: "AI Automation Solutions"
           }
         }
       ]
-    }
+    },
+    sameAs: [
+      "https://twitter.com/einortsolutions",
+      "https://linkedin.com/company/einortsolutions"
+    ]
   },
   websiteSchema: {
     "@context": "https://schema.org",
@@ -202,7 +196,7 @@ export const SEO_CONFIG = {
     url: "https://einort.com/",
     potentialAction: {
       "@type": "SearchAction",
-      target: "https://einort.com/search?q={search_term_string}",
+      target: "{search_term_string}",
       "query-input": "required name=search_term_string"
     }
   },

@@ -3,7 +3,6 @@ import { Helmet } from "react-helmet-async";
 import { SEO_CONFIG } from "../../constants/seo";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { SOCIAL_LINKS } from "../../config/socialLinks";
 
 interface SEOProps {
   title?: string;
@@ -130,14 +129,8 @@ export function SEO({
   }, [location.pathname]);
 
   const defaultSchemaArray = useMemo(() => [
-    {
-      ...SEO_CONFIG.organizationSchema,
-      sameAs: SOCIAL_LINKS.map(link => link.url)
-    },
-    {
-      ...SEO_CONFIG.localBusinessSchema,
-      sameAs: SOCIAL_LINKS.map(link => link.url)
-    },
+    SEO_CONFIG.organizationSchema,
+    SEO_CONFIG.localBusinessSchema,
     SEO_CONFIG.websiteSchema,
     {
       "@context": "https://schema.org",

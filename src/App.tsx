@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
 import { SEO } from "./components/seo/SEO";
-import { MetaPixelTracker } from "./components/seo/MetaPixelTracker";
 
 import { ProtectedRoute } from "./components/shared/ProtectedRoute";
 import { Loadable } from "./components/shared/Loadable";
@@ -39,9 +38,6 @@ const ContactForm = Loadable(
 );
 const ContactPage = Loadable(
   lazy(() => import("./features/contact/ContactPage").then((m) => ({ default: m.ContactPage }))),
-);
-const AboutPage = Loadable(
-  lazy(() => import("./features/about/AboutPage").then((m) => ({ default: m.AboutPage }))),
 );
 const AdminDashboard = Loadable(
   lazy(() => import("./features/admin/AdminDashboard").then((m) => ({ default: m.AdminDashboard }))),
@@ -245,7 +241,6 @@ export default function App() {
     <HelmetProvider>
       <AuthProvider>
         <BrowserRouter>
-          <MetaPixelTracker />
           <SEO />
           <ErrorBoundary>
             <Routes>
@@ -261,20 +256,6 @@ export default function App() {
                       }
                     >
                       <HomePage />
-                    </Suspense>
-                  }
-                />
-                <Route
-                  path="about"
-                  element={
-                    <Suspense
-                      fallback={
-                        <div className="min-h-screen bg-background flex items-center justify-center">
-                          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                        </div>
-                      }
-                    >
-                      <AboutPage />
                     </Suspense>
                   }
                 />

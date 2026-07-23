@@ -33,201 +33,137 @@
     "websites-web-apps": {
       "title": "Websites & Web Apps",
       "description": "Build stunning, high-performance websites and intelligent web applications engineered for growth, scalability, and premium user experience.",
-      "longDescription": "In today's fast-evolving African digital landscape, a generic website is no longer enough. Your web platform must serve as a 24/7 digital storefront, a lead generation engine, and a mark of ultimate credibility. We engineer highly performant, secure, and mobile-optimized web applications tailored for the Cameroonian and broader African market. Whether dealing with low-bandwidth environments or requiring seamless integrations with local payment gateways (like Mobile Money and Orange Money), we ensure your platform remains lightning-fast, highly converting, and globally competitive. Our approach involves rigorous architectural planning, deep technical audits, and aligning the digital solution precisely with your long-term business objectives. We prioritize semantic HTML, enterprise-grade security, and robust scalability. By utilizing cutting-edge technologies like React, Node.js, and cloud infrastructures, we ensure that your platform not only solves today's problems but is ready for tomorrow's challenges. Our engineering culture focuses on clean code, test-driven development, and continuous integration to deliver flawless products.",
+      "longDescription": "In today's fast-evolving African digital landscape, a generic website is no longer enough. Your web platform must serve as a 24/7 digital storefront, a lead generation engine, and a mark of ultimate credibility. We engineer highly performant, secure, and mobile-optimized web applications tailored for the Cameroonian and broader African market. Whether dealing with low-bandwidth environments or requiring seamless integrations with local payment gateways (like Mobile Money and Orange Money), we ensure your platform remains lightning-fast, highly converting, and globally competitive.",
       "cameroonContext": "With internet penetration growing rapidly in Cameroon, businesses that offer robust, fast-loading, and mobile-first web experiences stand out instantly. We build systems that overcome local infrastructural challenges, ensuring your enterprise remains online and accessible to clients globally and locally, without compromise.",
       "features": [
         "Custom Software Architecture",
         "Full-stack React & Next.js",
         "Progressive Web Apps (PWA)",
-        "High-converting Landing Pages",
-        "Enterprise Architecture",
-        "Semantic HTML & SEO",
-        "Knowledge Graph Integration",
-        "AI-Ready Infrastructure",
-        "Microservices Architecture"
+        "High-converting Landing Pages"
       ],
       "benefits": [
         "Process: We start with deep architectural planning and build pixel-perfect interfaces that capture your audience, delivering lightning-fast load times.",
         "Business Impact: Increase organic traffic, lower bounce rates, and turn your website into a powerful asset that directly drives revenue and leads.",
-        "Next Level: Move from a generic online presence to a bespoke, enterprise-grade digital platform that outpaces competitors.",
-        "Security: We implement zero-trust architectures and rigorous compliance checks to ensure data integrity.",
-        "Scalability: Designed to handle exponential traffic growth without performance degradation.",
-        "Discoverability: Engineered with semantic schema and JSON-LD to maximize visibility across all AI and traditional search engines."
+        "Next Level: Move from a generic online presence to a bespoke, enterprise-grade digital platform that outpaces competitors."
       ]
     },
     "ui-ux-design": {
       "title": "UI/UX Design",
       "description": "Crafting intuitive, visually exceptional, and conversion-focused user experiences that elevate digital engagement.",
-      "longDescription": "First impressions are digital. A poorly designed interface immediately erodes trust, especially in emerging markets where digital credibility is paramount. Our UI/UX design methodology goes beyond aesthetics; we focus on user psychology, cognitive load, and frictionless navigation. We create cinematic, Apple-level polished interfaces that not only look spectacular but guide your customers effortlessly toward making a purchase or contacting your team. Our approach involves rigorous architectural planning, deep technical audits, and aligning the digital solution precisely with your long-term business objectives. We prioritize semantic HTML, enterprise-grade security, and robust scalability. By utilizing cutting-edge technologies like React, Node.js, and cloud infrastructures, we ensure that your platform not only solves today's problems but is ready for tomorrow's challenges. Our engineering culture focuses on clean code, test-driven development, and continuous integration to deliver flawless products.",
+      "longDescription": "First impressions are digital. A poorly designed interface immediately erodes trust, especially in emerging markets where digital credibility is paramount. Our UI/UX design methodology goes beyond aesthetics; we focus on user psychology, cognitive load, and frictionless navigation. We create cinematic, Apple-level polished interfaces that not only look spectacular but guide your customers effortlessly toward making a purchase or contacting your team.",
       "cameroonContext": "Many local applications suffer from clustered, confusing interfaces that deter users. We elevate Cameroonian businesses to international design standards, building trust and conveying premium quality, which allows you to command higher prices and dominate your competitors.",
       "features": [
         "Wireframing & Prototyping",
         "Interactive Design Systems",
         "User Journey Mapping",
-        "Conversion Rate Optimization",
-        "Enterprise Architecture",
-        "Semantic HTML & SEO",
-        "Knowledge Graph Integration",
-        "AI-Ready Infrastructure",
-        "Microservices Architecture"
+        "Conversion Rate Optimization"
       ],
       "benefits": [
         "Process: We map out user journeys, identify friction points, and craft beautiful interfaces designed explicitly to guide users toward action.",
         "Business Impact: Boost conversion rates, improve user retention, and ensure your customers have a seamless and frictionless experience.",
-        "Next Level: Elevate your brand perception with a cinematic, Apple-level polish that commands premium pricing and trust.",
-        "Security: We implement zero-trust architectures and rigorous compliance checks to ensure data integrity.",
-        "Scalability: Designed to handle exponential traffic growth without performance degradation.",
-        "Discoverability: Engineered with semantic schema and JSON-LD to maximize visibility across all AI and traditional search engines."
+        "Next Level: Elevate your brand perception with a cinematic, Apple-level polish that commands premium pricing and trust."
       ]
     },
     "erp-solutions": {
       "title": "ERP Solutions",
       "description": "Streamline operations with intelligent ERP systems built to automate workflows, centralize management, and scale business efficiency.",
-      "longDescription": "As your business grows, relying on fragmented spreadsheets, paper-based records, and disconnected software creates massive bottlenecks. Our custom Enterprise Resource Planning (ERP) solutions centralize your data, automate repetitive tasks, and provide real-time visibility into your entire operation. From inventory management and HR to finance and customer relations, we build scalable systems that give business owners absolute control. Our approach involves rigorous architectural planning, deep technical audits, and aligning the digital solution precisely with your long-term business objectives. We prioritize semantic HTML, enterprise-grade security, and robust scalability. By utilizing cutting-edge technologies like React, Node.js, and cloud infrastructures, we ensure that your platform not only solves today's problems but is ready for tomorrow's challenges. Our engineering culture focuses on clean code, test-driven development, and continuous integration to deliver flawless products.",
+      "longDescription": "As your business grows, relying on fragmented spreadsheets, paper-based records, and disconnected software creates massive bottlenecks. Our custom Enterprise Resource Planning (ERP) solutions centralize your data, automate repetitive tasks, and provide real-time visibility into your entire operation. From inventory management and HR to finance and customer relations, we build scalable systems that give business owners absolute control.",
       "cameroonContext": "Many Cameroonian enterprises lose revenue due to operational inefficiencies, inventory theft, or poor data tracking. A custom ERP replaces chaos with clarity, digitizing your operations securely so you can manage your business remotely, track every CFA franc, and scale without administrative nightmares.",
       "features": [
         "Custom Business Logic",
         "Workflow Automation",
         "Centralized Data Hubs",
-        "Scalable Cloud Infrastructure",
-        "Enterprise Architecture",
-        "Semantic HTML & SEO",
-        "Knowledge Graph Integration",
-        "AI-Ready Infrastructure",
-        "Microservices Architecture"
+        "Scalable Cloud Infrastructure"
       ],
       "benefits": [
         "Process: We analyze your internal operations to build a tailored system that eliminates data silos and manual repetitive tasks.",
         "Business Impact: Drastically reduce operational costs, eliminate human errors, and gain real-time visibility into every aspect of your business.",
-        "Next Level: Transform your enterprise into a lean, data-driven organization capable of scaling without administrative bottlenecks.",
-        "Security: We implement zero-trust architectures and rigorous compliance checks to ensure data integrity.",
-        "Scalability: Designed to handle exponential traffic growth without performance degradation.",
-        "Discoverability: Engineered with semantic schema and JSON-LD to maximize visibility across all AI and traditional search engines."
+        "Next Level: Transform your enterprise into a lean, data-driven organization capable of scaling without administrative bottlenecks."
       ]
     },
     "mobile-app-development": {
       "title": "Mobile App Development",
       "description": "Deliver premium mobile experiences with high-performance applications designed for seamless functionality and modern usability.",
-      "longDescription": "Africa is a mobile-first continent. To truly capture your audience, you need a mobile application that is fast, intuitive, and functional even in low-connectivity areas. We develop premium native and cross-platform mobile apps for iOS and Android that drive engagement, foster brand loyalty, and open direct marketing channels to your customers' pockets. Our approach involves rigorous architectural planning, deep technical audits, and aligning the digital solution precisely with your long-term business objectives. We prioritize semantic HTML, enterprise-grade security, and robust scalability. By utilizing cutting-edge technologies like React, Node.js, and cloud infrastructures, we ensure that your platform not only solves today's problems but is ready for tomorrow's challenges. Our engineering culture focuses on clean code, test-driven development, and continuous integration to deliver flawless products.",
+      "longDescription": "Africa is a mobile-first continent. To truly capture your audience, you need a mobile application that is fast, intuitive, and functional even in low-connectivity areas. We develop premium native and cross-platform mobile apps for iOS and Android that drive engagement, foster brand loyalty, and open direct marketing channels to your customers' pockets.",
       "cameroonContext": "With smartphone usage exploding across Cameroon, an app gives you direct access to your clients via push notifications and localized services. We optimize our apps to be lightweight, data-efficient, and fully integrated with local tech ecosystems.",
       "features": [
         "Native & Cross-Platform",
         "Fluid Animations",
         "Offline Architecture",
-        "App Store Optimization",
-        "Enterprise Architecture",
-        "Semantic HTML & SEO",
-        "Knowledge Graph Integration",
-        "AI-Ready Infrastructure",
-        "Microservices Architecture"
+        "App Store Optimization"
       ],
       "benefits": [
         "Process: From concept to deployment, we engineer mobile applications that feel native, responsive, and deeply engaging.",
         "Business Impact: Capture the mobile-first audience, increase user engagement, and build a direct marketing channel to your customers' pockets.",
-        "Next Level: Establish a dominant mobile presence that fosters loyalty and recurring revenue through push notifications and seamless UX.",
-        "Security: We implement zero-trust architectures and rigorous compliance checks to ensure data integrity.",
-        "Scalability: Designed to handle exponential traffic growth without performance degradation.",
-        "Discoverability: Engineered with semantic schema and JSON-LD to maximize visibility across all AI and traditional search engines."
+        "Next Level: Establish a dominant mobile presence that fosters loyalty and recurring revenue through push notifications and seamless UX."
       ]
     },
     "branding-graphic-design": {
       "title": "Branding & Graphic Design",
       "description": "Develop a compelling visual identity with professional graphic design and brand strategy that resonates with your audience.",
-      "longDescription": "Your brand is your most valuable asset. It's the silent ambassador of your business. We don't just design logos; we architect comprehensive visual identities that communicate authority, trust, and premium quality. From cohesive color palettes and typography to marketing collateral and digital assets, we ensure your brand stands out instantly in a crowded marketplace. Our approach involves rigorous architectural planning, deep technical audits, and aligning the digital solution precisely with your long-term business objectives. We prioritize semantic HTML, enterprise-grade security, and robust scalability. By utilizing cutting-edge technologies like React, Node.js, and cloud infrastructures, we ensure that your platform not only solves today's problems but is ready for tomorrow's challenges. Our engineering culture focuses on clean code, test-driven development, and continuous integration to deliver flawless products.",
+      "longDescription": "Your brand is your most valuable asset. It's the silent ambassador of your business. We don't just design logos; we architect comprehensive visual identities that communicate authority, trust, and premium quality. From cohesive color palettes and typography to marketing collateral and digital assets, we ensure your brand stands out instantly in a crowded marketplace.",
       "cameroonContext": "In a market saturated with generic businesses, a strong, professional brand identity is the fastest way to build instant credibility. Cameroonian consumers are increasingly drawn to brands that look established and trustworthy. We help you transcend the 'local shop' aesthetic into a highly respected corporate entity.",
       "features": [
         "Visual Identity & Logos",
         "Brand Guidelines",
         "Marketing Collateral",
-        "Premium Typography & Color Theory",
-        "Enterprise Architecture",
-        "Semantic HTML & SEO",
-        "Knowledge Graph Integration",
-        "AI-Ready Infrastructure",
-        "Microservices Architecture"
+        "Premium Typography & Color Theory"
       ],
       "benefits": [
         "Process: We distill your core values into a striking visual language, creating cohesive assets that tell your brand's unique story.",
         "Business Impact: Build instant recognition, foster brand loyalty, and differentiate yourself in a crowded market.",
-        "Next Level: Transition from a commodity service to a highly sought-after premium brand that commands respect and attention.",
-        "Security: We implement zero-trust architectures and rigorous compliance checks to ensure data integrity.",
-        "Scalability: Designed to handle exponential traffic growth without performance degradation.",
-        "Discoverability: Engineered with semantic schema and JSON-LD to maximize visibility across all AI and traditional search engines."
+        "Next Level: Transition from a commodity service to a highly sought-after premium brand that commands respect and attention."
       ]
     },
     "social-media-management": {
       "title": "Social Media Management",
       "description": "Enhance your online presence with strategic social media campaigns, content creation, and community engagement.",
-      "longDescription": "Social media is where your customers spend their time. But simply posting is not enough. You need a calculated strategy that drives engagement, builds community, and converts followers into paying clients. We handle end-to-end social media management, crafting stunning visuals, writing compelling copy, and executing strategies that elevate your brand's digital footprint across all relevant platforms. Our approach involves rigorous architectural planning, deep technical audits, and aligning the digital solution precisely with your long-term business objectives. We prioritize semantic HTML, enterprise-grade security, and robust scalability. By utilizing cutting-edge technologies like React, Node.js, and cloud infrastructures, we ensure that your platform not only solves today's problems but is ready for tomorrow's challenges. Our engineering culture focuses on clean code, test-driven development, and continuous integration to deliver flawless products.",
+      "longDescription": "Social media is where your customers spend their time. But simply posting is not enough. You need a calculated strategy that drives engagement, builds community, and converts followers into paying clients. We handle end-to-end social media management, crafting stunning visuals, writing compelling copy, and executing strategies that elevate your brand's digital footprint across all relevant platforms.",
       "cameroonContext": "Platforms like Facebook, Instagram, and LinkedIn are the primary discovery engines for businesses in Cameroon. We leverage local cultural nuances, trending topics, and strategic timing to ensure your content resonates deeply with the local demographic while maintaining a world-class aesthetic.",
       "features": [
         "Content Strategy",
         "Community Engagement",
         "Analytics & Reporting",
-        "Growth Hacking",
-        "Enterprise Architecture",
-        "Semantic HTML & SEO",
-        "Knowledge Graph Integration",
-        "AI-Ready Infrastructure",
-        "Microservices Architecture"
+        "Growth Hacking"
       ],
       "benefits": [
         "Process: We manage your digital footprint with tailored content schedules, striking visuals, and proactive community building.",
         "Business Impact: Amplify brand awareness, engage directly with your target demographic, and drive organic traffic to your primary funnels.",
-        "Next Level: Become an industry authority and thought leader, building a passionate community around your business.",
-        "Security: We implement zero-trust architectures and rigorous compliance checks to ensure data integrity.",
-        "Scalability: Designed to handle exponential traffic growth without performance degradation.",
-        "Discoverability: Engineered with semantic schema and JSON-LD to maximize visibility across all AI and traditional search engines."
+        "Next Level: Become an industry authority and thought leader, building a passionate community around your business."
       ]
     },
     "digital-advertising": {
       "title": "Digital Advertising",
       "description": "Drive targeted traffic and conversions through data-driven digital advertising across Facebook, Instagram, and Google.",
-      "longDescription": "Stop relying on unpredictable word-of-mouth. Digital advertising is a predictable, scalable machine for generating revenue. We engineer high-converting ad campaigns on Facebook, Instagram, and Google, leveraging advanced targeting algorithms to place your offer directly in front of people actively looking to buy. We focus entirely on ROI, ensuring every franc spent brings measurable value back to your business. Our approach involves rigorous architectural planning, deep technical audits, and aligning the digital solution precisely with your long-term business objectives. We prioritize semantic HTML, enterprise-grade security, and robust scalability. By utilizing cutting-edge technologies like React, Node.js, and cloud infrastructures, we ensure that your platform not only solves today's problems but is ready for tomorrow's challenges. Our engineering culture focuses on clean code, test-driven development, and continuous integration to deliver flawless products.",
+      "longDescription": "Stop relying on unpredictable word-of-mouth. Digital advertising is a predictable, scalable machine for generating revenue. We engineer high-converting ad campaigns on Facebook, Instagram, and Google, leveraging advanced targeting algorithms to place your offer directly in front of people actively looking to buy. We focus entirely on ROI, ensuring every franc spent brings measurable value back to your business.",
       "cameroonContext": "Traditional advertising (billboards, radio) is expensive and impossible to track accurately. Digital ads allow Cameroonian businesses to target specific cities, neighborhoods, age groups, and interests with pinpoint accuracy. We optimize campaigns for the local market, driving real leads and sales.",
       "features": [
         "Google Search Ads",
         "Facebook & Instagram Ads",
         "Retargeting Campaigns",
-        "A/B Testing & Optimization",
-        "Enterprise Architecture",
-        "Semantic HTML & SEO",
-        "Knowledge Graph Integration",
-        "AI-Ready Infrastructure",
-        "Microservices Architecture"
+        "A/B Testing & Optimization"
       ],
       "benefits": [
         "Process: We leverage advanced targeting data to position your brand in front of high-intent buyers, constantly optimizing for the lowest acquisition cost.",
         "Business Impact: Generate immediate, measurable ROI, capture ready-to-buy leads, and predictably scale your revenue.",
-        "Next Level: Stop relying solely on word-of-mouth and build a predictable, scalable lead generation engine.",
-        "Security: We implement zero-trust architectures and rigorous compliance checks to ensure data integrity.",
-        "Scalability: Designed to handle exponential traffic growth without performance degradation.",
-        "Discoverability: Engineered with semantic schema and JSON-LD to maximize visibility across all AI and traditional search engines."
+        "Next Level: Stop relying solely on word-of-mouth and build a predictable, scalable lead generation engine."
       ]
     },
     "seo-workspace-setup": {
       "title": "SEO & Google Workspace Setup",
       "description": "Improve search visibility and streamline organizational productivity with expert SEO strategies and Workspace integrations.",
-      "longDescription": "Visibility and operational efficiency are the twin pillars of a modern enterprise. Search Engine Optimization (SEO) ensures that when a potential client searches for your services, your business appears first. Simultaneously, setting up Google Workspace professionalizes your internal communications (e.g., yourname@yourcompany.com) and provides enterprise-grade tools for secure document collaboration and storage. Our approach involves rigorous architectural planning, deep technical audits, and aligning the digital solution precisely with your long-term business objectives. We prioritize semantic HTML, enterprise-grade security, and robust scalability. By utilizing cutting-edge technologies like React, Node.js, and cloud infrastructures, we ensure that your platform not only solves today's problems but is ready for tomorrow's challenges. Our engineering culture focuses on clean code, test-driven development, and continuous integration to deliver flawless products.",
+      "longDescription": "Visibility and operational efficiency are the twin pillars of a modern enterprise. Search Engine Optimization (SEO) ensures that when a potential client searches for your services, your business appears first. Simultaneously, setting up Google Workspace professionalizes your internal communications (e.g., yourname@yourcompany.com) and provides enterprise-grade tools for secure document collaboration and storage.",
       "cameroonContext": "Many local businesses still use generic @yahoo or @gmail addresses, which instantly diminishes trust, especially for B2B transactions. Furthermore, local SEO competition is often low, meaning a well-optimized website can easily capture the majority of organic search traffic in your sector in Cameroon.",
       "features": [
         "Technical SEO Audits",
         "Keyword Strategy",
         "Google Workspace Integration",
-        "Productivity Automation",
-        "Enterprise Architecture",
-        "Semantic HTML & SEO",
-        "Knowledge Graph Integration",
-        "AI-Ready Infrastructure",
-        "Microservices Architecture"
+        "Productivity Automation"
       ],
       "benefits": [
         "Process: We optimize your digital infrastructure for search engines while streamlining your internal communications with seamless Google Workspace deployments.",
         "Business Impact: Capture high-quality organic search traffic effortlessly, while empowering your team with professional, secure email and collaboration tools.",
-        "Next Level: Future-proof your business by dominating search results and operating with enterprise-level efficiency and security.",
-        "Security: We implement zero-trust architectures and rigorous compliance checks to ensure data integrity.",
-        "Scalability: Designed to handle exponential traffic growth without performance degradation.",
-        "Discoverability: Engineered with semantic schema and JSON-LD to maximize visibility across all AI and traditional search engines."
+        "Next Level: Future-proof your business by dominating search results and operating with enterprise-level efficiency and security."
       ]
     }
   }

@@ -42,22 +42,6 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://einort.com/en/about</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/about" />
-    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/about" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/about" />
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://einort.com/fr/about</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/about" />
-    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/about" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/about" />
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://einort.com/en/case-studies/fintech-mobile-app</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/case-studies/fintech-mobile-app" />
     <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/case-studies/fintech-mobile-app" />
