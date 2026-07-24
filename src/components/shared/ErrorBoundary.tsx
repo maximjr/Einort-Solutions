@@ -20,24 +20,59 @@ export class ErrorBoundary extends Component<Props, State> {
     globalError: null
   };
 
+  private isThirdPartyError(event: ErrorEvent | PromiseRejectionEvent): boolean {
+    const message = event instanceof ErrorEvent ? event.message : String((event as any).reason);
+    const filename = event instanceof ErrorEvent ? event.filename : '';
+    const errorObj = event instanceof ErrorEvent ? event.error : (event as any).reason;
+    const stack = errorObj?.stack || '';
+
+    const thirdPartyDomains = [
+      'connect.facebook.net',
+      'google-analytics.com',
+      'googletagmanager.com',
+      'clarity.ms',
+      'analytics.tiktok.com',
+      'snap.licdn.com'
+    ];
+
+    const isThirdPartyDomain = thirdPartyDomains.some(domain => 
+      (filename && filename.includes(domain)) || 
+      (stack && stack.includes(domain))
+    );
+
+    const isKnownMetaPixelError = message.includes('getBoundingClientRect is not a function');
+
+    return isThirdPartyDomain || isKnownMetaPixelError;
+  }
+
   private handleGlobalError = (event: ErrorEvent) => {
-    console.error("[Global Error]:", event.error);
-    AnalyticsService.trackError(event.error || event.message, { type: "global_error", url: window.location.href });
-    this.setState({
-      hasError: true,
-      globalError: `[Global] ${event.message}\n${event.filename}:${event.lineno}:${event.colno}`,
-      error: event.error
-    });
+    console.error("[Global Error]:", event.error || event.message);
+    AnalyticsService.trackError(event.error || event.message, { type: "global_error", url: window.location.href, filename: event.filename });
+    
+    if (!this.isThirdPartyError(event)) {
+      this.setState({
+        hasError: true,
+        globalError: `[Global] ${event.message}\n${event.filename}:${event.lineno}:${event.colno}`,
+        error: event.error
+      });
+    } else {
+      console.warn("[ErrorBoundary] Suppressed third-party script error to prevent app crash.");
+    }
   };
 
   private handleUnhandledRejection = (event: PromiseRejectionEvent) => {
     console.error("[Unhandled Promise Rejection]:", event.reason);
     AnalyticsService.trackError(event.reason instanceof Error ? event.reason : String(event.reason), { type: "unhandled_rejection", url: window.location.href });
-    this.setState({
-      hasError: true,
-      globalError: `[Promise Rejection] ${event.reason}`,
-      error: event.reason instanceof Error ? event.reason : new Error(String(event.reason))
-    });
+    
+    if (!this.isThirdPartyError(event)) {
+      this.setState({
+        hasError: true,
+        globalError: `[Promise Rejection] ${event.reason}`,
+        error: event.reason instanceof Error ? event.reason : new Error(String(event.reason))
+      });
+    } else {
+      console.warn("[ErrorBoundary] Suppressed third-party unhandled rejection to prevent app crash.");
+    }
   };
 
   public componentDidMount() {

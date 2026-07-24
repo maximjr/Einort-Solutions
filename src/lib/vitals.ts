@@ -24,13 +24,8 @@ export function reportWebVitals(onPerfEntry?: (metric: Metric) => void) {
     });
 
     try {
-      // Use `navigator.sendBeacon()` if available, otherwise fallback to `fetch()`
+      // Send metric to our unified analytics service
       AnalyticsService.trackPerformance({ metric: metric.name, value: Math.round(metric.name === "CLS" ? metric.value * 1000 : metric.value) });
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon(VITALS_ENDPOINT, body);
-      } else {
-        fetch(VITALS_ENDPOINT, { body, method: "POST", keepalive: true });
-      }
     } catch (error) {
       // Failed to send web vitals silently
     }

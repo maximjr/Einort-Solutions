@@ -42,12 +42,20 @@ export class MetaPixelProvider implements IAnalyticsProvider {
       "https://connect.facebook.net/en_US/fbevents.js"
     );
 
-    window.fbq("init", PIXEL_ID);
+    try {
+      window.fbq("init", PIXEL_ID);
+    } catch (e) {
+      console.error("[MetaPixel] Initialization error:", e);
+    }
   }
 
   trackPageView(_url?: string, _title?: string, _language?: string) {
     if (!window.fbq) return;
-    window.fbq("track", "PageView");
+    try {
+      window.fbq("track", "PageView");
+    } catch (e) {
+      console.error("[MetaPixel] PageView tracking error:", e);
+    }
   }
 
   trackEvent(eventName: StandardEventName, properties?: Record<string, any>) {
@@ -65,10 +73,14 @@ export class MetaPixelProvider implements IAnalyticsProvider {
 
     const metaEvent = eventMapping[eventName];
     
-    if (metaEvent) {
-      window.fbq("track", metaEvent, properties || {});
-    } else {
-      window.fbq("trackCustom", eventName, properties || {});
+    try {
+      if (metaEvent) {
+        window.fbq("track", metaEvent, properties || {});
+      } else {
+        window.fbq("trackCustom", eventName, properties || {});
+      }
+    } catch (e) {
+      console.error(`[MetaPixel] Event tracking error for ${eventName}:`, e);
     }
   }
 }
