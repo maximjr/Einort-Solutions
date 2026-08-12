@@ -118,6 +118,68 @@ export function ServicesPage() {
                   )}
                 </section>
               </FadeUp>
+
+              {serviceId === 'websites-web-apps' && (
+                <FadeUp delay={0.2}>
+                  <section>
+                    <div className="mb-8">
+                      <h2 className="text-2xl font-display text-white mb-4">Our Recent Web Dev Projects</h2>
+                      <p className="text-text-muted font-light">Explore some of our latest enterprise and consumer web applications, built for scale and performance.</p>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {[
+                        {
+                          name: "E-Commerce Platform",
+                          type: "E-Commerce",
+                          desc: "A scalable, high-performance online retail platform featuring secure payments, intuitive product discovery, and seamless checkout.",
+                          image: "https://firebasestorage.googleapis.com/v0/b/jo-accessories-44ffa.firebasestorage.app/o/Einort%2FChatGPT%20Image%20Aug%2011%2C%202026%2C%2011_13_35%20AM.png?alt=media&token=cb43ebff-61ff-4b2a-8649-9e2217b1e307",
+                          link: "https://kbl-e-lectronics.vercel.app/",
+                        },
+                        {
+                          name: "Premium Hotel Landing Page",
+                          type: "PREMIUM HOTEL",
+                          desc: "An elegant, high-conversion landing page for a premium hotel.",
+                          image: "https://firebasestorage.googleapis.com/v0/b/jo-accessories-44ffa.firebasestorage.app/o/Einort%2FScreenshot%202026-08-11%20195316.png?alt=media&token=bc8c3e6b-704c-4e89-9f86-0f4dc24828a7",
+                          link: "https://kamojamas-hotel-zstz.vercel.app/",
+                        },
+                        {
+                          name: "Fashion E-Shop Platform",
+                          type: "FASHION E-SHOP",
+                          desc: "A modern e-commerce storefront for fashion and accessories.",
+                          image: "https://firebasestorage.googleapis.com/v0/b/jo-accessories-44ffa.firebasestorage.app/o/Einort%2FScreenshot%202026-08-11%20170344.png?alt=media&token=91b01adf-fbfb-48bf-b75c-93bf02f643e2",
+                          link: "https://jo-accessories-1.vercel.app/",
+                        },
+                        {
+                          name: "Apple E-Commerce Store",
+                          type: "E-COMMERCE",
+                          desc: "A sleek, high-performance online storefront for Apple products and electronics.",
+                          image: "https://firebasestorage.googleapis.com/v0/b/jo-accessories-44ffa.firebasestorage.app/o/Einort%2FScreenshot%202026-08-11%20194241.png?alt=media&token=8749a2fa-323b-49cf-83a7-f7e8d61eb81c",
+                          link: "https://best-buy-opal.vercel.app/",
+                        }
+                      ].map((project, idx) => {
+                        const CardWrapper = project.link ? 'a' : 'div';
+                        const linkProps = project.link ? { href: project.link, target: "_blank", rel: "noopener noreferrer" } : {};
+                        
+                        return (
+                        <CardWrapper key={idx} {...linkProps} className="group cursor-pointer relative overflow-hidden rounded-2xl border border-white/5 bg-background/50 hover:bg-white/[0.02] transition-colors block">
+                          <div className="aspect-[4/3] overflow-hidden">
+                            <img 
+                              src={project.image} 
+                              alt={project.name} 
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100"
+                            />
+                          </div>
+                          <div className="p-6">
+                            <p className="text-primary text-xs uppercase tracking-wider font-semibold mb-2">{project.type}</p>
+                            <h3 className="text-xl text-white font-medium mb-2">{project.name}</h3>
+                            <p className="text-text-muted font-light text-sm">{project.desc}</p>
+                          </div>
+                        </CardWrapper>
+                      )})}
+                    </div>
+                  </section>
+                </FadeUp>
+              )}
               
               <FadeUp delay={0.3}>
                  <section>
