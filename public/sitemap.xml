@@ -266,6 +266,22 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://einort.com/en/services</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/services" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://einort.com/fr/services</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services" />
+    <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://einort.com/en/services" />
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://einort.com/en/services/ai-automation</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://einort.com/en/services/ai-automation" />
     <xhtml:link rel="alternate" hreflang="fr" href="https://einort.com/fr/services/ai-automation" />
