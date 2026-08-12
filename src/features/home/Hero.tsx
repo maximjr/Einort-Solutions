@@ -20,7 +20,7 @@ export function Hero() {
   return (
     <header
       ref={containerRef}
-      className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden flex flex-col justify-center min-h-[100dvh] perspective-[1000px]"
+      className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden flex flex-col justify-center min-h-[100vh] perspective-[1000px]"
     >
       {/* Abstract Background Elements with Parallax */}
       <motion.div

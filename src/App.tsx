@@ -196,7 +196,7 @@ function Layout() {
 
   return (
     <PullToRefresh>
-      <div className="bg-background min-h-[100dvh] text-text-main font-sans selection:bg-primary selection:text-white flex flex-col">
+      <div className="bg-background min-h-[100vh] text-text-main font-sans selection:bg-primary selection:text-white flex flex-col">
         <Navbar />
         <main className="flex-grow">
           <Suspense
@@ -224,6 +224,7 @@ import { useTranslation } from "react-i18next";
 function LangWrapper() {
   const { lang } = useParams();
   const { i18n } = useTranslation();
+  const location = useLocation();
 
   useEffect(() => {
     if (lang && ['en', 'fr'].includes(lang)) {
@@ -234,7 +235,8 @@ function LangWrapper() {
   }, [lang, i18n]);
 
   if (lang && !['en', 'fr'].includes(lang)) {
-    return <Navigate to="/" replace />;
+    const defaultLang = i18n.resolvedLanguage || 'en';
+    return <Navigate to={`/${defaultLang}${location.pathname}${location.search}${location.hash}`} replace />;
   }
 
   return <Layout />;

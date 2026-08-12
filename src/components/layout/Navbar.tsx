@@ -156,7 +156,7 @@ export function Navbar() {
         <Container>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Link to="/" className="flex items-center gap-3 group">
+              <Link to="/" className="touch-manipulation flex items-center gap-3 group">
                 <Logo className="w-10 h-10 group-hover:drop-shadow-[0_0_15px_rgba(59,130,246,0.6)] transition-all duration-500" />
                 <div className="flex flex-col">
                   <span className="text-xl font-display font-bold uppercase tracking-widest text-white leading-none">
@@ -175,7 +175,7 @@ export function Navbar() {
                 <Link
                   key={link.name}
                   to={`${langPrefix}${link.href}`}
-                  className="text-[13px] font-medium tracking-[0.1em] uppercase text-text-muted hover:text-white transition-colors relative group"
+                  className="touch-manipulation text-[13px] font-medium tracking-[0.1em] uppercase text-text-muted hover:text-white transition-colors relative group"
                 >
                   {t(link.name.toLowerCase().replace(" ", "_"))}
                   <div className="absolute -bottom-2 left-0 right-0 h-px bg-primary scale-x-0 group-hover:scale-x-100 transition-transform duration-500 ease-out origin-left"></div>
@@ -202,14 +202,14 @@ export function Navbar() {
                         ? "/admin"
                         : "/client-portal"
                     )}
-                    className="text-[13px] font-bold tracking-[0.1em] uppercase text-text-muted hover:text-white transition-colors flex items-center gap-2 focus:outline-none"
+                    className="touch-manipulation text-[13px] font-bold tracking-[0.1em] uppercase text-text-muted hover:text-white transition-colors flex items-center gap-2 focus:outline-none"
                   >
                     <User size={16} className="text-primary" /> {t("dashboard")}
                   </Link>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="font-bold text-[11px] tracking-[0.15em] uppercase px-4 border-white/10 hover:bg-white/5"
+                    className="touch-manipulation font-bold text-[11px] tracking-[0.15em] uppercase px-4 border-white/10 hover:bg-white/5"
                     onClick={handleSignOut}
                   >
                     <LogOut size={14} className="mr-2" /> {t("sign_out")}
@@ -219,14 +219,14 @@ export function Navbar() {
                 <>
                   <button
                     onClick={() => openAuth("login")}
-                    className="text-[13px] font-bold tracking-[0.1em] uppercase text-text-muted hover:text-white transition-colors flex items-center gap-2 focus:outline-none"
+                    className="touch-manipulation text-[13px] font-bold tracking-[0.1em] uppercase text-text-muted hover:text-white transition-colors flex items-center gap-2 focus:outline-none"
                   >
                     <LogIn size={16} className="text-primary" /> {t("login")}
                   </button>
                   <Button
                     variant="primary"
                     size="sm"
-                    className="font-bold text-[11px] tracking-[0.15em] uppercase px-6"
+                    className="touch-manipulation font-bold text-[11px] tracking-[0.15em] uppercase px-6"
                     onClick={() => openAuth("register")}
                   >
                     {t("start_project")}
@@ -237,7 +237,7 @@ export function Navbar() {
 
             {/* Mobile Nav Toggle */}
             <button
-              className="lg:hidden text-text-muted hover:text-white focus:outline-none flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/5 transition-colors relative z-[60]"
+              className="touch-manipulation lg:hidden text-text-muted hover:text-white focus:outline-none flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/5 transition-colors relative z-[60]"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle mobile menu"
               aria-expanded={mobileMenuOpen}
@@ -273,7 +273,7 @@ export function Navbar() {
 
         {/* Drawer Sheet */}
         <div
-          className={`fixed inset-x-0 bottom-0 z-[55] h-[92dvh] bg-[#090b10] border-t border-white/5 rounded-t-[2.5rem] lg:hidden flex flex-col transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+          className={`fixed inset-x-0 bottom-0 z-[55] h-[92vh] bg-[#090b10] border-t border-white/5 rounded-t-[2.5rem] lg:hidden flex flex-col transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
             mobileMenuOpen
               ? "shadow-[0_-30px_100px_rgba(0,0,0,0.8)] pointer-events-auto"
               : "shadow-none pointer-events-none"
@@ -342,7 +342,7 @@ export function Navbar() {
                           : "/client-portal",
                       )
                     }
-                    className="w-full flex items-center justify-between p-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] active:bg-white/[0.1] active:opacity-80"
+                    className="touch-manipulation w-full flex items-center justify-between p-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.05] rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] active:bg-white/[0.1] active:opacity-80"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
@@ -365,7 +365,7 @@ export function Navbar() {
                             : "/client-portal#projects",
                         )
                       }
-                      className="flex flex-col items-start p-4 bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.05] rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] active:bg-white/[0.1] active:opacity-80 gap-3"
+                      className="touch-manipulation flex flex-col items-start p-4 bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.05] rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] active:bg-white/[0.1] active:opacity-80 gap-3"
                     >
                       <FolderGit2 size={18} className="text-emerald-400" />
                       <span className="font-medium text-white text-sm tracking-wide">
@@ -382,7 +382,7 @@ export function Navbar() {
                             : "/client-portal#messages",
                         )
                       }
-                      className="flex flex-col items-start p-4 bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.05] rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] active:bg-white/[0.1] active:opacity-80 gap-3 relative"
+                      className="touch-manipulation flex flex-col items-start p-4 bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.05] rounded-2xl transition-all duration-300 ease-out active:scale-[0.96] active:bg-white/[0.1] active:opacity-80 gap-3 relative"
                     >
                       <MessageSquare size={18} className="text-cyan-400" />
                       <span className="font-medium text-white text-sm tracking-wide">
@@ -409,14 +409,14 @@ export function Navbar() {
                 <div className="flex gap-3">
                   <Button
                     variant="primary"
-                    className="flex-1 h-14 rounded-2xl font-bold tracking-wider text-xs shadow-[0_4px_20px_rgba(10,102,194,0.3)] uppercase"
+                    className="touch-manipulation flex-1 h-14 rounded-2xl font-bold tracking-wider text-xs shadow-[0_4px_20px_rgba(10,102,194,0.3)] uppercase"
                     onClick={() => openAuth("register")}
                   >
                     {t("start_project")}
                   </Button>
                   <Button
                     variant="outline"
-                    className="flex-1 h-14 rounded-2xl font-bold tracking-wider text-xs border-white/10 text-white hover:bg-white/5 uppercase"
+                    className="touch-manipulation flex-1 h-14 rounded-2xl font-bold tracking-wider text-xs border-white/10 text-white hover:bg-white/5 uppercase"
                     onClick={() => openAuth("login")}
                   >
                     {t("login")}
@@ -435,7 +435,7 @@ export function Navbar() {
                   <button
                     key={link.name}
                     onClick={() => handleNavClick(link.href)}
-                    className="w-full flex items-center justify-between p-3.5 rounded-2xl hover:bg-white/[0.04] transition-all duration-300 ease-out active:scale-[0.96] active:bg-white/[0.1] active:opacity-80"
+                    className="touch-manipulation w-full flex items-center justify-between p-3.5 rounded-2xl hover:bg-white/[0.04] transition-all duration-300 ease-out active:scale-[0.96] active:bg-white/[0.1] active:opacity-80"
                   >
                     <span className="font-medium text-white text-[15px] tracking-wide">
                       {t(link.name.toLowerCase().replace(" ", "_"))}
@@ -450,7 +450,7 @@ export function Navbar() {
             <div className="mt-auto space-y-3 pt-6 pb-6 border-t border-white/[0.05]">
               <button
                 onClick={() => handleNavClick("/support")}
-                className="w-full flex items-center justify-between px-4 py-3 font-medium bg-white/[0.02] hover:bg-white/[0.05] rounded-2xl transition-all duration-300 ease-out border border-white/5 active:scale-[0.96] active:bg-white/[0.08]"
+                className="touch-manipulation w-full flex items-center justify-between px-4 py-3 font-medium bg-white/[0.02] hover:bg-white/[0.05] rounded-2xl transition-all duration-300 ease-out border border-white/5 active:scale-[0.96] active:bg-white/[0.08]"
               >
                 <span className="text-sm text-slate-300 flex items-center gap-3">
                   <LifeBuoy size={16} className="text-slate-400" /> {t("professional_support")}
@@ -464,7 +464,7 @@ export function Navbar() {
                     handleSignOut();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full flex justify-center items-center gap-2 h-14 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold tracking-widest text-[11px] uppercase rounded-2xl transition-all duration-300 ease-out border border-red-500/10 active:scale-[0.96] active:bg-red-500/20 active:opacity-80"
+                  className="touch-manipulation w-full flex justify-center items-center gap-2 h-14 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold tracking-widest text-[11px] uppercase rounded-2xl transition-all duration-300 ease-out border border-red-500/10 active:scale-[0.96] active:bg-red-500/20 active:opacity-80"
                 >
                   <LogOut size={14} />
                   {t("sign_out")}
@@ -481,7 +481,7 @@ export function Navbar() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={link.ariaLabel}
-                  className={`text-slate-400 transition-colors duration-300 ${link.hoverColor}`}
+                  className={`touch-manipulation text-slate-400 transition-colors duration-300 ${link.hoverColor}`}
                 >
                   {link.icon}
                 </a>
