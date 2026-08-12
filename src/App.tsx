@@ -293,6 +293,10 @@ export default function App() {
                   }
                 />
                 <Route
+                  path="services"
+                  element={<Navigate to="..#services" replace />}
+                />
+                <Route
                   path="services/:serviceId"
                   element={
                     <Suspense
@@ -393,17 +397,35 @@ export default function App() {
   );
 }
 
+function NotFound() {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.resolvedLanguage || 'en';
+  
+  return (
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center text-center px-4">
+      <h1 className="text-6xl font-display text-white mb-4">404</h1>
+      <p className="text-text-muted text-lg mb-8">The page you are looking for does not exist or has been moved.</p>
+      <a href={`/${lang}`} className="bg-primary text-white px-6 py-3 rounded-full font-medium hover:bg-primary/90 transition-colors">
+        Return Home
+      </a>
+    </div>
+  );
+}
+
 function RootRedirect() {
   const { i18n } = useTranslation();
   const lang = i18n.resolvedLanguage || 'en';
   const location = useLocation();
   const { pathname, search, hash } = location;
   
-  // Prevent infinite loops if pathname already has a valid lang prefix but wasn't matched
+  // If they are on a valid lang prefix but no route matched (e.g. /en/unknown-route),
+  // they should see a 404, not be silently kicked back to the homepage.
   if (pathname.startsWith('/en/') || pathname === '/en' || pathname.startsWith('/fr/') || pathname === '/fr') {
-     return <Navigate to={`/${lang}`} replace />;
+     return <NotFound />;
   }
 
+  // If they are at the root or missing a lang prefix, prefix it and redirect.
+  // (e.g. /about -> /en/about)
   const newPath = pathname === '/' ? `/${lang}` : `/${lang}${pathname}`;
   return <Navigate to={`${newPath}${search}${hash}`} replace />;
 }

@@ -131,7 +131,7 @@ export function ContactPage() {
     { icon: <MapPin className="w-5 h-5 text-primary" />, title: "Office Address", details: "Douala, Littoral Region, Cameroon" },
     { icon: <Phone className="w-5 h-5 text-primary" />, title: "Phone Numbers", details: "+237 686 661 578" },
     { icon: <Mail className="w-5 h-5 text-primary" />, title: "Email Addresses", details: "einortsolutions237@gmail.com" },
-    { icon: <Globe className="w-5 h-5 text-primary" />, title: "Website", details: "www.einort.com" },
+    { icon: <Globe className="w-5 h-5 text-primary" />, title: "Website", details: "www.einortsolutions.com" },
     { icon: <Clock className="w-5 h-5 text-primary" />, title: "Business Hours", details: "Mon-Fri: 9AM - 6PM WAT" },
   ];
 

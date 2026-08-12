@@ -87,9 +87,10 @@ export function SEO({
 
   const currentLang = i18n.resolvedLanguage || lang;
   
-  const basePath = location.pathname.replace(/^\/(en|fr)/, '');
-  const urlEn = `https://einort.com/en${basePath === '' ? '' : basePath}`;
-  const urlFr = `https://einort.com/fr${basePath === '' ? '' : basePath}`;
+  const rawBasePath = location.pathname.replace(/^\/(en|fr)/, '');
+  const basePath = rawBasePath === '/' ? '' : rawBasePath;
+  const urlEn = `https://einortsolutions.com/en${basePath}`;
+  const urlFr = `https://einortsolutions.com/fr${basePath}`;
   
   const url = canonical || (currentLang === 'fr' ? urlFr : urlEn);
   
@@ -103,7 +104,7 @@ export function SEO({
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://einort.com/",
+        "item": "https://einortsolutions.com/",
       },
     ];
 
@@ -118,7 +119,7 @@ export function SEO({
         "@type": "ListItem",
         "position": index + 2,
         "name": name,
-        "item": `https://einort.com${currentPath}`,
+        "item": `https://einortsolutions.com${currentPath}`,
       });
     });
 
@@ -185,9 +186,9 @@ export function SEO({
 
       {/* Canonical and Multilingual SEO */}
       <link rel="canonical" href={url} />
-      <link rel="alternate" hrefLang="x-default" href={urlEn} />
-      <link rel="alternate" hrefLang="en" href={urlEn} />
-      <link rel="alternate" hrefLang="fr" href={urlFr} />
+      <link rel="alternate" hreflang="x-default" href={urlEn} />
+      <link rel="alternate" hreflang="en" href={urlEn} />
+      <link rel="alternate" hreflang="fr" href={urlFr} />
 
       {/* JSON-LD Schema */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: finalSchema }} />

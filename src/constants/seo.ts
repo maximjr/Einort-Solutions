@@ -70,7 +70,7 @@ export const SEO_CONFIG = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://einort.com/",
+    url: "https://einortsolutions.com/",
     siteName: "Einort Solutions",
     title: "Einort Solutions | Custom Web Apps & Enterprise Architecture Cameroon",
     description:
@@ -87,8 +87,8 @@ export const SEO_CONFIG = {
     "@type": "Organization",
     name: "Einort Solutions",
     legalName: "Einort Solutions LLC",
-    url: "https://einort.com",
-    logo: "https://einort.com/icon.png",
+    url: "https://einortsolutions.com",
+    logo: "https://einortsolutions.com/icon.png",
     description: "Premier software engineering agency and enterprise web architecture firm based in Douala, Cameroon. Specializing in custom CRM & ERP solutions, full-stack web development, and AI automation.",
     foundingDate: "2022",
     founders: [
@@ -101,7 +101,7 @@ export const SEO_CONFIG = {
       "@type": "ContactPoint",
       telephone: "+237686661578",
       contactType: "customer service",
-      email: "contact@einort.com",
+      email: "contact@einortsolutions.com",
       areaServed: ["CM", "US", "CA", "GB", "DE", "FR"],
       availableLanguage: ["en", "fr"]
     },
@@ -125,11 +125,11 @@ export const SEO_CONFIG = {
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "ProfessionalService", "SoftwareApplication", "TechArticle"],
     name: "Einort Solutions",
-    image: "https://einort.com/icon.png",
-    "@id": "https://einort.com",
-    url: "https://einort.com",
+    image: "https://einortsolutions.com/icon.png",
+    "@id": "https://einortsolutions.com",
+    url: "https://einortsolutions.com",
     telephone: "+237686661578",
-    email: "contact@einort.com",
+    email: "contact@einortsolutions.com",
     priceRange: "$$$",
     address: {
       "@type": "PostalAddress",
@@ -199,10 +199,10 @@ export const SEO_CONFIG = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Einort Solutions",
-    url: "https://einort.com/",
+    url: "https://einortsolutions.com/",
     potentialAction: {
       "@type": "SearchAction",
-      target: "https://einort.com/search?q={search_term_string}",
+      target: "https://einortsolutions.com/search?q={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   },
