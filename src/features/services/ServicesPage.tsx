@@ -128,8 +128,8 @@ export function ServicesPage() {
                           name: "Apple E-Commerce Store",
                           type: "E-COMMERCE",
                           desc: "A sleek, high-performance online storefront for Apple products and electronics.",
-                          image: "https://firebasestorage.googleapis.com/v0/b/jo-accessories-44ffa.firebasestorage.app/o/Einort%2FScreenshot%202026-08-11%20194241.png?alt=media&token=8749a2fa-323b-49cf-83a7-f7e8d61eb81c",
-                          link: "https://best-buy-opal.vercel.app/",
+                          image: "https://firebasestorage.googleapis.com/v0/b/jo-accessories-44ffa.firebasestorage.app/o/NOVA%2FScreenshot%202026-08-13%20210038.png?alt=media&token=697dedb2-0603-4dc9-94b9-5d85ceb8cefb",
+                          link: "https://novantelecom.vercel.app/",
                         }
                       ].map((project, idx) => {
                         const CardWrapper = project.link ? 'a' : 'div';
