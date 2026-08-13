@@ -104,7 +104,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
       if (isChunkError) {
         return (
-          <div className="min-h-screen bg-surface flex flex-col items-center justify-center text-center px-4">
+          <div className="min-h-dvh bg-surface flex flex-col items-center justify-center text-center px-4">
             <h1 className="text-3xl font-display text-white mb-4">Connection Interrupted</h1>
             <p className="text-text-muted text-lg mb-8 max-w-md">
               We couldn't load this section of the application. This usually happens when the app has been updated or your connection drops.
@@ -128,7 +128,7 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen bg-background text-text flex items-center justify-center p-8 flex-col text-left">
+        <div className="min-h-dvh bg-background text-text flex items-center justify-center p-8 flex-col text-left">
           <div className="w-full max-w-4xl bg-[#0a0f18] border border-red-500/30 p-6 rounded-lg shadow-2xl overflow-hidden">
             <h1 className="text-2xl font-mono font-bold text-red-400 mb-4 flex items-center gap-2">
               <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
@@ -157,7 +157,6 @@ export class ErrorBoundary extends Component<Props, State> {
               
               <div className="bg-white/5 border border-white/10 p-4 rounded text-gray-300">
                 <span className="text-gray-400 font-bold block mb-1">Lifecycle State:</span>
-                <div>User Agent: {navigator.userAgent}</div>
                 <div>URL: {window.location.href}</div>
                 <div>Time: {new Date().toISOString()}</div>
               </div>

@@ -79,7 +79,7 @@ export function CaseStudyPage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen pt-32 pb-24 flex items-center justify-center text-white">
+      <div className="min-h-dvh pt-32 pb-24 flex items-center justify-center text-white">
         <div className="text-center">
           <h1 className="text-3xl font-display mb-4">Case Study Not Found</h1>
           <Link to="/" className="text-primary hover:underline">
@@ -91,7 +91,7 @@ export function CaseStudyPage() {
   }
 
   return (
-    <main className="min-h-screen pt-32 pb-24 relative z-10 selection:bg-primary selection:text-white">
+    <main className="min-h-dvh pt-32 pb-24 relative z-10 selection:bg-primary selection:text-white">
       <Helmet>
         <title>{data.title} | Case Study</title>
         <meta name="description" content={data.overview} />

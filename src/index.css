@@ -26,10 +26,13 @@
 }
 
 @layer base {
-  html, body {
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: none; /* Prevents native iOS elastic bounce, letting our custom pull-to-refresh work pure */
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  body {
     overflow-x: hidden;
+    overflow-x: clip;
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -76,6 +79,9 @@
 }
 
 @layer utilities {
+  .min-h-dvh { min-height: 100vh; }
+  @supports (min-height: 100dvh) { .min-h-dvh { min-height: 100dvh; } }
+
   .pulse-glow {
     animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }

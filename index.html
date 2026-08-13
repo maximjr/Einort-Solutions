@@ -1,6 +1,15 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Einort Solutions" />
+    <meta property="og:title" content="Einort Solutions | Elite Custom Software &amp; Enterprise Web Architecture" />
+    <meta property="og:description" content="Einort Solutions is a premier enterprise software engineering agency based in Douala, Cameroon." />
+    <meta property="og:url" content="https://einortsolutions.com/" />
+    <meta property="og:image" content="https://einortsolutions.com/og-image.png" />
+    <meta property="og:locale" content="en_US" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://einortsolutions.com/og-image.png" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>Einort Solutions | Elite Custom Software Architecture</title>
@@ -18,6 +27,29 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@300;400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   </head>
   <body class="bg-surface text-text font-sans antialiased selection:bg-primary/30">
+    <div id="legacy-browser-notice">
+      <div style="font-family: sans-serif; padding: 20px; background: #fee2e2; color: #991b1b; text-align: center; border-bottom: 1px solid #f87171;">
+        <p style="margin: 0 0 10px; font-weight: bold;">Your browser is not supported / Votre navigateur n'est pas supporté</p>
+        <p style="margin: 0 0 10px;">Please update Safari or use another browser to view this site. / Veuillez mettre à jour Safari ou utiliser un autre navigateur pour voir ce site.</p>
+        <p style="margin: 0;"><a href="https://wa.me/message/52SRSBT3VZXQB1" style="color: #b91c1c; text-decoration: underline;">Contact us on WhatsApp / Contactez-nous sur WhatsApp</a></p>
+      </div>
+    </div>
+    <style>
+      @supports (color: color-mix(in oklab, red, blue)) {
+        #legacy-browser-notice { display: none; }
+      }
+    </style>
+    
+    <noscript>
+      <div style="font-family: sans-serif; padding: 40px 20px; text-align: center; background: #0f172a; color: #f8fafc; min-height: 100vh;">
+        <h1 style="margin-bottom: 20px;">Einort Solutions</h1>
+        <p style="margin-bottom: 20px;">Please enable JavaScript to view this site. / Veuillez activer JavaScript pour voir ce site.</p>
+        <p style="margin-bottom: 10px;">Phone: +237 686 661 578</p>
+        <p style="margin-bottom: 10px;">Email: <a href="mailto:einortsolutions237@gmail.com" style="color: #3b82f6;">einortsolutions237@gmail.com</a></p>
+        <p style="margin-bottom: 10px;"><a href="https://wa.me/message/52SRSBT3VZXQB1" style="color: #22c55e;">Contact us on WhatsApp / Contactez-nous sur WhatsApp</a></p>
+      </div>
+    </noscript>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

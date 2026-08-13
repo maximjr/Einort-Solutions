@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -65,9 +66,11 @@ const servicesList = [
 import { AnalyticsService } from "../../lib/analytics";
 
 export function ContactPage() {
+  const { t } = useTranslation("contact_page");
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [successContact, setSuccessContact] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const {
@@ -112,45 +115,43 @@ export function ContactPage() {
       });
 
       if (result.success) {
-        if (data.preferredContact === "whatsapp") {
-          window.open("https://wa.me/message/52SRSBT3VZXQB1", "_blank");
-        }
+        if (data.preferredContact === "whatsapp") { setSuccessContact("whatsapp"); } else { setSuccessContact(null); }
         setIsSuccess(true);
         reset();
       } else {
-        setSubmitError(result.message || "An error occurred submitting your request.");
+        setSubmitError(result.message || t("form.error", "An error occurred submitting your request."));
       }
     } catch (error) {
-      setSubmitError("An error occurred submitting your request.");
+      setSubmitError(t("form.error", "An error occurred submitting your request."));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const contactMethods = [
-    { icon: <MapPin className="w-5 h-5 text-primary" />, title: "Office Address", details: "Douala, Littoral Region, Cameroon" },
-    { icon: <Phone className="w-5 h-5 text-primary" />, title: "Phone Numbers", details: "+237 686 661 578" },
-    { icon: <Mail className="w-5 h-5 text-primary" />, title: "Email Addresses", details: "einortsolutions237@gmail.com" },
-    { icon: <Globe className="w-5 h-5 text-primary" />, title: "Website", details: "www.einortsolutions.com" },
-    { icon: <Clock className="w-5 h-5 text-primary" />, title: "Business Hours", details: "Mon-Fri: 9AM - 6PM WAT" },
+    { icon: <MapPin className="w-5 h-5 text-primary" />, title: t("info.methods.address.title", "Office Address"), details: t("info.methods.address.value", "Douala, Littoral Region, Cameroon") },
+    { icon: <Phone className="w-5 h-5 text-primary" />, title: t("info.methods.phone.title", "Phone Numbers"), details: t("info.methods.phone.value", "+237 686 661 578") },
+    { icon: <Mail className="w-5 h-5 text-primary" />, title: t("info.methods.email.title", "Email Addresses"), details: t("info.methods.email.value", "einortsolutions237@gmail.com") },
+    { icon: <Globe className="w-5 h-5 text-primary" />, title: t("info.methods.website.title", "Website"), details: t("info.methods.website.value", "www.einortsolutions.com") },
+    { icon: <Clock className="w-5 h-5 text-primary" />, title: t("info.methods.hours.title", "Business Hours"), details: t("info.methods.hours.value", "Mon-Fri: 9AM - 6PM WAT") },
   ];
 
   const whyChooseUs = [
-    { icon: <Building2 className="w-8 h-8 text-primary" />, title: "Enterprise Expertise", desc: "Proven track record delivering large-scale systems." },
-    { icon: <Cpu className="w-8 h-8 text-primary" />, title: "AI-Powered Solutions", desc: "Next-gen intelligent software architecture." },
-    { icon: <Zap className="w-8 h-8 text-primary" />, title: "Modern Technologies", desc: "Built with React, Next.js, and cutting-edge stacks." },
-    { icon: <ShieldCheck className="w-8 h-8 text-primary" />, title: "Scalable Systems", desc: "Infrastructure designed to grow with your business." },
-    { icon: <Globe2 className="w-8 h-8 text-primary" />, title: "Global Standards", desc: "World-class engineering and UI/UX design." },
-    { icon: <HeadphonesIcon className="w-8 h-8 text-primary" />, title: "Dedicated Support", desc: "24/7 technical assistance and maintenance." },
+    { icon: <Building2 className="w-8 h-8 text-primary" />, title: t("advantages.items.0.title", "Enterprise Expertise"), desc: t("advantages.items.0.description", "Proven track record delivering large-scale systems.") },
+    { icon: <Cpu className="w-8 h-8 text-primary" />, title: t("advantages.items.1.title", "AI-Powered Solutions"), desc: t("advantages.items.1.description", "Next-gen intelligent software architecture.") },
+    { icon: <Zap className="w-8 h-8 text-primary" />, title: t("advantages.items.2.title", "Modern Technologies"), desc: t("advantages.items.2.description", "Built with React, Next.js, and cutting-edge stacks.") },
+    { icon: <ShieldCheck className="w-8 h-8 text-primary" />, title: t("advantages.items.3.title", "Scalable Systems"), desc: t("advantages.items.3.description", "Infrastructure designed to grow with your business.") },
+    { icon: <Globe2 className="w-8 h-8 text-primary" />, title: t("advantages.items.4.title", "Global Standards"), desc: t("advantages.items.4.description", "World-class engineering and UI/UX design.") },
+    { icon: <HeadphonesIcon className="w-8 h-8 text-primary" />, title: t("advantages.items.5.title", "Dedicated Support"), desc: t("advantages.items.5.description", "24/7 technical assistance and maintenance.") },
   ];
 
   const faqs = [
-    { q: "How long does a project take?", a: "Project timelines vary depending on complexity. A standard corporate website takes 2-4 weeks, while a custom ERP or SaaS platform can take 3-6 months. We provide precise timelines during the technical discovery phase." },
-    { q: "Do you work internationally?", a: "Yes. While our core market is Africa, we deliver enterprise solutions for clients globally, ensuring timezone overlaps for critical meetings." },
-    { q: "Can you customize EINORT ERP?", a: "Absolutely. EINORT ERP is built modularly. We tailor workflows, dashboards, and integrations specifically for your business operations." },
-    { q: "How much does a website cost?", a: "Costs depend on scope, features, and integrations. We build premium, high-converting platforms rather than generic templates. Contact us for a precise quotation." },
-    { q: "How do I request a quotation?", a: "Fill out the contact form above with details about your project, and our architecture team will respond within 24 hours to schedule a discovery call." },
-    { q: "Can you redesign an existing system?", a: "Yes. We specialize in digital transformation, taking legacy systems and upgrading them to modern, scalable, and beautifully designed cloud applications." },
+    { q: t("faq.items.0.q", "How long does a project take?"), a: t("faq.items.0.a", "Project timelines vary depending on complexity. A standard corporate website takes 2-4 weeks, while a custom ERP or SaaS platform can take 3-6 months. We provide precise timelines during the technical discovery phase.") },
+    { q: t("faq.items.1.q", "Do you work internationally?"), a: t("faq.items.1.a", "Yes. While our core market is Africa, we deliver enterprise solutions for clients globally, ensuring timezone overlaps for critical meetings.") },
+    { q: t("faq.items.2.q", "Can you customize EINORT ERP?"), a: t("faq.items.2.a", "Absolutely. EINORT ERP is built modularly. We tailor workflows, dashboards, and integrations specifically for your business operations.") },
+    { q: t("faq.items.3.q", "How much does a website cost?"), a: t("faq.items.3.a", "Costs depend on scope, features, and integrations. We build premium, high-converting platforms rather than generic templates. Contact us for a precise quotation.") },
+    { q: t("faq.items.4.q", "How do I request a quotation?"), a: t("faq.items.4.a", "Fill out the contact form above with details about your project, and our architecture team will respond within 24 hours to schedule a discovery call.") },
+    { q: t("faq.items.5.q", "Can you redesign an existing system?"), a: t("faq.items.5.a", "Yes. We specialize in digital transformation, taking legacy systems and upgrading them to modern, scalable, and beautifully designed cloud applications.") },
   ];
 
   const faqSchema = JSON.stringify({
@@ -167,7 +168,7 @@ export function ContactPage() {
   });
 
   return (
-    <div className="bg-background min-h-screen pt-24 pb-0">
+    <div className="bg-background min-h-dvh pt-24 pb-0">
       <SEO 
         title="Contact Us | Einort Solutions"
         description="Get in touch with Einort Solutions. Let's discuss your enterprise software, ERP, website, or digital transformation needs."
@@ -201,12 +202,9 @@ export function ContactPage() {
                 >
                   Schedule Consultation
                 </Button>
-                <Button 
-                  onClick={() => window.open("https://wa.me/message/52SRSBT3VZXQB1", "_blank")}
-                  className="h-12 px-8 uppercase tracking-widest text-xs font-bold bg-[#00e676]/10 text-[#00e676] border border-[#00e676]/20 hover:bg-[#00e676]/20 hover:border-[#00e676]/50 transition-colors"
-                >
-                  Chat Via WhatsApp
-                </Button>
+                <a href="https://wa.me/message/52SRSBT3VZXQB1" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-10 px-8 py-2">
+      Chat Via WhatsApp
+    </a>
               </div>
             </div>
           </FadeUp>
@@ -260,8 +258,8 @@ export function ContactPage() {
               <FadeUp delay={0.2}>
                 <Card className="bg-background/80 border-white/5 shadow-2xl backdrop-blur-xl">
                   <CardHeader className="border-b border-white/5 pb-6">
-                    <CardTitle className="text-2xl font-display text-white">Send us a message</CardTitle>
-                    <p className="text-text-muted text-sm mt-2">Fill out the form below and our team will get back to you within 24 hours.</p>
+                    <CardTitle className="text-2xl font-display text-white">{t("form.title", "Send us a message")}</CardTitle>
+                    <p className="text-text-muted text-sm mt-2">{t("form.subtitle", "Fill out the form below and our team will get back to you within 24 hours.")}</p>
                   </CardHeader>
                   <CardContent className="p-6 md:p-8">
                     {isSuccess ? (
@@ -269,50 +267,55 @@ export function ContactPage() {
                         <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
                           <CheckCircle2 size={40} className="text-primary" />
                         </div>
-                        <h4 className="text-2xl font-display text-white mb-4">Request Received</h4>
+                        <h4 className="text-2xl font-display text-white mb-4">{t("form.success.title", "Request Received")}</h4>
                         <p className="text-text-muted mb-8 max-w-md mx-auto">
-                          Thank you for reaching out to EINORT Solutions. Our architecture team is reviewing your details and will be in touch shortly.
+                          {t("form.success.description", "Thank you for reaching out to EINORT Solutions. Our architecture team is reviewing your details and will be in touch shortly.")}
                         </p>
                         <Button onClick={() => setIsSuccess(false)} variant="outline">
-                          Send Another Message
-                        </Button>
+    {t("form.success.cta", "Send Another Message")}
+  </Button>
+  {successContact === "whatsapp" && (
+    <a href="https://wa.me/message/52SRSBT3VZXQB1" target="_blank" rel="noopener noreferrer" className="ml-4 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-10 px-8 py-2">
+      {t("methods.whatsapp", "Chat via WhatsApp")}
+    </a>
+  )}
                       </div>
                     ) : (
                       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
-                            <label htmlFor="clientName" className="text-sm font-medium text-text-muted">Full Name *</label>
-                            <Input id="clientName" {...register("clientName")} placeholder="John Doe" className="bg-surface border-white/5 focus:border-primary/50" />
+                            <label htmlFor="clientName" className="text-sm font-medium text-text-muted">{t("form.fields.name", "Full Name *")}</label>
+                            <Input id="clientName" {...register("clientName")} placeholder={t("form.placeholders.name", "John Doe")} className="bg-surface border-white/5 focus:border-primary/50" />
                             {errors.clientName && <p className="text-red-400 text-xs mt-1">{errors.clientName.message}</p>}
                           </div>
                           <div className="space-y-2">
-                            <label htmlFor="company" className="text-sm font-medium text-text-muted">Company Name *</label>
-                            <Input id="company" {...register("company")} placeholder="Acme Corp" className="bg-surface border-white/5 focus:border-primary/50" />
+                            <label htmlFor="company" className="text-sm font-medium text-text-muted">{t("form.fields.company", "Company Name *")}</label>
+                            <Input id="company" {...register("company")} placeholder={t("form.placeholders.company", "Acme Corp")} className="bg-surface border-white/5 focus:border-primary/50" />
                             {errors.company && <p className="text-red-400 text-xs mt-1">{errors.company.message}</p>}
                           </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
-                            <label htmlFor="email" className="text-sm font-medium text-text-muted">Email Address *</label>
-                            <Input id="email" {...register("email")} type="email" placeholder="john@company.com" className="bg-surface border-white/5 focus:border-primary/50" />
+                            <label htmlFor="email" className="text-sm font-medium text-text-muted">{t("form.fields.email", "Email Address *")}</label>
+                            <Input id="email" {...register("email")} type="email" placeholder={t("form.placeholders.email", "john@company.com")} className="bg-surface border-white/5 focus:border-primary/50" />
                             {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email.message}</p>}
                           </div>
                           <div className="space-y-2">
-                            <label htmlFor="phone" className="text-sm font-medium text-text-muted">Phone Number *</label>
-                            <Input id="phone" {...register("phone")} type="tel" placeholder="+237 600 000 000" className="bg-surface border-white/5 focus:border-primary/50" />
+                            <label htmlFor="phone" className="text-sm font-medium text-text-muted">{t("form.fields.phone", "Phone Number *")}</label>
+                            <Input id="phone" {...register("phone")} type="tel" placeholder={t("form.placeholders.phone", "+237 600 000 000")} className="bg-surface border-white/5 focus:border-primary/50" />
                             {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone.message}</p>}
                           </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
-                            <label htmlFor="country" className="text-sm font-medium text-text-muted">Country *</label>
+                            <label htmlFor="country" className="text-sm font-medium text-text-muted">{t("form.fields.country", "Country *")}</label>
                             <Input id="country" {...register("country")} placeholder="Cameroon" className="bg-surface border-white/5 focus:border-primary/50" />
                             {errors.country && <p className="text-red-400 text-xs mt-1">{errors.country.message}</p>}
                           </div>
                           <div className="space-y-2">
-                            <label htmlFor="industry" className="text-sm font-medium text-text-muted">Business Industry *</label>
+                            <label htmlFor="industry" className="text-sm font-medium text-text-muted">{t("form.fields.industry", "Business Industry *")}</label>
                             <Input id="industry" {...register("industry")} placeholder="Finance, Logistics, Retail..." className="bg-surface border-white/5 focus:border-primary/50" />
                             {errors.industry && <p className="text-red-400 text-xs mt-1">{errors.industry.message}</p>}
                           </div>
@@ -320,12 +323,12 @@ export function ContactPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
-                            <label htmlFor="subject" className="text-sm font-medium text-text-muted">Subject *</label>
+                            <label htmlFor="subject" className="text-sm font-medium text-text-muted">{t("form.fields.subject", "Subject *")}</label>
                             <Input id="subject" {...register("subject")} placeholder="Project Inquiry" className="bg-surface border-white/5 focus:border-primary/50" />
                             {errors.subject && <p className="text-red-400 text-xs mt-1">{errors.subject.message}</p>}
                           </div>
                           <div className="space-y-2">
-                            <label htmlFor="projectType" className="text-sm font-medium text-text-muted">Service Interested In *</label>
+                            <label htmlFor="projectType" className="text-sm font-medium text-text-muted">{t("form.fields.service", "Service Interested In *")}</label>
                             <div className="relative">
                               <select 
                                 id="projectType"
@@ -344,18 +347,18 @@ export function ContactPage() {
                         </div>
 
                         <div className="space-y-2">
-                          <label htmlFor="requirements" className="text-sm font-medium text-text-muted">Message / Requirements *</label>
+                          <label htmlFor="requirements" className="text-sm font-medium text-text-muted">{t("form.fields.message", "Message / Requirements *")}</label>
                           <textarea 
                             id="requirements"
                             {...register("requirements")} 
-                            placeholder="Tell us about your goals, current challenges, and timeline..." 
+                            placeholder={t("form.placeholders.message", "Tell us about your goals, current challenges, and timeline...")} 
                             className="w-full min-h-[120px] bg-surface border border-white/5 rounded-lg p-4 text-white text-sm focus:border-primary/50 focus:ring-1 focus:ring-primary/50 outline-none transition-all resize-y"
                           />
                           {errors.requirements && <p className="text-red-400 text-xs mt-1">{errors.requirements.message}</p>}
                         </div>
 
                         <div className="space-y-2">
-                          <label className="text-sm font-medium text-text-muted mb-2 block">Preferred Contact Method *</label>
+                          <label className="text-sm font-medium text-text-muted mb-2 block">{t("form.fields.contact_method", "Preferred Contact Method *")}</label>
                           <div className="flex gap-6">
                             <label className="flex items-center gap-2 cursor-pointer group">
                               <input type="radio" value="email" {...register("preferredContact")} className="text-primary bg-surface border-white/10 focus:ring-primary/50" />
@@ -377,7 +380,7 @@ export function ContactPage() {
                           <label className="flex items-start gap-3 cursor-pointer group">
                             <input type="checkbox" {...register("consent")} className="mt-1 text-primary bg-surface border-white/10 rounded focus:ring-primary/50" />
                             <span className="text-sm text-text-muted leading-relaxed">
-                              I consent to EINORT Solutions processing my personal data in order to handle this inquiry, in accordance with the Privacy Policy.
+                              {t("form.fields.consent", "I consent to EINORT Solutions processing my personal data in order to handle this inquiry, in accordance with the Privacy Policy.")}
                             </span>
                           </label>
                           {errors.consent && <p className="text-red-400 text-xs">{errors.consent.message}</p>}
@@ -396,10 +399,10 @@ export function ContactPage() {
                         >
                           {isSubmitting ? (
                             <span className="flex items-center gap-2">
-                              <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> Processing
+                              <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> {t("form.submitting", "Processing")}
                             </span>
                           ) : (
-                            <span className="flex items-center gap-2">Submit Request <ArrowRight className="w-4 h-4" /></span>
+                            <span className="flex items-center gap-2">{t("form.submit", "Submit Request")} <ArrowRight className="w-4 h-4" /></span>
                           )}
                         </Button>
                       </form>

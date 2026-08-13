@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { SEO_CONFIG } from "../../constants/seo";
+import { SEO_CONFIG, SITE_URL } from "../../constants/seo";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { SOCIAL_LINKS } from "../../config/socialLinks";
@@ -89,8 +89,8 @@ export function SEO({
   
   const rawBasePath = location.pathname.replace(/^\/(en|fr)/, '');
   const basePath = rawBasePath === '/' ? '' : rawBasePath;
-  const urlEn = `https://einortsolutions.com/en${basePath}`;
-  const urlFr = `https://einortsolutions.com/fr${basePath}`;
+  const urlEn = `${SITE_URL}/en${basePath}`;
+  const urlFr = `${SITE_URL}/fr${basePath}`;
   
   const url = canonical || (currentLang === 'fr' ? urlFr : urlEn);
   
@@ -104,7 +104,7 @@ export function SEO({
         "@type": "ListItem",
         "position": 1,
         "name": "Home",
-        "item": "https://einortsolutions.com/",
+        "item": "${SITE_URL}/",
       },
     ];
 
@@ -119,7 +119,7 @@ export function SEO({
         "@type": "ListItem",
         "position": index + 2,
         "name": name,
-        "item": `https://einortsolutions.com${currentPath}`,
+        "item": `${SITE_URL}${currentPath}`,
       });
     });
 
@@ -186,9 +186,9 @@ export function SEO({
 
       {/* Canonical and Multilingual SEO */}
       <link rel="canonical" href={url} />
-      <link rel="alternate" hreflang="x-default" href={urlEn} />
-      <link rel="alternate" hreflang="en" href={urlEn} />
-      <link rel="alternate" hreflang="fr" href={urlFr} />
+      <link rel="alternate" hrefLang="x-default" href={urlEn} />
+      <link rel="alternate" hrefLang="en" href={urlEn} />
+      <link rel="alternate" hrefLang="fr" href={urlFr} />
 
       {/* JSON-LD Schema */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: finalSchema }} />

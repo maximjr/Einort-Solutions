@@ -1,4 +1,5 @@
-import { useState, useEffect, lazy } from "react";
+import { useState, useEffect } from "react";
+import { lazyWithRetry } from "../../lib/lazyWithRetry";
 import {
   Menu,
   X,
@@ -16,13 +17,14 @@ import { useTranslation } from "react-i18next";
 import { Container } from "./Container";
 import { Button } from "../ui/Button";
 import { useAuth } from "../../hooks/useAuth";
+import { useScrollLock } from "../../hooks/useScrollLock";
 import { Logo } from "../ui/Logo";
 import { Loadable } from "../shared/Loadable";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { SOCIAL_LINKS } from "../../config/socialLinks";
 
 const AuthModal = Loadable(
-  lazy(() =>
+  lazyWithRetry(() =>
     import("../../features/auth/AuthModal").then((m) => ({
       default: m.AuthModal,
     })),
@@ -126,17 +128,19 @@ export function Navbar() {
     return () => window.removeEventListener("open-auth", handleOpenAuth);
   }, []);
 
+  const { lock, unlock } = useScrollLock();
+
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     if (mobileMenuOpen) {
-      document.body.style.overflow = "hidden";
+      lock();
     } else {
-      document.body.style.overflow = "unset";
+      unlock();
     }
     return () => {
-      document.body.style.overflow = "unset";
+      unlock();
     };
-  }, [mobileMenuOpen]);
+  }, [mobileMenuOpen, lock, unlock]);
 
   const openAuth = (mode: "login" | "register") => {
     setAuthMode(mode);

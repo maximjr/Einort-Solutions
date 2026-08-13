@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "browserslist": ["> 0.3%", "last 3 versions", "iOS >= 15.4", "Safari >= 15.4", "not dead"],
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "prebuild": "node generate-sitemap.js",

@@ -20,7 +20,7 @@ export function Hero() {
   return (
     <header
       ref={containerRef}
-      className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden flex flex-col justify-center min-h-[100vh] perspective-[1000px]"
+      className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden flex flex-col justify-center min-h-dvh perspective-[1000px]"
     >
       {/* Abstract Background Elements with Parallax */}
       <motion.div
@@ -88,12 +88,9 @@ export function Hero() {
             >
               {t("button_primary")}
             </Button>
-            <Button
-              onClick={() => window.open("https://wa.me/message/52SRSBT3VZXQB1", "_blank")}
-              className="w-full sm:w-auto uppercase tracking-[0.2em] text-[11px] px-12 h-14 font-bold bg-[#00e676]/10 text-[#00e676] border border-[#00e676]/20 hover:bg-[#00e676]/20 hover:border-[#00e676]/50 transition-colors backdrop-blur-md"
-            >
-              {t("button_whatsapp")}
-            </Button>
+            <a href="https://wa.me/message/52SRSBT3VZXQB1" target="_blank" rel="noopener noreferrer" className="border-white/10 hover:bg-white/5 group inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-11 px-8">
+      {t("button_whatsapp")}
+    </a>
           </div>
         </motion.div>
 

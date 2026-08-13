@@ -21,7 +21,7 @@ export function AboutPage() {
         })}
       />
       
-      <main className="pt-32 pb-24 bg-background min-h-screen relative overflow-hidden">
+      <main className="pt-32 pb-24 bg-background min-h-dvh relative overflow-hidden">
         {/* Abstract Background */}
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 blur-[150px] pointer-events-none rounded-full translate-x-1/3 -translate-y-1/3"></div>
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-900/5 blur-[120px] pointer-events-none rounded-full -translate-x-1/2 translate-y-1/3"></div>

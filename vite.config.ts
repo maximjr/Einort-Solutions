@@ -19,6 +19,7 @@ export default defineConfig(() => {
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
     },
     build: {
+      target: ['es2020', 'safari15.4', 'chrome87', 'firefox78', 'edge88'],
       chunkSizeWarningLimit: 1500
     }
   };

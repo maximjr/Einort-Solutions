@@ -49,7 +49,6 @@ import { notificationService } from "../../services/admin/notificationService";
 import { messageService } from "../../services/admin/messageService";
 import { AdminMessenger } from "./AdminMessenger";
 import { useMessaging } from "../../hooks/useMessaging";
-import { PullToRefresh } from "../../components/ui/PullToRefresh";
 
 import { useTranslation } from "react-i18next";
 
@@ -270,10 +269,7 @@ export function AdminDashboard() {
   };
 
   return (
-    <PullToRefresh onRefresh={async () => {
-      // Simulate network wait for real-time Firebase sync assurance
-      await new Promise(resolve => setTimeout(resolve, 800));
-    }}>
+    <>
       <Helmet>
         <title>{t("seo.title")}</title>
         <meta name="description" content={t("seo.description")} />
@@ -1421,6 +1417,6 @@ export function AdminDashboard() {
         )}
       </Container>
       </section>
-    </PullToRefresh>
+    </>
   );
 }

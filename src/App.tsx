@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect } from "react";
+import { Suspense, useEffect } from "react";
+import { lazyWithRetry } from "./lib/lazyWithRetry";
 import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { Navbar } from "./components/layout/Navbar";
@@ -14,52 +15,52 @@ import { Hero } from "./features/home/Hero";
 
 // Lazy loaded features
 const Services = Loadable(
-  lazy(() => import("./features/home/Services").then((m) => ({ default: m.Services }))),
+  lazyWithRetry(() => import("./features/home/Services").then((m) => ({ default: m.Services }))),
 );
 const ERP = Loadable(
-  lazy(() => import("./features/home/ERP").then((m) => ({ default: m.ERP }))),
+  lazyWithRetry(() => import("./features/home/ERP").then((m) => ({ default: m.ERP }))),
 );
 const WhyChooseUs = Loadable(
-  lazy(() => import("./features/home/WhyChooseUs").then((m) => ({ default: m.WhyChooseUs }))),
+  lazyWithRetry(() => import("./features/home/WhyChooseUs").then((m) => ({ default: m.WhyChooseUs }))),
 );
 const Testimonials = Loadable(
-  lazy(() => import("./features/home/Testimonials").then((m) => ({ default: m.Testimonials }))),
+  lazyWithRetry(() => import("./features/home/Testimonials").then((m) => ({ default: m.Testimonials }))),
 );
 const ContactUs = Loadable(
-  lazy(() => import("./features/home/ContactUs").then((m) => ({ default: m.ContactUs }))),
+  lazyWithRetry(() => import("./features/home/ContactUs").then((m) => ({ default: m.ContactUs }))),
 );
 const FAQ = Loadable(
-  lazy(() => import("./features/home/FAQ").then((m) => ({ default: m.FAQ }))),
+  lazyWithRetry(() => import("./features/home/FAQ").then((m) => ({ default: m.FAQ }))),
 );
 const CaseStudies = Loadable(
-  lazy(() => import("./features/home/CaseStudies").then((m) => ({ default: m.CaseStudies }))),
+  lazyWithRetry(() => import("./features/home/CaseStudies").then((m) => ({ default: m.CaseStudies }))),
 );
 const ContactForm = Loadable(
-  lazy(() => import("./features/home/ContactForm").then((m) => ({ default: m.ContactForm }))),
+  lazyWithRetry(() => import("./features/home/ContactForm").then((m) => ({ default: m.ContactForm }))),
 );
 const ContactPage = Loadable(
-  lazy(() => import("./features/contact/ContactPage").then((m) => ({ default: m.ContactPage }))),
+  lazyWithRetry(() => import("./features/contact/ContactPage").then((m) => ({ default: m.ContactPage }))),
 );
 const AboutPage = Loadable(
-  lazy(() => import("./features/about/AboutPage").then((m) => ({ default: m.AboutPage }))),
+  lazyWithRetry(() => import("./features/about/AboutPage").then((m) => ({ default: m.AboutPage }))),
 );
 const AdminDashboard = Loadable(
-  lazy(() => import("./features/admin/AdminDashboard").then((m) => ({ default: m.AdminDashboard }))),
+  lazyWithRetry(() => import("./features/admin/AdminDashboard").then((m) => ({ default: m.AdminDashboard }))),
 );
 const ClientPortal = Loadable(
-  lazy(() => import("./features/client-portal/ClientPortal").then((m) => ({ default: m.ClientPortal }))),
+  lazyWithRetry(() => import("./features/client-portal/ClientPortal").then((m) => ({ default: m.ClientPortal }))),
 );
 const ServicesPage = Loadable(
-  lazy(() => import("./features/services/ServicesPage").then((m) => ({ default: m.ServicesPage }))),
+  lazyWithRetry(() => import("./features/services/ServicesPage").then((m) => ({ default: m.ServicesPage }))),
 );
 const LocationPage = Loadable(
-  lazy(() => import("./features/seo/LocationPage").then((m) => ({ default: m.LocationPage }))),
+  lazyWithRetry(() => import("./features/seo/LocationPage").then((m) => ({ default: m.LocationPage }))),
 );
 const IndustryPage = Loadable(
-  lazy(() => import("./features/seo/IndustryPage").then((m) => ({ default: m.IndustryPage }))),
+  lazyWithRetry(() => import("./features/seo/IndustryPage").then((m) => ({ default: m.IndustryPage }))),
 );
 const CaseStudyPage = Loadable(
-  lazy(() => import("./features/case-studies/CaseStudyPage").then((m) => ({ default: m.CaseStudyPage }))),
+  lazyWithRetry(() => import("./features/case-studies/CaseStudyPage").then((m) => ({ default: m.CaseStudyPage }))),
 );
 
 function HomePage() {
@@ -88,8 +89,6 @@ function HomePage() {
   );
 }
 
-import { PullToRefresh } from "./components/ui/PullToRefresh";
-
 import { WhatsAppMessenger } from "./components/layout/WhatsAppMessenger";
 
 function MessengerWrapper() {
@@ -105,7 +104,6 @@ function Layout() {
       window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
     // 2. Detect Safari strictly (often has rubber-banding issues with custom scroll)
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
     // 3. Detect low-end devices
     const isLowMemory =
@@ -115,12 +113,9 @@ function Layout() {
     
     // 4. Detect reduced motion and specific mobile strings
     const isReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const isMobileString = /iPhone|iPad|iPod|Android|webOS|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
 
     // Disable completely and fallback to native scrolling
-    if (isTouchDevice || isSafari || isLowMemory || isLowProcessing || isReducedMotion || isMobileString) {
+    if (isTouchDevice || isLowMemory || isLowProcessing || isReducedMotion) {
       document.documentElement.classList.add("native-scroll");
       // Add native scroll styles dynamically just to be sure
       document.documentElement.style.scrollBehavior = "auto";
@@ -195,24 +190,22 @@ function Layout() {
   }, []);
 
   return (
-    <PullToRefresh>
-      <div className="bg-background min-h-[100vh] text-text-main font-sans selection:bg-primary selection:text-white flex flex-col">
-        <Navbar />
-        <main className="flex-grow">
-          <Suspense
-            fallback={
-              <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-              </div>
-            }
-          >
-            <Outlet />
-          </Suspense>
-        </main>
-        <Footer />
-        <MessengerWrapper />
-      </div>
-    </PullToRefresh>
+    <div className="bg-background min-h-[100vh] text-text-main font-sans selection:bg-primary selection:text-white flex flex-col">
+      <Navbar />
+      <main className="flex-grow">
+        <Suspense
+          fallback={
+            <div className="min-h-screen bg-background flex items-center justify-center">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          }
+        >
+          <Outlet />
+        </Suspense>
+      </main>
+      <Footer />
+      <MessengerWrapper />
+    </div>
   );
 }
 
@@ -400,7 +393,7 @@ export default function App() {
 }
 
 function NotFound() {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const lang = i18n.resolvedLanguage || 'en';
   
   return (

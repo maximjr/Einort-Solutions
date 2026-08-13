@@ -1,3 +1,5 @@
+export const SITE_URL = import.meta.env.VITE_SITE_URL || "https://einortsolutions.com";
+
 export const SEO_CONFIG = {
   title:
     "Einort Solutions | Elite Custom Software & Enterprise Web Architecture",
@@ -70,7 +72,7 @@ export const SEO_CONFIG = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://einortsolutions.com/",
+    url: `${SITE_URL}/`,
     siteName: "Einort Solutions",
     title: "Einort Solutions | Custom Web Apps & Enterprise Architecture Cameroon",
     description:
@@ -87,8 +89,8 @@ export const SEO_CONFIG = {
     "@type": "Organization",
     name: "Einort Solutions",
     legalName: "Einort Solutions LLC",
-    url: "https://einortsolutions.com",
-    logo: "https://einortsolutions.com/icon.png",
+    url: `${SITE_URL}`,
+    logo: `${SITE_URL}/icon.png`,
     description: "Premier software engineering agency and enterprise web architecture firm based in Douala, Cameroon. Specializing in custom CRM & ERP solutions, full-stack web development, and AI automation.",
     foundingDate: "2022",
     founders: [
@@ -125,9 +127,9 @@ export const SEO_CONFIG = {
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "ProfessionalService", "SoftwareApplication", "TechArticle"],
     name: "Einort Solutions",
-    image: "https://einortsolutions.com/icon.png",
-    "@id": "https://einortsolutions.com",
-    url: "https://einortsolutions.com",
+    image: `${SITE_URL}/icon.png`,
+    "@id": `${SITE_URL}`,
+    url: `${SITE_URL}`,
     telephone: "+237686661578",
     email: "contact@einortsolutions.com",
     priceRange: "$$$",
@@ -199,10 +201,10 @@ export const SEO_CONFIG = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "Einort Solutions",
-    url: "https://einortsolutions.com/",
+    url: `${SITE_URL}/`,
     potentialAction: {
       "@type": "SearchAction",
-      target: "https://einortsolutions.com/search?q={search_term_string}",
+      target: `${SITE_URL}/search?q={search_term_string}`,
       "query-input": "required name=search_term_string"
     }
   },

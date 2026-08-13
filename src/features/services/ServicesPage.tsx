@@ -4,9 +4,9 @@ import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Card } from "../../components/ui/Card";
 import { ShieldCheck } from "lucide-react";
-import { Button } from "../../components/ui/Button";
 
 import { SEO } from "../../components/seo/SEO";
+import { SITE_URL } from "../../constants/seo";
 import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
 import { getServiceById } from "../../config/services";
 
@@ -45,7 +45,7 @@ export function ServicesPage() {
     provider: {
       "@type": "Organization",
       name: "Einort Solutions",
-      url: "https://einortsolutions.com"
+      url: SITE_URL
     },
   });
 
@@ -193,12 +193,9 @@ export function ServicesPage() {
                   </ul>
                   <div className="mt-8 pt-8 border-t border-white/5">
                      <p className="text-sm text-text-muted mb-4 font-light">{t("ui.ready_to_elevate")}</p>
-                     <Button
-                        onClick={() => window.open("https://wa.me/message/52SRSBT3VZXQB1", "_blank")}
-                        className="w-full flex items-center justify-center gap-2 uppercase font-bold tracking-[0.15em] text-[11px] h-12 bg-[#00e676]/10 text-[#00e676] border border-[#00e676]/20 hover:bg-[#00e676]/20 hover:border-[#00e676]/50 transition-colors"
-                      >
-                        {t("ui.chat_whatsapp")}
-                      </Button>
+                     <a href="https://wa.me/message/52SRSBT3VZXQB1" target="_blank" rel="noopener noreferrer" className="border-white/10 hover:bg-white/5 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-11 px-8">
+      {t("ui.chat_whatsapp")}
+    </a>
                   </div>
                 </Card>
               </FadeUp>

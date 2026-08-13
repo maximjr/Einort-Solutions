@@ -17,6 +17,9 @@ import { Input } from "../../components/ui/Input";
 import { Logo } from "../../components/ui/Logo";
 import { useNavigate } from "react-router-dom";
 
+import { useEffect } from "react";
+import { useScrollLock } from "../../hooks/useScrollLock";
+
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -36,6 +39,16 @@ export function AuthModal({
   const [successStatus, setSuccessStatus] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  
+  const { lock, unlock } = useScrollLock();
+  useEffect(() => {
+    if (isOpen) {
+      lock();
+    } else {
+      unlock();
+    }
+    return () => unlock();
+  }, [isOpen, lock, unlock]);
 
   const loginSchema = useMemo(() => z.object({
     email: z.string().email(t("validation.email_invalid")),

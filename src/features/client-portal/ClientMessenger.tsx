@@ -515,7 +515,7 @@ export function ClientMessenger({
               placeholder={sending ? "Sending..." : "Message Support..."}
               disabled={sending}
               rows={1}
-              className="w-full min-h-[42px] md:min-h-[46px] max-h-32 bg-slate-100/80 dark:bg-[#141a26]/80 backdrop-blur-md border border-transparent focus:border-black/10 dark:focus:border-primary/30 rounded-[24px] px-4 py-2.5 md:py-[13px] text-[15px] md:text-[14px] text-slate-900 dark:text-white placeholder-slate-500 font-normal focus:outline-none resize-none transition-colors scrollbar-premium disabled:opacity-50"
+              className="w-full min-h-[42px] md:min-h-[46px] max-h-32 bg-slate-100/80 dark:bg-[#141a26]/80 backdrop-blur-md border border-transparent focus:border-black/10 dark:focus:border-primary/30 rounded-[24px] px-4 py-2.5 md:py-[13px] text-base md:text-[14px] text-slate-900 dark:text-white placeholder-slate-500 font-normal focus:outline-none resize-none transition-colors scrollbar-premium disabled:opacity-50"
               style={{
                 // Prevent iOS zoom on focus
                 fontSize: '16px' 

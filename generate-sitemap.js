@@ -5,7 +5,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BASE_URL = 'https://einort.com';
+
+const BASE_URL = process.env.VITE_SITE_URL || 'https://einortsolutions.com';
 const srcDir = path.join(__dirname, 'src');
 const publicRoutes = new Set(['/']);
 
@@ -100,7 +101,7 @@ for (const routePath of appTsxPaths) {
     
     // Add these combinations if they are public
     if (!routePath.startsWith('/admin') && !routePath.startsWith('/client-portal')) {
-        generatedPaths.forEach(gp => publicRoutes.add(gp));
+        generatedPaths.forEach(gp => { if (!gp.includes(":")) publicRoutes.add(gp); });
     }
   }
 }

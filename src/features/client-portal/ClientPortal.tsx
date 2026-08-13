@@ -18,7 +18,6 @@ import { Button } from "../../components/ui/Button";
 import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
 import { useAuth } from "../../hooks/useAuth";
 import { projectService } from "../../services/admin/projectService";
-import { PullToRefresh } from "../../components/ui/PullToRefresh";
 import { ClientMessenger } from "./ClientMessenger";
 import {
   collection,
@@ -192,15 +191,12 @@ export function ClientPortal() {
   };
 
   return (
-    <PullToRefresh onRefresh={async () => {
-      // Simulate network wait for real-time Firebase sync assurance
-      await new Promise(resolve => setTimeout(resolve, 800));
-    }}>
+    <>
       <Helmet>
         <title>{t("seo.title")}</title>
         <meta name="description" content={t("seo.description")} />
       </Helmet>
-      <section className="py-24 bg-[#030712] min-h-screen relative pt-32 overflow-hidden">
+      <section className="py-24 bg-[#030712] min-h-dvh relative pt-32 overflow-hidden">
         {/* Premium Background Ambience */}
         <div className="absolute top-0 left-1/2 w-[800px] h-[600px] bg-primary/5 blur-[150px] pointer-events-none rounded-full -translate-x-1/2 -translate-y-1/2"></div>
 
@@ -650,6 +646,6 @@ export function ClientPortal() {
         )}
       </Container>
       </section>
-    </PullToRefresh>
+    </>
   );
 }
