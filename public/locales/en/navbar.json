@@ -20,5 +20,7 @@
     "super_admin": "Super Admin",
     "admin": "Administrator",
     "client": "Enterprise Client"
-  }
+  },
+  "about": "About",
+  "insights": "Insights"
 }

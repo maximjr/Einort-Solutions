@@ -14,5 +14,10 @@
   "save": "Save",
   "delete": "Delete",
   "edit": "Edit",
-  "close": "Close"
+  "close": "Close",
+  "insights": {
+    "title": "Insights & Articles",
+    "subtitle": "Expert perspectives on software engineering, digital transformation, and technology in Africa.",
+    "back": "Back to Insights"
+  }
 }

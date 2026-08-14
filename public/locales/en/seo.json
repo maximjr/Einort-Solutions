@@ -76,6 +76,56 @@
   },
   "services": {
     "title_template": "{{service}} Services & Custom Solutions | Einort Solutions",
-    "description_template": "Expert {{service}} solutions and enterprise engineering tailored for your business."
+    "description_template": "Expert {{service}} solutions and enterprise engineering tailored for your business.",
+    "specific": {
+      "websites-web-apps": {
+        "title": "Web Development Company in Cameroon | EINORT Solutions",
+        "description": "EINORT Solutions builds custom websites and web applications for businesses in Cameroon. We specialize in React, Node.js, and enterprise architecture."
+      },
+      "ui-ux-design": {
+        "title": "UI/UX Design Company in Cameroon | EINORT Solutions",
+        "description": "Professional UI/UX design services in Douala, Cameroon. We design intuitive, beautiful digital experiences for modern businesses and applications."
+      },
+      "erp-solutions": {
+        "title": "ERP Solutions for Businesses in Cameroon | EINORT Solutions",
+        "description": "Custom ERP systems and business management software for companies in Cameroon. Streamline operations, inventory, and sales with EINORT ERP."
+      },
+      "mobile-app-development": {
+        "title": "Mobile App Development in Cameroon | EINORT Solutions",
+        "description": "Top mobile app development company in Douala, Cameroon. We build high-performance iOS and Android applications for businesses."
+      },
+      "branding-graphic-design": {
+        "title": "Branding & Graphic Design in Cameroon | EINORT Solutions",
+        "description": "Premium branding and graphic design services for businesses in Cameroon. Build a strong, professional visual identity."
+      },
+      "social-media-management": {
+        "title": "Social Media Management in Cameroon | EINORT Solutions",
+        "description": "Professional social media management services in Cameroon. Engage your audience and grow your brand on Facebook, Instagram, and LinkedIn."
+      },
+      "digital-advertising": {
+        "title": "Digital Advertising in Cameroon | EINORT Solutions",
+        "description": "Results-driven digital advertising campaigns in Cameroon. Maximize ROI with targeted Facebook, Instagram, and Google Ads."
+      },
+      "seo-google-workspace": {
+        "title": "SEO Services in Cameroon | EINORT Solutions",
+        "description": "Improve your visibility with expert SEO services in Cameroon. We also provide Google Workspace setup and professional business email configuration."
+      }
+    }
+  },
+  "about": {
+    "title": "About EINORT Solutions | Technology Company in Douala",
+    "description": "Learn about EINORT Solutions, our mission, and our team of expert software engineers and digital transformation specialists in Cameroon."
+  },
+  "contact": {
+    "title": "Contact EINORT Solutions | Software Development Agency in Cameroon",
+    "description": "Get in touch with EINORT Solutions for custom software development, ERP systems, and digital marketing services in Douala, Cameroon."
+  },
+  "services_index": {
+    "title": "Our Digital Services | Software, Web & Marketing in Cameroon",
+    "description": "Explore our full range of enterprise software engineering, web development, UI/UX design, and digital marketing services."
+  },
+  "insights": {
+    "title": "Insights & Technology Blog | EINORT Solutions",
+    "description": "Read our latest articles on software development, digital transformation, ERPs, and marketing strategies for businesses in Cameroon."
   }
 }

@@ -20,5 +20,7 @@
     "super_admin": "Super Administrateur",
     "admin": "Administrateur",
     "client": "Client Entreprise"
-  }
+  },
+  "about": "À Propos",
+  "insights": "Actualités"
 }

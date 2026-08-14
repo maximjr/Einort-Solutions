@@ -1,9 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /en/admin
-Disallow: /fr/admin
-Disallow: /en/client-portal
-Disallow: /fr/client-portal
 
-# Sitemaps
 Sitemap: https://einortsolutions.com/sitemap.xml

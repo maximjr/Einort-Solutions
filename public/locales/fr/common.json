@@ -14,5 +14,10 @@
   "save": "Enregistrer",
   "delete": "Supprimer",
   "edit": "Modifier",
-  "close": "Fermer"
+  "close": "Fermer",
+  "insights": {
+    "title": "Actualités & Articles",
+    "subtitle": "Perspectives d'experts sur l'ingénierie logicielle, la transformation numérique et la technologie en Afrique.",
+    "back": "Retour aux articles"
+  }
 }
