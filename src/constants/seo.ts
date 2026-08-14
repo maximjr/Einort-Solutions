@@ -6,68 +6,18 @@ export const SEO_CONFIG = {
   description:
     "Einort Solutions is a premier enterprise software engineering agency based in Douala, Cameroon. We specialize in custom web development, ERP systems, AI automation, and premium UI/UX design across Cameroon, Africa, and globally.",
   keywords: [
-    // Cameroon Specific Keywords (English)
-    "Best Software Company in Cameroon",
-    "Web Development Agency in Douala",
-    "Top Web Designers in Yaounde",
-    "Enterprise Software Development Cameroon",
-    "Custom ERP Systems Cameroon",
-    "Tech Company in Cameroon",
-    "Einort Solutions Cameroon",
-    "Top IT Company in Douala",
-    "Software Engineers Cameroon",
-    "Mobile App Development Cameroon",
-    "Best Web Hosting Cameroon",
-    "SEO Agency Douala",
-    
-    // Cameroon Specific Keywords (French)
-    "Agence de création de site web au Cameroun",
-    "Développement d'applications web Douala",
-    "Entreprise de développement informatique Cameroun",
-    "Création de logiciels sur mesure Cameroun",
-    "Agence Web Douala",
-    "Meilleure entreprise informatique au Cameroun",
-    "Développement d'applications mobiles Cameroun",
-    "Création de site e-commerce Cameroun",
-    "Conception d'applications d'entreprise Douala",
-
-    // Global English Keywords
-    "Custom Software Development",
-    "Enterprise Web Architecture",
-    "ERP Systems Development",
-    "AI Automation Solutions",
-    "Premium UI/UX Design",
-    "Full-Stack Systems Engineering",
-    "SaaS Application Development",
-    "Cloud Infrastructure Setup",
-    "Legacy System Modernization",
-    "Fintech Software Solutions",
-    "Healthcare IT Solutions",
-    "Retail Management Systems",
-    "Web Development Agency",
-    "React Development Company",
-    "Next.js Development",
-    "Global Software Agency",
-    "Einort Solutions",
-    
-    // Global French Keywords
-    "Développement de Logiciels sur Mesure",
-    "Architecture Web d'Entreprise",
-    "Développement de Systèmes ERP",
-    "Solutions d'Automatisation IA",
-    "Conception UI/UX Premium",
-    "Ingénierie de Systèmes Full-Stack",
-    "Développement d'Applications SaaS",
-    "Configuration d'Infrastructure Cloud",
-    "Modernisation de Systèmes Existants",
-    "Solutions Logicielles Fintech",
-    "Solutions Informatiques de Santé",
-    "Systèmes de Gestion de Vente au Détail",
-    "Agence de Développement Web",
-    "Entreprise de Développement React",
-    "Développement Next.js",
-    "Agence Logicielle Mondiale",
-    "Einort Solutions France"
+    "technology company Cameroon",
+    "software development company Douala",
+    "digital transformation company Cameroon",
+    "web development company Cameroon",
+    "mobile app development Cameroon",
+    "UI UX design Douala",
+    "ERP solutions Cameroon",
+    "AI automation Cameroon",
+    "entreprise technologique Cameroun",
+    "développement logiciel Cameroun",
+    "agence web Douala",
+    "transformation digitale Cameroun"
   ].join(", "),
   openGraph: {
     type: "website",
@@ -93,11 +43,11 @@ export const SEO_CONFIG = {
     logo: `${SITE_URL}/icon.png`,
     description: "Premier software engineering agency and enterprise web architecture firm based in Douala, Cameroon. Specializing in custom CRM & ERP solutions, full-stack web development, and AI automation.",
     foundingDate: "2022",
-    founders: [
-      {
-        "@type": "Person",
-        name: "Einort Leadership"
-      }
+    sameAs: [
+      "https://www.facebook.com/share/1E288sJ791/",
+      "https://www.instagram.com/einortsolutions?igsh=am0wczAxZTN1em80",
+      "https://www.tiktok.com/@einortsolutions.com?_r=1&_t=ZS-98H5nVwcYPg",
+      "https://www.linkedin.com/in/einort-solutions-5607a7336?utm_source=share_via&utm_content=profile&utm_medium=member_android"
     ],
     contactPoint: {
       "@type": "ContactPoint",

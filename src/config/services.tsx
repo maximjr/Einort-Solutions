@@ -36,7 +36,7 @@ export const servicesRegistry: ServiceConfig[] = [
     icon: <Target className="w-12 h-12 text-primary" />,
   },
   {
-    id: "seo-workspace-setup",
+    id: "seo-google-workspace",
     icon: <Search className="w-12 h-12 text-primary" />,
   },
 ];

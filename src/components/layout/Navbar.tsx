@@ -33,10 +33,9 @@ const AuthModal = Loadable(
 );
 
 const navLinks = [
-  { name: "Services", href: "/#services" },
-  { name: "Architecture", href: "/#architecture" },
-  { name: "Why Us", href: "/#why-us" },
-  { name: "Testimonials", href: "/#testimonials" },
+  { name: "Services", href: "/services" },
+  { name: "About", href: "/about" },
+  { name: "Insights", href: "/insights" },
   { name: "Contact", href: "/contact" },
 ];
 

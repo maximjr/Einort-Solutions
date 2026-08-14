@@ -41,7 +41,7 @@ const services = [
     icon: <Target className="w-6 h-6 text-primary" />,
   },
   {
-    id: "seo-workspace-setup",
+    id: "seo-google-workspace",
     icon: <Search className="w-6 h-6 text-primary" />,
   },
 ];

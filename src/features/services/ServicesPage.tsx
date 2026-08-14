@@ -1,14 +1,14 @@
-import { useParams } from "react-router-dom";
+
+import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { Card } from "../../components/ui/Card";
-import { ShieldCheck } from "lucide-react";
-
+import { ShieldCheck, ArrowRight, CheckCircle2, Building2 } from "lucide-react";
 import { SEO } from "../../components/seo/SEO";
 import { SITE_URL } from "../../constants/seo";
 import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
-import { getServiceById } from "../../config/services";
+import { getServiceById, servicesRegistry } from "../../config/services";
 
 export function ServicesPage() {
   const { serviceId } = useParams();
@@ -24,28 +24,46 @@ export function ServicesPage() {
     );
   }
 
-  // Safe fetch of translations. Using fallback to empty array for arrays if not ready yet
+  // Fetch structured content
   const title = t(`items.${serviceId}.title`);
-  const description = t(`items.${serviceId}.description`);
-  const longDescription = t(`items.${serviceId}.longDescription`);
+  const valueProposition = t(`items.${serviceId}.valueProposition`);
+  const introduction = t(`items.${serviceId}.introduction`);
+  const targetAudience = t(`items.${serviceId}.targetAudience`);
+  const problemsSolved = t(`items.${serviceId}.problemsSolved`);
+  const approach = t(`items.${serviceId}.approach`);
+  const technology = t(`items.${serviceId}.technology`);
   const cameroonContext = t(`items.${serviceId}.cameroonContext`);
   
-  // Need returnObjects: true for arrays. Fallback to empty array if still loading (returns string key)
-  const featuresRaw = t(`items.${serviceId}.features`, { returnObjects: true });
-  const features = Array.isArray(featuresRaw) ? featuresRaw : [];
+  const coreCapabilitiesRaw = t(`items.${serviceId}.coreCapabilities`, { returnObjects: true });
+  const coreCapabilities = Array.isArray(coreCapabilitiesRaw) ? coreCapabilitiesRaw : [];
   
   const benefitsRaw = t(`items.${serviceId}.benefits`, { returnObjects: true });
   const benefits = Array.isArray(benefitsRaw) ? benefitsRaw : [];
+  
+  const useCasesRaw = t(`items.${serviceId}.useCases`, { returnObjects: true });
+  const useCases = Array.isArray(useCasesRaw) ? useCasesRaw : [];
+  
+  const industriesServedRaw = t(`items.${serviceId}.industriesServed`, { returnObjects: true });
+  const industriesServed = Array.isArray(industriesServedRaw) ? industriesServedRaw : [];
+  
+  const processRaw = t(`items.${serviceId}.process`, { returnObjects: true });
+  const processSteps = Array.isArray(processRaw) ? processRaw : [];
+  
+  const faqsRaw = t(`items.${serviceId}.faqs`, { returnObjects: true });
+  const faqs = Array.isArray(faqsRaw) ? faqsRaw : [];
+  
+  const relatedServicesRaw = t(`items.${serviceId}.relatedServices`, { returnObjects: true });
+  const relatedServices = Array.isArray(relatedServicesRaw) ? relatedServicesRaw : [];
 
   const jsonLdSchema = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Service",
-    name: title !== `items.${serviceId}.title` ? title : "Service",
-    description: description !== `items.${serviceId}.description` ? description : "",
-    provider: {
+    "name": title !== `items.${serviceId}.title` ? title : "Service",
+    "description": valueProposition !== `items.${serviceId}.valueProposition` ? valueProposition : "",
+    "provider": {
       "@type": "Organization",
-      name: "Einort Solutions",
-      url: SITE_URL
+      "name": "Einort Solutions",
+      "url": SITE_URL
     },
   });
 
@@ -53,49 +71,136 @@ export function ServicesPage() {
 
   return (
     <>
-      <SEO 
-        title={`${title !== `items.${serviceId}.title` ? title : "Service"} | Einort Solutions`}
-        description={description !== `items.${serviceId}.description` ? description : ""}
-        schema={jsonLdSchema}
-      />
-      <main className="pt-32 pb-24 bg-surface min-h-[80vh] relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 blur-[200px] pointer-events-none rounded-full translate-x-1/3 -translate-y-1/3"></div>
+      <SEO schema={jsonLdSchema} />
+      <main className="pt-32 pb-24 min-h-screen">
         <Container>
-          <header className="mb-16 relative z-10 max-w-4xl">
-            <FadeUp>
-              <Breadcrumbs
-                items={[
-                  { label: t("ui.home"), href: langPrefix || "/" },
-                  { label: t("ui.services"), href: `${langPrefix}/#services` },
-                  { label: title !== `items.${serviceId}.title` ? title : "Service" },
-                ]}
-              />
-              <div className="mb-6">{serviceConfig.icon}</div>
-              <h1 className="text-4xl md:text-6xl font-display font-medium text-white mb-6 leading-[1.1] tracking-tight">
-                {title !== `items.${serviceId}.title` ? title : ""}
-              </h1>
-              <p className="text-2xl text-text-muted font-light leading-relaxed mb-8">
-                {description !== `items.${serviceId}.description` ? description : ""}
-              </p>
-            </FadeUp>
-          </header>
+          <div className="mb-8">
+            <Breadcrumbs items={[{ label: "Services", href: "/services" }, { label: title }]} />
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <article className="lg:col-span-2 space-y-16">
+              
+              <FadeUp>
+                <header>
+                  <h1 className="text-4xl md:text-5xl font-display text-white mb-6 leading-tight">
+                    {title}
+                  </h1>
+                  <p className="text-xl text-primary font-medium mb-6">
+                    {valueProposition}
+                  </p>
+                  <div className="prose prose-invert max-w-none prose-p:text-text-muted prose-p:leading-relaxed prose-p:text-lg">
+                    <p>{introduction}</p>
+                  </div>
+                </header>
+              </FadeUp>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 relative z-10 mb-24">
-            <article className="col-span-1 lg:col-span-2 space-y-12">
               <FadeUp delay={0.1}>
-                <section className="prose prose-invert max-w-none">
-                  <h2 className="text-2xl font-display text-white mb-4">{t("ui.enterprise_overview")}</h2>
-                  <p className="text-text-muted leading-relaxed text-[17px] font-light">{longDescription !== `items.${serviceId}.longDescription` ? longDescription : ""}</p>
-                  {cameroonContext !== `items.${serviceId}.cameroonContext` && cameroonContext && (
-                    <div className="mt-8 p-6 bg-primary/5 border border-primary/10 rounded-2xl italic text-text-muted">
-                       {cameroonContext}
-                    </div>
-                  )}
+                <section>
+                  <h2 className="text-2xl font-display text-white mb-4">Who This Is For</h2>
+                  <p className="text-text-muted leading-relaxed mb-6">{targetAudience}</p>
+                  
+                  <h2 className="text-2xl font-display text-white mb-4">Business Problems Solved</h2>
+                  <p className="text-text-muted leading-relaxed">{problemsSolved}</p>
                 </section>
               </FadeUp>
 
-              {serviceId === 'websites-web-apps' && (
+              {coreCapabilities.length > 0 && (
                 <FadeUp delay={0.2}>
+                  <section>
+                    <h2 className="text-2xl font-display text-white mb-6">Core Capabilities</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {coreCapabilities.map((cap: any, i: number) => (
+                        <div key={i} className="bg-surface border border-white/5 p-6 rounded-2xl">
+                          <h3 className="text-white font-medium mb-2">{cap.title}</h3>
+                          <p className="text-sm text-text-muted">{cap.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                </FadeUp>
+              )}
+
+              <FadeUp delay={0.3}>
+                <section>
+                  <h2 className="text-2xl font-display text-white mb-4">Our Approach & Technology</h2>
+                  <p className="text-text-muted leading-relaxed mb-6">{approach}</p>
+                  <p className="text-text-muted leading-relaxed">{technology}</p>
+                </section>
+              </FadeUp>
+
+              
+              {useCases.length > 0 && (
+                <FadeUp delay={0.45}>
+                  <section>
+                    <h2 className="text-2xl font-display text-white mb-6">Common Use Cases</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {useCases.map((uc: any, i: number) => (
+                        <div key={i} className="p-6 bg-primary/5 border border-primary/20 rounded-2xl">
+                          <h3 className="text-primary font-medium mb-2">{uc.title}</h3>
+                          <p className="text-sm text-text-muted">{uc.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                </FadeUp>
+              )}
+
+              {benefits.length > 0 && (
+                <FadeUp delay={0.4}>
+                  <section>
+                    <h2 className="text-2xl font-display text-white mb-6">Key Benefits</h2>
+                    <ul className="space-y-4">
+                      {benefits.map((benefit: string, i: number) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <CheckCircle2 className="w-6 h-6 text-primary shrink-0 mt-0.5" />
+                          <span className="text-text-muted">{benefit}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                </FadeUp>
+              )}
+
+              {processSteps.length > 0 && (
+                <FadeUp delay={0.5}>
+                  <section>
+                    <h2 className="text-2xl font-display text-white mb-6">Implementation Process</h2>
+                    <div className="space-y-6 relative before:absolute before:inset-0 before:ml-4 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent">
+                      {processSteps.map((step: any, i: number) => (
+                        <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full border border-white/20 bg-background text-text-muted shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">
+                            <span className="text-xs font-semibold">{i + 1}</span>
+                          </div>
+                          <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-white/5 bg-surface/50">
+                            <h3 className="text-white font-medium mb-1">{step.step}</h3>
+                            <p className="text-sm text-text-muted">{step.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                </FadeUp>
+              )}
+
+              {faqs.length > 0 && (
+                <FadeUp delay={0.6}>
+                  <section>
+                    <h2 className="text-2xl font-display text-white mb-6">Frequently Asked Questions</h2>
+                    <div className="space-y-4">
+                      {faqs.map((faq: any, i: number) => (
+                        <div key={i} className="p-6 bg-surface border border-white/5 rounded-2xl">
+                          <h3 className="text-white font-medium mb-2">{faq.q}</h3>
+                          <p className="text-text-muted text-sm">{faq.a}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                </FadeUp>
+              )}
+
+              {serviceId === 'websites-web-apps' && (
+                <FadeUp delay={0.7}>
                   <section>
                     <div className="mb-8">
                       <h2 className="text-2xl font-display text-white mb-4">Our Recent Web Dev Projects</h2>
@@ -155,49 +260,72 @@ export function ServicesPage() {
                   </section>
                 </FadeUp>
               )}
-              
-              <FadeUp delay={0.3}>
-                 <section>
-                   <h2 className="text-2xl font-display text-white mb-6">{t("ui.execution_process")}</h2>
-                   <div className="space-y-6">
-                      {benefits.map((benefit: string, i: number) => {
-                         const parts = benefit.split(': ');
-                         const benefitTitle = parts[0];
-                         const benefitDesc = parts.length > 1 ? parts.slice(1).join(': ') : '';
-                         
-                         return (
-                           <div key={i} className="bg-background/50 border border-white/5 p-6 rounded-xl hover:border-white/10 transition-colors">
-                             <h4 className="text-white font-medium mb-2">{benefitTitle}</h4>
-                             <p className="text-text-muted font-light leading-relaxed">{benefitDesc || benefitTitle}</p>
-                           </div>
-                         )
-                      })}
-                   </div>
-                 </section>
-              </FadeUp>
+
+              {cameroonContext && cameroonContext !== `items.${serviceId}.cameroonContext` && (
+                <FadeUp delay={0.8}>
+                  <div className="p-6 bg-primary/5 border border-primary/10 rounded-2xl italic text-text-muted"> 
+                    {cameroonContext}
+                  </div>
+                </FadeUp>
+              )}
+
             </article>
 
             <aside className="col-span-1">
               <FadeUp delay={0.4}>
-                <Card className="bg-background/50 border-white/5 p-8 sticky top-32">
-                  <h3 className="text-white font-display text-lg mb-6 flex items-center gap-2">
-                    <ShieldCheck className="w-5 h-5 text-primary" /> {t("ui.core_capabilities")}
-                  </h3>
-                  <ul className="space-y-4 text-sm text-text-muted font-light">
-                    {features.map((feature: string, i: number) => (
-                      <li key={i} className="flex items-center gap-3">
-                        <div className="w-1.5 h-1.5 bg-primary/50 shadow-[0_0_8px_rgba(10,102,194,0.6)] rounded-full shrink-0"></div>{" "}
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                  <div className="mt-8 pt-8 border-t border-white/5">
-                     <p className="text-sm text-text-muted mb-4 font-light">{t("ui.ready_to_elevate")}</p>
-                     <a href="https://wa.me/message/52SRSBT3VZXQB1" target="_blank" rel="noopener noreferrer" className="border-white/10 hover:bg-white/5 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-transparent shadow-sm hover:bg-accent hover:text-accent-foreground h-11 px-8">
-      {t("ui.chat_whatsapp")}
-    </a>
-                  </div>
-                </Card>
+                <div className="sticky top-32 space-y-8">
+                  <Card className="bg-surface border-white/5 p-8">
+                    <h3 className="text-white font-display text-lg mb-4 flex items-center gap-2">
+                      <ShieldCheck className="w-5 h-5 text-primary" /> Start a Project
+                    </h3>
+                    <p className="text-sm text-text-muted mb-6 font-light">
+                      Ready to elevate your enterprise? Speak with our architecture team to discuss your requirements.
+                    </p>
+                    <div className="space-y-4">
+                      <Link to={`${langPrefix}/contact`} className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 rounded-lg flex items-center justify-center transition-colors">
+                        Request Consultation <ArrowRight className="w-4 h-4 ml-2" />
+                      </Link>
+                      <a href="https://wa.me/message/52SRSBT3VZXQB1" target="_blank" rel="noopener noreferrer" className="w-full border border-white/10 hover:bg-white/5 text-white font-medium py-3 rounded-lg flex items-center justify-center transition-colors">
+                        Chat Via WhatsApp
+                      </a>
+                    </div>
+                  </Card>
+
+                  {industriesServed.length > 0 && (
+                    <Card className="bg-surface border-white/5 p-8">
+                      <h3 className="text-white font-display text-lg mb-4 flex items-center gap-2">
+                        <Building2 className="w-5 h-5 text-primary" /> Industries Served
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {industriesServed.map((industry: string, i: number) => (
+                          <span key={i} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-text-muted">
+                            {industry}
+                          </span>
+                        ))}
+                      </div>
+                    </Card>
+                  )}
+
+                  {relatedServices.length > 0 && (
+                    <Card className="bg-surface border-white/5 p-8">
+                      <h3 className="text-white font-display text-lg mb-4">Related Services</h3>
+                      <ul className="space-y-3">
+                        {relatedServices.map((relId: string, i: number) => {
+                          const relService = servicesRegistry.find(s => s.id === relId);
+                          if (!relService) return null;
+                          return (
+                            <li key={i}>
+                              <Link to={`${langPrefix}/services/${relId}`} className="flex items-center text-sm text-text-muted hover:text-primary transition-colors group">
+                                <ArrowRight className="w-3 h-3 mr-2 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                {t(`items.${relId}.title`, { defaultValue: relId })}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </Card>
+                  )}
+                </div>
               </FadeUp>
             </aside>
           </div>

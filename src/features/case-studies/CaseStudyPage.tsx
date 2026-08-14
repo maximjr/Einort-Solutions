@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { Container } from "../../components/layout/Container";
 import { FadeUp } from "../../components/animations/FadeUp";
 import { CheckCircle2 } from "lucide-react";
+import { SEO } from "../../components/seo/SEO";
 import { Helmet } from "react-helmet-async";
 import { Breadcrumbs } from "../../components/ui/Breadcrumbs";
 
@@ -92,10 +93,10 @@ export function CaseStudyPage() {
 
   return (
     <main className="min-h-dvh pt-32 pb-24 relative z-10 selection:bg-primary selection:text-white">
-      <Helmet>
-        <title>{data.title} | Case Study</title>
-        <meta name="description" content={data.overview} />
-      </Helmet>
+      <SEO 
+        title={`${data.title} | Case Study | EINORT Solutions`}
+        description={data.overview}
+      />
 
       <Container>
         <article className="max-w-4xl mx-auto">

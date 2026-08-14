@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, lazy } from "react";
 import { lazyWithRetry } from "./lib/lazyWithRetry";
 import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
@@ -41,6 +41,8 @@ const ContactForm = Loadable(
 const ContactPage = Loadable(
   lazyWithRetry(() => import("./features/contact/ContactPage").then((m) => ({ default: m.ContactPage }))),
 );
+
+const WorkPage = lazy(() => import("./features/work/WorkPage"));
 const AboutPage = Loadable(
   lazyWithRetry(() => import("./features/about/AboutPage").then((m) => ({ default: m.AboutPage }))),
 );
@@ -209,6 +211,8 @@ function Layout() {
   );
 }
 
+import InsightsPage from "./features/insights/InsightsPage";
+import ArticlePage from "./features/insights/ArticlePage";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ErrorBoundary } from "./components/shared/ErrorBoundary";
 import { useParams, Navigate, useLocation } from "react-router-dom";
@@ -273,8 +277,25 @@ export default function App() {
                     </Suspense>
                   }
                 />
+                
                 <Route
-                  path="contact"
+                  path="insights"
+                  element={
+                    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>}>
+                      <InsightsPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="insights/:articleSlug"
+                  element={
+                    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>}>
+                      <ArticlePage />
+                    </Suspense>
+                  }
+                />
+                <Route path="work" element={<Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>}><WorkPage /></Suspense>} />
+                <Route path="contact"
                   element={
                     <Suspense
                       fallback={

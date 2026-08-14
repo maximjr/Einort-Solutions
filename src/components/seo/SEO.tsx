@@ -44,6 +44,26 @@ export function SEO({
           title: t("client_portal.title"),
           description: t("client_portal.description"),
         };
+      case "/about":
+        return {
+          title: t("about.title"),
+          description: t("about.description"),
+        };
+      case "/contact":
+        return {
+          title: t("contact.title"),
+          description: t("contact.description"),
+        };
+      case "/services":
+        return {
+          title: t("services_index.title"),
+          description: t("services_index.description"),
+        };
+      case "/insights":
+        return {
+          title: t("insights.title"),
+          description: t("insights.description"),
+        };
       default:
         if (normalizedPath.startsWith("/locations/")) {
           const region = normalizedPath
@@ -57,8 +77,22 @@ export function SEO({
           };
         }
         if (normalizedPath.startsWith("/services/")) {
-          const serviceName = normalizedPath
-            .replace("/services/", "")
+          const serviceId = normalizedPath.replace("/services/", "");
+          
+          const titleKey = `services.specific.${serviceId}.title`;
+          const descKey = `services.specific.${serviceId}.description`;
+          
+          const specificTitle = t(titleKey);
+          const specificDesc = t(descKey);
+
+          if (specificTitle !== titleKey && specificDesc !== descKey) {
+            return {
+              title: specificTitle,
+              description: specificDesc
+            };
+          }
+
+          const serviceName = serviceId
             .replace(/-/g, " ");
           const formattedService =
             serviceName.charAt(0).toUpperCase() + serviceName.slice(1);

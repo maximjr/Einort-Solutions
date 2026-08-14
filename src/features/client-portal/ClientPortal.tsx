@@ -26,6 +26,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
+import { SEO } from "../../components/seo/SEO";
 import { Helmet } from "react-helmet-async";
 
 import { useTranslation } from "react-i18next";
@@ -192,10 +193,10 @@ export function ClientPortal() {
 
   return (
     <>
-      <Helmet>
-        <title>{t("seo.title")}</title>
-        <meta name="description" content={t("seo.description")} />
-      </Helmet>
+      <SEO 
+        title={t("seo.title")}
+        description={t("seo.description")}
+      />
       <section className="py-24 bg-[#030712] min-h-dvh relative pt-32 overflow-hidden">
         {/* Premium Background Ambience */}
         <div className="absolute top-0 left-1/2 w-[800px] h-[600px] bg-primary/5 blur-[150px] pointer-events-none rounded-full -translate-x-1/2 -translate-y-1/2"></div>
